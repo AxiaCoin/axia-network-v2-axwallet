@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -25,13 +24,11 @@ class _ReceivePageState extends State<ReceivePage> {
     CommonWidgets.snackBar(coinData.address);
   }
 
-  //TODO: Build set amount function and widget
-  setAmount() {
-
-  }
+  setAmount() {}
 
   shareAddress() {
-    String message = "Hello, you can send me ${coinData.name} at my wallet address- $shareableAddress}";
+    String message =
+        "Hello, you can send me ${coinData.name} at my wallet address- $shareableAddress}";
     Share.share(message);
   }
 
@@ -45,7 +42,9 @@ class _ReceivePageState extends State<ReceivePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Receive ${coinData.name}"),),
+      appBar: AppBar(
+        title: Text("Receive ${coinData.name}"),
+      ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -53,9 +52,13 @@ class _ReceivePageState extends State<ReceivePage> {
           // Container(padding: EdgeInsets.only(top: Get.width * 0.15), child: OnboardWidgets.title("QR Code")),
           // Spacer(),
           Container(
-            padding: EdgeInsets.only(left: Get.width * 0.15, right: Get.width * 0.15, top: Get.width * 0.1),
+            padding: EdgeInsets.only(
+                left: Get.width * 0.15,
+                right: Get.width * 0.15,
+                top: Get.width * 0.1),
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               elevation: 4,
               // margin: EdgeInsets.all(Get.width * 0.05),
               child: Container(
@@ -85,10 +88,11 @@ class _ReceivePageState extends State<ReceivePage> {
           Text.rich(
             TextSpan(text: "Send only ", children: [
               TextSpan(
-                text: "${coinData.name} ",
-                style: TextStyle(fontWeight: FontWeight.bold)
-              ),
-              TextSpan(text: "to this address.\nSending any other coins may result in permanent loss")
+                  text: "${coinData.name} ",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      "to this address.\nSending any other coins may result in permanent loss")
             ]),
             style: TextStyle(color: Colors.black54, fontSize: 13),
             textAlign: TextAlign.center,
@@ -96,9 +100,21 @@ class _ReceivePageState extends State<ReceivePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              HomeWidgets.quickAction(icon: Icon(Icons.copy), text: "Copy", onPressed: copyAddress, whiteBG: true),
-              HomeWidgets.quickAction(icon: Icon(Icons.local_offer_outlined), text: "Set Amount", onPressed: (){}, whiteBG: true),
-              HomeWidgets.quickAction(icon: Icon(Icons.share), text: "Share", onPressed: shareAddress, whiteBG: true)
+              HomeWidgets.quickAction(
+                  icon: Icon(Icons.copy),
+                  text: "Copy",
+                  onPressed: copyAddress,
+                  whiteBG: true),
+              HomeWidgets.quickAction(
+                  icon: Icon(Icons.local_offer_outlined),
+                  text: "Set Amount",
+                  onPressed: () {},
+                  whiteBG: true),
+              HomeWidgets.quickAction(
+                  icon: Icon(Icons.adaptive.share),
+                  text: "Share",
+                  onPressed: shareAddress,
+                  whiteBG: true)
             ],
           )
         ],

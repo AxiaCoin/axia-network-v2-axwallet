@@ -17,20 +17,25 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
         title: Text("DApp Browser"),
       ),
       body: Container(
-      child: Column(
-        children: [
-          SwitchListTile(
+        child: Column(
+          children: [
+            SwitchListTile.adaptive(
               title: Text("Enable"),
-              value: useBrowser, onChanged: (val) {
-                setState(() {
-                  useBrowser = val;
-                });
-          }),
-          ListTile(
-            title: Text("Clear browser cache"),
-          )
-        ],
+              value: useBrowser,
+              onChanged: (val) {
+                setState(
+                  () {
+                    useBrowser = val;
+                  },
+                );
+              },
+            ),
+            ListTile(
+              title: Text("Clear browser cache"),
+            )
+          ],
+        ),
       ),
-    ),);
+    );
   }
 }

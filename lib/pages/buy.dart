@@ -8,7 +8,8 @@ import 'package:wallet/widgets/number_keyboard.dart';
 class BuyPage extends StatefulWidget {
   final CoinData coinData;
   final double minimum;
-  const BuyPage({Key? key, required this.coinData, required this.minimum}) : super(key: key);
+  const BuyPage({Key? key, required this.coinData, required this.minimum})
+      : super(key: key);
 
   @override
   _BuyPageState createState() => _BuyPageState();
@@ -21,11 +22,8 @@ class _BuyPageState extends State<BuyPage> {
   bool isValid = true;
   bool isLower = false;
   bool isHigher = false;
-  List providers = [
-    "MoonPay", "Simplex"
-  ];
+  List providers = ["MoonPay", "Simplex"];
   int providerIndex = 0;
-
 
   @override
   void initState() {
@@ -33,15 +31,19 @@ class _BuyPageState extends State<BuyPage> {
     coinData = widget.coinData;
     minimum = widget.minimum;
     controller = new TextEditingController(text: minimum.toStringAsFixed(0));
-    controller.addListener(() {
-      setState(() {});
-    });
+    controller.addListener(
+      () {
+        setState(() {});
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    String exchangeRate = FormatText.exchangeValue(coinData.value, 1, controller.text);
-    double currentInput = double.parse(controller.text == "" ? "0" : controller.text);
+    String exchangeRate =
+        FormatText.exchangeValue(coinData.value, 1, controller.text);
+    double currentInput =
+        double.parse(controller.text == "" ? "0" : controller.text);
     if (currentInput < minimum) {
       isLower = true;
       isHigher = false;
@@ -60,27 +62,32 @@ class _BuyPageState extends State<BuyPage> {
           //brightness: Brightness.dark,
           title: Text("Buy ${coinData.unit}"),
           centerTitle: true,
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.info_outline))],
+          actions: [
+            IconButton(onPressed: () {}, icon: Icon(Icons.info_outline))
+          ],
         );
 
     Widget provider() {
-
       Widget bestRate() => Container(
           padding: EdgeInsets.all(2),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.green.withOpacity(0.2)
-          ),
-          child: Text("Best rate", style: context.textTheme.caption!.copyWith(color: Colors.green[900]),));
+              color: Colors.green.withOpacity(0.2)),
+          child: Text(
+            "Best rate",
+            style:
+                context.textTheme.caption!.copyWith(color: Colors.green[900]),
+          ));
 
       showProviders() {
-        Get.bottomSheet(Container(
-          color: Colors.white,
-          child: ListView.builder(
+        Get.bottomSheet(
+          Container(
+            color: Colors.white,
+            child: ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: providers.length,
-              itemBuilder: (context, index){
+              itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(providers[index]),
                   leading: FlutterLogo(),
@@ -96,15 +103,17 @@ class _BuyPageState extends State<BuyPage> {
                       ],
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
                       providerIndex = index;
                     });
                     Get.back();
                   },
                 );
-              }),
-        ));
+              },
+            ),
+          ),
+        );
       }
 
       return Container(
@@ -124,7 +133,9 @@ class _BuyPageState extends State<BuyPage> {
             ],
           ),
           onTap: showProviders,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)), side: BorderSide(width: 1, color: Colors.black45)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              side: BorderSide(width: 1, color: Colors.black45)),
         ),
       );
     }
@@ -140,12 +151,15 @@ class _BuyPageState extends State<BuyPage> {
               style: context.textTheme.headline2,
               textAlign: TextAlign.center,
             ),
-            Text(isLower
-                ? "\$$minimum Minimum Purchase"
-                : isHigher
-                    ? "\$20000 Maximum Purchase"
-                    : "~$exchangeRate ${coinData.unit}",
-            style: context.textTheme.subtitle2!.copyWith(color: Colors.black45),),
+            Text(
+              isLower
+                  ? "\$$minimum Minimum Purchase"
+                  : isHigher
+                      ? "\$20000 Maximum Purchase"
+                      : "~$exchangeRate ${coinData.unit}",
+              style:
+                  context.textTheme.subtitle2!.copyWith(color: Colors.black45),
+            ),
             // TextField(
             //   controller: controller,
             //   autofocus: true,
@@ -158,9 +172,11 @@ class _BuyPageState extends State<BuyPage> {
             // ),
             Spacer(),
             provider(),
-            SizedBox(height: 8,),
+            SizedBox(
+              height: 8,
+            ),
             NumberKeyboard(
-                controller: controller,
+              controller: controller,
               backgroundOpacity: 0,
             ),
             SizedBox(

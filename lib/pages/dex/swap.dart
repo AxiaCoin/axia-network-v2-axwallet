@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -39,14 +38,13 @@ class _SwapPageState extends State<SwapPage> {
         double payValue = payToken.value;
         double getValue = getToken.value;
         // double exchangeValue = (getValue / payValue) * double.parse(payController.text);
-        String exchangeValue = FormatText.exchangeValue(payValue, getValue, payController.text);
+        String exchangeValue =
+            FormatText.exchangeValue(payValue, getValue, payController.text);
         setState(() {
           getController.text = exchangeValue == "0" ? "" : exchangeValue;
         });
       } else if (focusMode == FocusMode.get) {
-        setState(() {
-
-        });
+        setState(() {});
       } else {
         setState(() {
           getController.text = "";
@@ -58,14 +56,13 @@ class _SwapPageState extends State<SwapPage> {
         double payValue = payToken.value;
         double getValue = getToken.value;
         // double exchangeValue = (getValue / payValue) * double.parse(payController.text);
-        String exchangeValue = FormatText.exchangeValue(getValue, payValue, getController.text);
+        String exchangeValue =
+            FormatText.exchangeValue(getValue, payValue, getController.text);
         setState(() {
           payController.text = exchangeValue == "0" ? "" : exchangeValue;
         });
       } else if (focusMode == FocusMode.pay) {
-        setState(() {
-
-        });
+        setState(() {});
       } else {
         setState(() {
           payController.text = "";
@@ -82,31 +79,44 @@ class _SwapPageState extends State<SwapPage> {
     numPadVisibility = focusMode != FocusMode.none;
 
     Widget proportion(int value) => Expanded(
-      child: GestureDetector(
-        onTap: (){
-          focusMode = FocusMode.pay;
-          payController.text = FormatText.roundOff(((value / 100) * balanceInfo[payToken]!));
-        },
-        child: Container(
+          child: GestureDetector(
+            onTap: () {
+              focusMode = FocusMode.pay;
+              payController.text =
+                  FormatText.roundOff(((value / 100) * balanceInfo[payToken]!));
+            },
+            child: Container(
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 color: appColor.withOpacity(0.2),
               ),
-              child: Text("$value%", style: context.textTheme.caption, textAlign: TextAlign.center,),
+              child: Text(
+                "$value%",
+                style: context.textTheme.caption,
+                textAlign: TextAlign.center,
+              ),
             ),
-      ),
-    );
+          ),
+        );
 
     Widget suffix(CoinData coinData) => Row(
           mainAxisSize: MainAxisSize.min,
-          children: [FlutterLogo(), Text(coinData.name), Icon(Icons.navigate_next)],
+          children: [
+            FlutterLogo(),
+            Text(coinData.name),
+            Icon(Icons.navigate_next)
+          ],
         );
 
     Widget formField({required bool payMode}) {
       CoinData token = payMode ? payToken : getToken;
       return Container(
-        padding: EdgeInsets.only(left: 16, right: 16, top: payMode ? 16 : 8, bottom: payMode ? 8 : 16),
+        padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: payMode ? 16 : 8,
+            bottom: payMode ? 8 : 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +134,10 @@ class _SwapPageState extends State<SwapPage> {
                     controller: payMode ? payController : getController,
                     showCursor: true,
                     readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none, hintText: "0"),
+                    decoration: InputDecoration(
+                        border: InputBorder.none, hintText: "0"),
                     style: TextStyle(fontSize: 24),
-                    onTap: (){
+                    onTap: () {
                       setState(() {
                         focusMode = payMode ? FocusMode.pay : FocusMode.get;
                       });
@@ -134,14 +145,15 @@ class _SwapPageState extends State<SwapPage> {
                   ),
                 ),
                 GestureDetector(
-                    onTap: (){
-                      Get.to(() => SearchPage(searchMode: SearchMode.swap))!.then((value) => setState(() {
-                        if (payMode) {
-                          payToken = value;
-                        } else {
-                          getToken = value;
-                        }
-                      }));
+                    onTap: () {
+                      Get.to(() => SearchPage(searchMode: SearchMode.swap))!
+                          .then((value) => setState(() {
+                                if (payMode) {
+                                  payToken = value;
+                                } else {
+                                  getToken = value;
+                                }
+                              }));
                     },
                     child: suffix(token))
               ],
@@ -175,7 +187,7 @@ class _SwapPageState extends State<SwapPage> {
                 ),
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   CoinData temp = getToken;
                   payController.clear();
                   getController.clear();
@@ -190,8 +202,10 @@ class _SwapPageState extends State<SwapPage> {
                     // height: 50,
                     // width: 50,
                     padding: EdgeInsets.all(8),
-                    decoration:
-                        BoxDecoration(shape: BoxShape.circle, border: Border.all(color: context.theme.dividerColor), color: Colors.white),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: context.theme.dividerColor),
+                        color: Colors.white),
                     child: Icon(Icons.swap_vert_outlined),
                   ),
                 ),
@@ -201,7 +215,7 @@ class _SwapPageState extends State<SwapPage> {
         );
 
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {
           currentFocus.unfocus();
@@ -222,24 +236,49 @@ class _SwapPageState extends State<SwapPage> {
                     padding: const EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [proportion(25), SizedBox(width: 8,), proportion(50), SizedBox(width: 8,), proportion(75), SizedBox(width: 8,), proportion(100)],
+                      children: [
+                        proportion(25),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        proportion(50),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        proportion(75),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        proportion(100)
+                      ],
                     ),
                   ),
-                  SizedBox(height: 16,),
+                  SizedBox(
+                    height: 16,
+                  ),
                   Container(
                     width: Get.width,
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: ElevatedButton(onPressed: () {
-                      Get.to(() => ConfirmationPage(from: payToken, to: getToken, fromValue: payController.text, toValue: getController.text))!.then((value) {
-                        if (value) {
-                          getController.clear();
-                          payController.clear();
-                          setState(() {
-                            focusMode = FocusMode.none;
-                          });
-                        }
-                      });
-                    }, child: Text("SWAP"), style: MyButtonStyles.statefulStyle(isValid),),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.to(() => ConfirmationPage(
+                                from: payToken,
+                                to: getToken,
+                                fromValue: double.parse(payController.text),
+                                toValue: double.parse(getController.text)))!
+                            .then((value) {
+                          if (value) {
+                            getController.clear();
+                            payController.clear();
+                            setState(() {
+                              focusMode = FocusMode.none;
+                            });
+                          }
+                        });
+                      },
+                      child: Text("SWAP"),
+                      style: MyButtonStyles.statefulStyle(isValid),
+                    ),
                   )
                 ],
               ),
@@ -247,11 +286,12 @@ class _SwapPageState extends State<SwapPage> {
             Visibility(
               visible: numPadVisibility,
               child: Align(
-                alignment: Alignment.bottomCenter,
+                  alignment: Alignment.bottomCenter,
                   child: NumberKeyboard(
-                    controller: focusMode == FocusMode.pay ? payController : getController,
-                  )
-              ),
+                    controller: focusMode == FocusMode.pay
+                        ? payController
+                        : getController,
+                  )),
             )
           ],
         ),
@@ -261,14 +301,10 @@ class _SwapPageState extends State<SwapPage> {
 
   @override
   void dispose() {
-    super.dispose();
     payController.dispose();
     getController.dispose();
+    super.dispose();
   }
 }
 
-enum FocusMode {
-  none,
-  pay,
-  get
-}
+enum FocusMode { none, pay, get }

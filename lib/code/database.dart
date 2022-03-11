@@ -5,7 +5,6 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
 
 class TokenData extends GetxController {
-  //TODO: make the change value random
   var data = List.generate(20, (i) => CoinData("Coin $i", "XCN$i", 123.45, "1.2")).obs;
   var selected;
   changeSelection(int index, bool value) {

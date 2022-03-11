@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -53,15 +51,19 @@ class _QRScanPageState extends State<QRScanPage> {
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      if (result == null) {
-        setState(() {
-          result = scanData;
-          Get.back(result: result!.code);
-          controller.dispose();
-        });
-      }
-    });
+    controller.scannedDataStream.listen(
+      (scanData) {
+        if (result == null) {
+          setState(
+            () {
+              result = scanData;
+              Get.back(result: result!.code);
+              controller.dispose();
+            },
+          );
+        }
+      },
+    );
   }
 
   @override

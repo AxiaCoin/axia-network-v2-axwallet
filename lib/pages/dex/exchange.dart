@@ -38,7 +38,8 @@ class _ExchangePageState extends State<ExchangePage> {
           ),
         );
 
-    Widget tickerItem(double price, double amount, double max, Color color) => Container(
+    Widget tickerItem(double price, double amount, double max, Color color) =>
+        Container(
           padding: EdgeInsets.symmetric(vertical: 2),
           child: Stack(
             alignment: Alignment.centerRight,
@@ -55,7 +56,10 @@ class _ExchangePageState extends State<ExchangePage> {
                     FormatText.roundOff(price, maxDecimals: 4),
                     style: TextStyle(fontSize: 16, color: color),
                   ),
-                  Text(FormatText.roundOff(amount, maxDecimals: 2), style: TextStyle(color: color),)
+                  Text(
+                    FormatText.roundOff(amount, maxDecimals: 2),
+                    style: TextStyle(color: color),
+                  )
                 ],
               ),
             ],
@@ -77,7 +81,7 @@ class _ExchangePageState extends State<ExchangePage> {
                   ],
                 ),
                 trailing: Icon(Icons.navigate_next),
-                onTap: (){
+                onTap: () {
                   pushNewScreen(context, screen: MarketsPage());
                 },
               ),
@@ -97,9 +101,13 @@ class _ExchangePageState extends State<ExchangePage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         style: TextButton.styleFrom(
-                            backgroundColor: buyMode ? tickerGreen : Colors.blueGrey.withOpacity(0.4),
+                            backgroundColor: buyMode
+                                ? tickerGreen
+                                : Colors.blueGrey.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.horizontal(left: Radius.circular(5), right: Radius.circular(0)))),
+                                borderRadius: BorderRadius.horizontal(
+                                    left: Radius.circular(5),
+                                    right: Radius.circular(0)))),
                       ),
                     ),
                   ),
@@ -117,9 +125,13 @@ class _ExchangePageState extends State<ExchangePage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         style: TextButton.styleFrom(
-                            backgroundColor: !buyMode ? tickerRed : Colors.blueGrey.withOpacity(0.4),
+                            backgroundColor: !buyMode
+                                ? tickerRed
+                                : Colors.blueGrey.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.horizontal(left: Radius.circular(0), right: Radius.circular(5)))),
+                                borderRadius: BorderRadius.horizontal(
+                                    left: Radius.circular(0),
+                                    right: Radius.circular(5)))),
                       ),
                     ),
                   ),
@@ -129,13 +141,15 @@ class _ExchangePageState extends State<ExchangePage> {
                 height: 16,
               ),
               TextField(
-                decoration: InputDecoration(labelText: "Price BUSD", border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                    labelText: "Price BUSD", border: OutlineInputBorder()),
               ),
               SizedBox(
                 height: 32,
               ),
               TextField(
-                decoration: InputDecoration(labelText: "Amount DOT", border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                    labelText: "Amount DOT", border: OutlineInputBorder()),
               ),
               SizedBox(
                 height: 16,
@@ -196,7 +210,9 @@ class _ExchangePageState extends State<ExchangePage> {
                   style: TextButton.styleFrom(
                       backgroundColor: buyMode ? tickerGreen : tickerRed,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.horizontal(left: Radius.circular(5), right: Radius.circular(5)))),
+                          borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(5),
+                              right: Radius.circular(5)))),
                 ),
               )
             ],
@@ -220,9 +236,9 @@ class _ExchangePageState extends State<ExchangePage> {
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     var rand = Random().nextDouble();
-                    double price = 44.353 + index*rand;
+                    double price = 44.353 + index * rand;
                     double max = 210.7;
-                    double amount = index == 5 ? max : 10 + index*rand;
+                    double amount = index == 5 ? max : 10 + index * rand;
                     return tickerItem(price, amount, max, tickerRed);
                   }),
               Padding(
@@ -230,23 +246,32 @@ class _ExchangePageState extends State<ExchangePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("49.134", style: TextStyle(color: tickerRed),),
-                    SizedBox(width: 4,),
-                    Icon(Icons.arrow_downward, color: tickerRed,)
+                    Text(
+                      "49.134",
+                      style: TextStyle(color: tickerRed),
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Icon(
+                      Icons.arrow_downward,
+                      color: tickerRed,
+                    )
                   ],
                 ),
               ),
               ListView.builder(
-                  itemCount: 6,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    var rand = Random().nextDouble();
-                    double price = 44.353 + index*rand;
-                    double max = 210.7;
-                    double amount = index == 0 ? max : 10 + index*rand;
-                    return tickerItem(price, amount, max, tickerGreen);
-                  }),
+                itemCount: 6,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  var rand = Random().nextDouble();
+                  double price = 44.353 + index * rand;
+                  double max = 210.7;
+                  double amount = index == 0 ? max : 10 + index * rand;
+                  return tickerItem(price, amount, max, tickerGreen);
+                },
+              ),
             ],
           ),
         );
@@ -282,23 +307,35 @@ class _ExchangePageState extends State<ExchangePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Open Orders", style: TextStyle(fontSize: 16),),
-                      TextButton(onPressed: (){
-                        pushNewScreen(context, screen: AllOpenOrdersPage());
-                      }, child: Text("All", style: TextStyle(fontSize: 16)),)
+                      Text(
+                        "Open Orders",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          pushNewScreen(context, screen: AllOpenOrdersPage());
+                        },
+                        child: Text("All", style: TextStyle(fontSize: 16)),
+                      )
                     ],
                   ),
                 ),
                 ListView.builder(
                   shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 1,
-                    itemBuilder: (context, index){
-                  return Padding(
-                    padding: EdgeInsets.only(top:60),
-                    child: Center(child: Text("Open Orders will appear here", style: context.textTheme.caption!.copyWith(fontSize: 14),)),
-                  );
-                })
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: 1,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(top: 60),
+                      child: Center(
+                          child: Text(
+                        "Open Orders will appear here",
+                        style:
+                            context.textTheme.caption!.copyWith(fontSize: 14),
+                      )),
+                    );
+                  },
+                )
               ],
             ),
           ),

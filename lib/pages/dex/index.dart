@@ -20,28 +20,29 @@ class _DEXPageState extends State<DEXPage> {
 
   @override
   Widget build(BuildContext context) {
-
     AppBar appBar() => AppBar(
-      centerTitle: true,
-      title: SizedBox(
-        width: Get.width * 0.8,
-        child: CupertinoSlidingSegmentedControl<int>(
-          children: {
-            0: HomeWidgets.segmentedText("Swap"),
-            1: HomeWidgets.segmentedText("Exchange"),
-          },
-          groupValue: slidingIndex,
-          onValueChanged: (int? val) {
-            setState(() {
-              slidingIndex = val!;
-              pageController.jumpToPage(val);
-            });
-          },
-          backgroundColor: Colors.black.withOpacity(0.2),
-          thumbColor: appColor,
-        ),
-      ),
-    );
+          centerTitle: true,
+          title: SizedBox(
+            width: Get.width * 0.8,
+            child: CupertinoSlidingSegmentedControl<int>(
+              children: {
+                0: HomeWidgets.segmentedText("Swap"),
+                1: HomeWidgets.segmentedText("Exchange"),
+              },
+              groupValue: slidingIndex,
+              onValueChanged: (int? val) {
+                setState(
+                  () {
+                    slidingIndex = val!;
+                    pageController.jumpToPage(val);
+                  },
+                );
+              },
+              backgroundColor: Colors.black.withOpacity(0.2),
+              thumbColor: appColor,
+            ),
+          ),
+        );
 
     return Scaffold(
       appBar: appBar(),
@@ -55,7 +56,7 @@ class _DEXPageState extends State<DEXPage> {
 
   @override
   void dispose() {
-    super.dispose();
     pageController.dispose();
+    super.dispose();
   }
 }

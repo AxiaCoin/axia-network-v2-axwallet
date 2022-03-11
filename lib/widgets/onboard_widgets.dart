@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wallet/code/models.dart';
-
 class OnboardWidgets {
   OnboardWidgets._();
 

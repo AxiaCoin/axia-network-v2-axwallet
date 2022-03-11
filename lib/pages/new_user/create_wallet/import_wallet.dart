@@ -30,94 +30,106 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   Widget build(BuildContext context) {
     isValid = phraseController.text != "" && nameController.text != "";
     return Scaffold(
-        appBar: AppBar(
-          //brightness: Brightness.dark,
-          title: Text("Import Wallet"),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.qr_code_scanner),
-              onPressed: (){
-                Get.to(() => QRScanPage())!.then((value) => updateFields(value));
-              },
-            )
-          ],
-        ),
-        body: new GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
-          child: Container(
-            padding: EdgeInsets.all(8),
-            height: Get.height,
-            width: Get.width,
-            color: Colors.transparent,
-            child: Stack(
-              // alignment: Alignment.bottomCenter,
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      TextFormField(
-                        controller: nameController,
-                        validator: (val) => val == "" ? "Please enter a name for the wallet" : null,
-                        autovalidateMode: AutovalidateMode.always,
-                        decoration: InputDecoration(
-                          labelText: "Name",
-                          border: OutlineInputBorder()
-                        ),
-                        onChanged: (val) => setState((){}),
+      appBar: AppBar(
+        //brightness: Brightness.dark,
+        title: Text("Import Wallet"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.qr_code_scanner),
+            onPressed: () {
+              Get.to(() => QRScanPage())!.then((value) => updateFields(value));
+            },
+          )
+        ],
+      ),
+      body: new GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
+        child: Container(
+          padding: EdgeInsets.all(8),
+          height: Get.height,
+          width: Get.width,
+          color: Colors.transparent,
+          child: Stack(
+            // alignment: Alignment.bottomCenter,
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    TextFormField(
+                      controller: nameController,
+                      validator: (val) => val == ""
+                          ? "Please enter a name for the wallet"
+                          : null,
+                      autovalidateMode: AutovalidateMode.always,
+                      decoration: InputDecoration(
+                          labelText: "Name", border: OutlineInputBorder()),
+                      onChanged: (val) => setState(() {}),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    TextFormField(
+                      controller: phraseController,
+                      decoration: InputDecoration(
+                        labelText: "Phrase",
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(),
                       ),
-                      SizedBox(height: 16,),
-                      TextFormField(
-                        controller: phraseController,
-                        decoration: InputDecoration(
-                            labelText: "Phrase",
-                            alignLabelWithHint: true,
-                            border: OutlineInputBorder(),
-                        ),
-                        onChanged: (val) => setState((){}),
-                        minLines: 4,
-                        maxLines: null,
+                      onChanged: (val) => setState(() {}),
+                      minLines: 4,
+                      maxLines: null,
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: TextButton(
+                        child: Text("Paste"),
+                        onPressed: () async {
+                          ClipboardData? data =
+                              await Clipboard.getData('text/plain');
+                          setState(
+                            () {
+                              phraseController.text = data!.text!;
+                            },
+                          );
+                        },
                       ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: TextButton(child: Text("Paste"), onPressed: () async {
-                          ClipboardData? data = await Clipboard.getData('text/plain');
-                          setState(() {
-                            phraseController.text = data!.text!;
-                          });
-                        },),
-                      ),
-                      OnboardWidgets.subtitle("Typically 12 (sometimes 24) words separated by single spaces"),
-                      // Spacer(),
-                    ],
-                  ),
+                    ),
+                    OnboardWidgets.subtitle(
+                        "Typically 12 (sometimes 24) words separated by single spaces"),
+                    // Spacer(),
+                  ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    width: Get.width,
-                    // alignment: Alignment.bottomCenter,
-                    padding: EdgeInsets.only(top: 16),
-                    child: ElevatedButton(
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  width: Get.width,
+                  // alignment: Alignment.bottomCenter,
+                  padding: EdgeInsets.only(top: 16),
+                  child: ElevatedButton(
                       // style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30)))),
-                        style: MyButtonStyles.statefulStyle(isValid),
-                        onPressed: () {
-                          // if (isValid) Get.offAll(() => HomePage());
-                          if (isValid) Get.offAll(() => HomePage());
-                        }, child: Text("IMPORT")),
-                  ),
+                      style: MyButtonStyles.statefulStyle(isValid),
+                      onPressed: () {
+                        // if (isValid) Get.offAll(() => HomePage());
+                        if (isValid) Get.offAll(() => HomePage());
+                      },
+                      child: Text("IMPORT")),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   @override
   void dispose() {
-    super.dispose();    phraseController.dispose();
+    phraseController.dispose();
     nameController.dispose();
+    super.dispose();
   }
 }

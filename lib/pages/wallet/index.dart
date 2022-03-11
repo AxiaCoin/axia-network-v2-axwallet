@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
 import 'package:wallet/pages/search.dart';
@@ -34,9 +31,14 @@ class _WalletPageState extends State<WalletPage> {
                 ? IconButton(
                     icon: Icon(Icons.tune_outlined),
                     onPressed: () {
-                      pushNewScreen(context, screen: SearchPage(searchMode: SearchMode.customize,)).then((value) {
-                        tokensKey.currentState?.setState(() {});
-                      });
+                      pushNewScreen(context,
+                          screen: SearchPage(
+                            searchMode: SearchMode.customize,
+                          )).then(
+                        (value) {
+                          tokensKey.currentState?.setState(() {});
+                        },
+                      );
                     },
                   )
                 : Container()
@@ -56,10 +58,12 @@ class _WalletPageState extends State<WalletPage> {
             },
             groupValue: slidingIndex,
             onValueChanged: (int? val) {
-              setState(() {
-                slidingIndex = val!;
-                pageController.jumpToPage(val);
-              });
+              setState(
+                () {
+                  slidingIndex = val!;
+                  pageController.jumpToPage(val);
+                },
+              );
             },
             backgroundColor: Colors.black.withOpacity(0.2),
             thumbColor: appColor,
@@ -79,7 +83,7 @@ class _WalletPageState extends State<WalletPage> {
 
   @override
   void dispose() {
-    super.dispose();
     pageController.dispose();
+    super.dispose();
   }
 }

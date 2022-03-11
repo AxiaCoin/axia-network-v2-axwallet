@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/database.dart';
@@ -76,7 +74,7 @@ class _CollectiblesPageState extends State<CollectiblesPage> with AutomaticKeepA
     return Scaffold(
       body: Container(
         child: Center(
-          child: isLoading ? Center(child: CircularProgressIndicator()) : emptyList(),
+          child: isLoading ? Center(child: CircularProgressIndicator.adaptive()) : emptyList(),
         ),
       ),
     );

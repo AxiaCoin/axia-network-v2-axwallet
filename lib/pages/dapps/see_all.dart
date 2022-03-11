@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/webview.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 class SeeAllPage extends StatelessWidget {
   final String title;
   final List<DAppsTile> data;
