@@ -163,7 +163,7 @@ class _CoinPageState extends State<CoinPage> {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator.adaptive(),
                     ),
                   );
                 else if (data.isEmpty) return emptyList();

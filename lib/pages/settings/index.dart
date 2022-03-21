@@ -35,79 +35,97 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text("Wallets"),
               subtitle: Text("Wallet 1"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.account_balance_wallet), color: Colors.green),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.account_balance_wallet),
+                  color: Colors.green),
+              onTap: () {
                 pushNewScreen(context, screen: ManageWalletsPage());
               },
             ),
             Divider(),
-            Obx(() => SwitchListTile(
-                title: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    HomeWidgets.settingsTileIcon(icon: Icon(Icons.dark_mode), color: Colors.black),
-                    SizedBox(width: 16,),
-                    Text("Dark Mode"),
-                  ],
-                ),
-                value: settingsState.darkMode.value, onChanged: (val){
-                settingsState.toggleDarkMode();
-              }),
+            Obx(
+              () => SwitchListTile.adaptive(
+                  title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      HomeWidgets.settingsTileIcon(
+                          icon: Icon(Icons.dark_mode), color: Colors.black),
+                      SizedBox(
+                        width: 16,
+                      ),
+                      Text("Dark Mode"),
+                    ],
+                  ),
+                  value: settingsState.darkMode.value,
+                  onChanged: (val) {
+                    settingsState.toggleDarkMode();
+                  }),
             ),
             Divider(),
             ListTile(
               title: Text("Security"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.lock), color: Colors.grey),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.lock), color: Colors.grey),
+              onTap: () {
                 pushNewScreen(context, screen: SecurityPage());
               },
             ),
             ListTile(
               title: Text("Push Notifications"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.doorbell), color: Colors.red),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.doorbell), color: Colors.red),
+              onTap: () {
                 pushNewScreen(context, screen: PushNotificationsPage());
               },
             ),
             ListTile(
               title: Text("Preferences"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.settings_applications), color: Colors.lightGreen),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.settings_applications),
+                  color: Colors.lightGreen),
+              onTap: () {
                 pushNewScreen(context, screen: PreferencesPage());
               },
             ),
             ListTile(
               title: Text("Price Alerts"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.attach_money), color: Colors.pink),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.attach_money), color: Colors.pink),
+              onTap: () {
                 pushNewScreen(context, screen: PriceAlertsPage());
               },
             ),
             ListTile(
               title: Text("WalletConnect"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.ac_unit), color: Colors.blue),
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.ac_unit), color: Colors.blue),
             ),
             Divider(),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Text("Join Community", style: context.textTheme.caption!.copyWith(color: appColor),),
+              child: Text(
+                "Join Community",
+                style: context.textTheme.caption!.copyWith(color: appColor),
+              ),
             ),
             ListTile(
               title: Text("Help Center"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.help), color: Colors.orange),
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.help), color: Colors.orange),
             ),
             ListTile(
               title: Text("Feedback"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.email), color: Colors.blueGrey),
-              onTap: (){
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.email), color: Colors.blueGrey),
+              onTap: () {
                 pushNewScreen(context, screen: FeedbackPage());
               },
             ),
@@ -115,7 +133,8 @@ class _SettingsPageState extends State<SettingsPage> {
               // dense: true,
               title: Text("About"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.favorite), color: Colors.redAccent),
+              leading: HomeWidgets.settingsTileIcon(
+                  icon: Icon(Icons.favorite), color: Colors.redAccent),
             ),
           ],
         ),

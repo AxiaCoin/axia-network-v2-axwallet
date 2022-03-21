@@ -63,7 +63,7 @@ class _FinancePageState extends State<FinancePage> with AutomaticKeepAliveClient
     super.build(context);
     return Scaffold(
       body: Container(
-        child: data.isEmpty ? Center(child: CircularProgressIndicator()) : ListView.builder(
+        child: data.isEmpty ? Center(child: CircularProgressIndicator.adaptive()) : ListView.builder(
           itemCount: titles.length,
           itemBuilder: (context, index) {
             return HomeWidgets.financeList(context, title: titles[index], data: data[titles[index]]!);

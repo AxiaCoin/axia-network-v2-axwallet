@@ -18,13 +18,17 @@ class _PushNotificationsPageState extends State<PushNotificationsPage> {
       body: Container(
         child: Column(
           children: [
-            SwitchListTile(
-                title: Text("Allow Push Notifications"),
-                value: allowed, onChanged: (val) {
-              setState(() {
-                allowed = val;
-              });
-            })
+            SwitchListTile.adaptive(
+              title: Text("Allow Push Notifications"),
+              value: allowed,
+              onChanged: (val) {
+                setState(
+                  () {
+                    allowed = val;
+                  },
+                );
+              },
+            )
           ],
         ),
       ),

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -113,7 +112,7 @@ class _ReceivePageState extends State<ReceivePage> {
                   onPressed: () {},
                   whiteBG: true),
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.share),
+                  icon: Icon(Icons.adaptive.share),
                   text: "Share",
                   onPressed: shareAddress,
                   whiteBG: true)

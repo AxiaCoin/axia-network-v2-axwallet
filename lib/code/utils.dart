@@ -1,8 +1,7 @@
 
+// ignore_for_file: dead_code
+
 import 'dart:math';
-
-import 'package:wallet/code/models.dart';
-
 class FormatText {
   FormatText._();
 

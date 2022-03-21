@@ -11,13 +11,14 @@ class _AllOpenOrdersPageState extends State<AllOpenOrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("History"),
+      appBar: AppBar(
+        title: Text("History"),
+      ),
+      body: Container(
+        child: Center(
+          child: Text("History will appear here"),
         ),
-        body: Container(
-          child: Center(
-            child: Text("History will appear here"),
-          ),
-        ));
+      ),
+    );
   }
 }

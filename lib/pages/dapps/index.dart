@@ -16,7 +16,16 @@ class _DAppsPageState extends State<DAppsPage> {
   bool isLoading = true;
   bool isRefreshing = false;
   Map<String, List<DAppsTile>> data = {};
-  List<String> titles = ["New DApps", "DeFi", "Popular", "Smart Chain", "Yield Farming", "Games", "Exchanges", "Marketplaces"];
+  List<String> titles = [
+    "New DApps",
+    "DeFi",
+    "Popular",
+    "Smart Chain",
+    "Yield Farming",
+    "Games",
+    "Exchanges",
+    "Marketplaces"
+  ];
 
   Future refreshData() async {
     if (isLoading || isRefreshing) {
@@ -25,7 +34,11 @@ class _DAppsPageState extends State<DAppsPage> {
         List<DAppsTile> items = [];
         var rand = Random().nextInt(15);
         for (var i = 0; i < rand + 4; i++) {
-          items.add(DAppsTile("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed.", FlutterLogo(), "https://www.google.com/"));
+          items.add(DAppsTile(
+              "Title",
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed.",
+              FlutterLogo(),
+              "https://www.google.com/"));
         }
         data[element] = items;
       });
@@ -44,28 +57,28 @@ class _DAppsPageState extends State<DAppsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     AppBar appBar() => AppBar(
-      title: Container(
-        height: kToolbarHeight * 0.8,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(8)
+          title: Container(
+            height: kToolbarHeight * 0.8,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: Colors.white,
+            ),
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.black12,
+                  ),
+                  hintText: "Search or enter website url"),
+            ),
           ),
-          color: Colors.white,
-        ),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            prefixIcon: Icon(Icons.search, color: Colors.black12,),
-            hintText: "Search or enter website url"
-          ),
-        ),
-      ),
-    );
+        );
 
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
 
         if (!currentFocus.hasPrimaryFocus) {
@@ -75,18 +88,21 @@ class _DAppsPageState extends State<DAppsPage> {
       child: Scaffold(
         appBar: appBar(),
         body: Container(
-          child: isLoading ? Center(child: CircularProgressIndicator()) : RefreshIndicator(
-            onRefresh: () async {
-              isRefreshing = true;
-              await refreshData();
-            },
-            child: ListView.builder(
-              itemCount: titles.length,
-              itemBuilder: (context, index) {
-                return HomeWidgets.dAppsCarousel(context, title: titles[index], data: data[titles[index]]!);
-              },
-            ),
-          ),
+          child: isLoading
+              ? Center(child: CircularProgressIndicator.adaptive())
+              : RefreshIndicator(
+                  onRefresh: () async {
+                    isRefreshing = true;
+                    await refreshData();
+                  },
+                  child: ListView.builder(
+                    itemCount: titles.length,
+                    itemBuilder: (context, index) {
+                      return HomeWidgets.dAppsCarousel(context,
+                          title: titles[index], data: data[titles[index]]!);
+                    },
+                  ),
+                ),
         ),
       ),
     );
