@@ -9,7 +9,14 @@ class NumberKeyboard extends StatefulWidget {
   final double backgroundOpacity;
   final bool showClose;
 
-  NumberKeyboard({Key? key, required this.controller, this.viewFraction = 0.3, this.backgroundColor = Colors.black, this.backgroundOpacity = 0.03, this.showClose = false}) : super(key: key);
+  NumberKeyboard(
+      {Key? key,
+      required this.controller,
+      this.viewFraction = 0.3,
+      this.backgroundColor = Colors.black,
+      this.backgroundOpacity = 0.03,
+      this.showClose = false})
+      : super(key: key);
 
   @override
   _NumberKeyboardState createState() => _NumberKeyboardState();
@@ -22,7 +29,11 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
     final text = widget.controller.text;
     if (text.contains(".") && myText == ".") return;
     var textSelection = widget.controller.selection;
-    if (textSelection.baseOffset < 0) textSelection = TextSelection(baseOffset: text.length, extentOffset: text.length,);
+    if (textSelection.baseOffset < 0)
+      textSelection = TextSelection(
+        baseOffset: text.length,
+        extentOffset: text.length,
+      );
     final newText = text.replaceRange(
       textSelection.start,
       textSelection.end,
@@ -39,7 +50,9 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
   void backspace() {
     final text = widget.controller.text;
     var textSelection = widget.controller.selection;
-    if (textSelection.baseOffset < 0) textSelection = TextSelection(baseOffset: text.length, extentOffset: text.length,);
+    if (textSelection.baseOffset < 0)
+      textSelection =
+          TextSelection(baseOffset: text.length, extentOffset: text.length);
     final selectionLength = textSelection.end - textSelection.start;
     // There is a selection.
     if (selectionLength > 0) {
@@ -81,7 +94,7 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
   }
 
   Future longDelete() async {
-    while(this.isLongDeleting) {
+    while (this.isLongDeleting) {
       print("deleting $isLongDeleting");
       backspace();
       await 0.1.delay();
@@ -109,10 +122,12 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
             //   side: BorderSide(color: Colors.white, width: 5, style: BorderStyle.solid),
             // ),
 //        padding: EdgeInsets.all(20),
-            child: pad != "X" ? Text(
-              pad,
-              style: TextStyle(fontSize: 32),
-            ) : Icon(Icons.backspace),
+            child: pad != "X"
+                ? Text(
+                    pad,
+                    style: TextStyle(fontSize: 32),
+                  )
+                : Icon(Icons.backspace),
             onPressed: () {
               if (pad == "X") {
                 backspace();
@@ -131,14 +146,18 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        widget.showClose ? Icon(Icons.cancel, color: appColor,) : Container(),
+        widget.showClose
+            ? Icon(
+                Icons.cancel,
+                color: appColor,
+              )
+            : Container(),
         Container(
           // color: Colors.white,
           height: Get.height * widget.viewFraction,
           decoration: BoxDecoration(
               color: Colors.grey[200],
-              borderRadius: BorderRadius.all(Radius.circular(10))
-          ),
+              borderRadius: BorderRadius.all(Radius.circular(10))),
           // height: MediaQuery.of(context).size.height * 0.50,
           // width: MediaQuery.of(context).size.width * 0.8,
           child: Column(
@@ -187,7 +206,6 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
             ],
           ),
         ),
-
       ],
     );
   }

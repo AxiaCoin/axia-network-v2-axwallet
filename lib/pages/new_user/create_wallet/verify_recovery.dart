@@ -39,18 +39,21 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
         String item = items[i];
         wordItems.add(GestureDetector(
             onTap: () {
-              setState(() {
-                // e.selected = !e.selected;
-                if (!isSelected) {
-                  selectedList.add(item);
-                  shuffledList.remove(item);
-                } else {
-                  selectedList.remove(item);
-                  shuffledList.add(item);
-                }
-              });
+              setState(
+                () {
+                  // e.selected = !e.selected;
+                  if (!isSelected) {
+                    selectedList.add(item);
+                    shuffledList.remove(item);
+                  } else {
+                    selectedList.remove(item);
+                    shuffledList.add(item);
+                  }
+                },
+              );
             },
-            child: OnboardWidgets.wordItem(item, i + 1, showIndex: isSelected ? true : false)));
+            child: OnboardWidgets.wordItem(item, i + 1,
+                showIndex: isSelected ? true : false)));
       }
       return Container(
         child: Wrap(
@@ -63,20 +66,21 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
     }
 
     return Scaffold(
-        body: SafeArea(
-      child: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            OnboardWidgets.titleAlt("Verify Recovery phrase"),
-            OnboardWidgets.subtitle("Tap the words to put them next to each other in the correct order"),
-            // code(),
-            // actions(),
-            SizedBox(
-              height: 16,
-            ),
-            Container(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OnboardWidgets.titleAlt("Verify Recovery phrase"),
+              OnboardWidgets.subtitle(
+                  "Tap the words to put them next to each other in the correct order"),
+              // code(),
+              // actions(),
+              SizedBox(
+                height: 16,
+              ),
+              Container(
                 constraints: BoxConstraints(minHeight: Get.height * 0.1),
                 color: Colors.grey.withOpacity(0.2),
                 width: Get.width,
@@ -89,16 +93,17 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                             "Invalid Order!",
                             style: TextStyle(color: Colors.red),
                           )
-                        :                     Container()
+                        : Container()
                   ],
-                )),
-            SizedBox(
-              height: 16,
-            ),
-            challengeWidget(isSelected: false),
-            Spacer(),
-            // OnboardWidgets.neverShare(),
-            Container(
+                ),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              challengeWidget(isSelected: false),
+              Spacer(),
+              // OnboardWidgets.neverShare(),
+              Container(
                 width: Get.width,
                 padding: EdgeInsets.only(top: 8),
                 child: ElevatedButton(
@@ -109,10 +114,12 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                   },
                   child: Text("DONE"),
                   style: MyButtonStyles.statefulStyle(isValid),
-                ))
-          ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

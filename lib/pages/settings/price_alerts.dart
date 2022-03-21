@@ -18,18 +18,26 @@ class _PriceAlertsPageState extends State<PriceAlertsPage> {
         title: Text("Price Alerts"),
       ),
       body: Container(
-      child: Column(
-        children: [
-          SwitchListTile(
+        child: Column(
+          children: [
+            SwitchListTile.adaptive(
               title: Text("Price Alerts"),
-              value: priceAlert, onChanged: (val) {
-            setState(() {
-              priceAlert = val;
-            });
-          }),
-          Text("Get alerts for significant price changes of your favorite cryptocurrencies", style: context.textTheme.caption,)
-        ],
+              value: priceAlert,
+              onChanged: (val) {
+                setState(
+                  () {
+                    priceAlert = val;
+                  },
+                );
+              },
+            ),
+            Text(
+              "Get alerts for significant price changes of your favorite cryptocurrencies",
+              style: context.textTheme.caption,
+            )
+          ],
+        ),
       ),
-    ),);
+    );
   }
 }

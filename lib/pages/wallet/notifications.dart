@@ -97,7 +97,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         body: Container(
           // padding: EdgeInsets.all(8),
           alignment: Alignment.center,
-          child: isLoading ? CircularProgressIndicator() : data.isEmpty ? emptyList() : notificationsList(data),
+          child: isLoading ? CircularProgressIndicator.adaptive() : data.isEmpty ? emptyList() : notificationsList(data),
         ));
   }
 }

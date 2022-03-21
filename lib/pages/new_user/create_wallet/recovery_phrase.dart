@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/new_user/create_wallet/verify_recovery.dart';
 import 'package:wallet/pages/qr_creation.dart';
@@ -23,7 +22,7 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
   Widget code() {
     List<Widget> wordItems = [];
     for (var i = 0; i < words.length; i++) {
-      wordItems.add(OnboardWidgets.wordItem(words[i], i+1));
+      wordItems.add(OnboardWidgets.wordItem(words[i], i + 1));
     }
     return Container(
       padding: EdgeInsets.only(top: 24),
@@ -35,7 +34,6 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
       ),
     );
   }
-
 
   Widget actions() {
     String wordList = FormatText.wordList(words);
@@ -49,15 +47,17 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: wordList));
                 print(wordList);
-                CommonWidgets.snackBar(wordList);
+                CommonWidgets.snackBar(wordList, copyMode: true);
               },
               child: Text("COPY")),
           SizedBox(
             width: 16,
           ),
-          TextButton(onPressed: () {
-            Get.to(() => QRCreationPage(qrData: wordList));
-          }, child: Text("SHOW QR")),
+          TextButton(
+              onPressed: () {
+                Get.to(() => QRCreationPage(qrData: wordList));
+              },
+              child: Text("SHOW QR")),
         ],
       ),
     );
@@ -67,39 +67,47 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
   void initState() {
     super.initState();
 
-    words = List.generate(12, (index) {
-      String word = "word${index + 1}";
-      // words.add(word);
-      return word;
-    });
+    words = List.generate(
+      12,
+      (index) {
+        String word = "word${index + 1}";
+        // words.add(word);
+        return word;
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-      child: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            OnboardWidgets.titleAlt("Your Recovery phrase"),
-            OnboardWidgets.subtitle("Write down or copy these words in the right order and save them somewhere safe"),
-            code(),
-            actions(),
-            Spacer(),
-            OnboardWidgets.neverShare(),
-            Container(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OnboardWidgets.titleAlt("Your Recovery phrase"),
+              OnboardWidgets.subtitle(
+                  "Write down or copy these words in the right order and save them somewhere safe"),
+              code(),
+              actions(),
+              Spacer(),
+              OnboardWidgets.neverShare(),
+              Container(
                 width: Get.width,
                 padding: EdgeInsets.only(top: 8),
                 child: ElevatedButton(
-                  onPressed: () => Get.to(() => VerifyRecoveryPage(words: words,)),
+                  onPressed: () => Get.to(() => VerifyRecoveryPage(
+                        words: words,
+                      )),
                   child: Text("CONTINUE"),
                   style: MyButtonStyles.onboardStyle,
-                ))
-          ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

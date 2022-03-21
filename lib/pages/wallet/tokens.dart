@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -20,7 +18,8 @@ class TokensPage extends StatefulWidget {
   _TokensPageState createState() => _TokensPageState();
 }
 
-class _TokensPageState extends State<TokensPage> with AutomaticKeepAliveClientMixin {
+class _TokensPageState extends State<TokensPage>
+    with AutomaticKeepAliveClientMixin {
   bool keepAlive = true;
   @override
   bool get wantKeepAlive => keepAlive;
@@ -44,7 +43,6 @@ class _TokensPageState extends State<TokensPage> with AutomaticKeepAliveClientMi
       });
     }
   }
-
 
   @override
   void initState() {
@@ -110,7 +108,8 @@ class _TokensPageState extends State<TokensPage> with AutomaticKeepAliveClientMi
                           onPressed: () {
                             pushNewScreen(
                               context,
-                              screen: SearchPage(searchMode: SearchMode.receive),
+                              screen:
+                                  SearchPage(searchMode: SearchMode.receive),
                             );
                           }),
                       HomeWidgets.quickAction(
@@ -138,9 +137,10 @@ class _TokensPageState extends State<TokensPage> with AutomaticKeepAliveClientMi
         itemBuilder: (context, index) {
           if (isLoading || index == 0) {
             if (index == 0) return dash();
-            return Center(child: Padding(
+            return Center(
+                child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator.adaptive(),
             ));
           }
           CoinData item = list.selected[index - 1];
@@ -159,11 +159,17 @@ class _TokensPageState extends State<TokensPage> with AutomaticKeepAliveClientMi
             trailing: Text(balance),
             title: Text(name),
             subtitle: Text.rich(
-              TextSpan(text: value, children: [TextSpan(text: ticker, style: TextStyle(color: tickerColor[rand]))]),
+              TextSpan(text: value, children: [
+                TextSpan(
+                    text: ticker, style: TextStyle(color: tickerColor[rand]))
+              ]),
             ),
             onTap: () => pushNewScreen(
               context,
-              screen: CoinPage(coinData: item, balance: balanceInfo[item]!,),
+              screen: CoinPage(
+                coinData: item,
+                balance: balanceInfo[item]!,
+              ),
             ),
           );
         },

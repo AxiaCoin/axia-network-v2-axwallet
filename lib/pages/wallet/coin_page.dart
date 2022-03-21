@@ -11,7 +11,8 @@ import 'package:wallet/widgets/home_widgets.dart';
 class CoinPage extends StatefulWidget {
   final CoinData coinData;
   final double balance;
-  const CoinPage({Key? key, required this.coinData, required this.balance}) : super(key: key);
+  const CoinPage({Key? key, required this.coinData, required this.balance})
+      : super(key: key);
 
   @override
   _CoinPageState createState() => _CoinPageState();
@@ -36,10 +37,8 @@ class _CoinPageState extends State<CoinPage> {
 
   copyAddress() {
     Clipboard.setData(ClipboardData(text: coinData.address));
-    CommonWidgets.snackBar(coinData.address);
+    CommonWidgets.snackBar(coinData.address, copyMode: true);
   }
-
-
 
   @override
   void initState() {
@@ -51,15 +50,22 @@ class _CoinPageState extends State<CoinPage> {
 
   @override
   Widget build(BuildContext context) {
-
     AppBar appBar() => AppBar(
-      // //brightness: Brightness.dark,
-      title: Text("${coinData.name} (${coinData.unit})"),
-      actions: [
-        TextButton(onPressed: () => Get.to(() => BuyPage(coinData: coinData, minimum: 50,)), child: Text("BUY", style: TextStyle(color: Colors.white),)),
-        IconButton(onPressed: (){}, icon: Icon(Icons.show_chart_outlined))
-      ],
-    );
+          // //brightness: Brightness.dark,
+          title: Text("${coinData.name} (${coinData.unit})"),
+          actions: [
+            TextButton(
+                onPressed: () => Get.to(() => BuyPage(
+                      coinData: coinData,
+                      minimum: 50,
+                    )),
+                child: Text(
+                  "BUY",
+                  style: TextStyle(color: Colors.white),
+                )),
+            IconButton(onPressed: () {}, icon: Icon(Icons.show_chart_outlined))
+          ],
+        );
 
     Widget header() {
       return Container(
@@ -76,27 +82,46 @@ class _CoinPageState extends State<CoinPage> {
     }
 
     Widget dash() => Column(
-      children: [
-        header(),
-        SizedBox(
-            width: Get.width * 0.15,
-            height: Get.width * 0.15,
-            child: FlutterLogo()),
-        SizedBox(height: 8,),
-        Text("$balance ${coinData.unit}"),
-        SizedBox(height: 16,),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            HomeWidgets.quickAction(icon: Icon(Icons.upload_outlined), text: "Send", onPressed: () => Get.to(SendPage(coinData: coinData, balance: balance)), whiteBG: true),
-            HomeWidgets.quickAction(icon: Icon(Icons.download_outlined), text: "Receive", onPressed: () => Get.to(ReceivePage(coinData: coinData)), whiteBG: true),
-            HomeWidgets.quickAction(icon: Icon(Icons.copy), text: "Copy", onPressed: copyAddress, whiteBG: true),
+            header(),
+            SizedBox(
+                width: Get.width * 0.15,
+                height: Get.width * 0.15,
+                child: FlutterLogo()),
+            SizedBox(
+              height: 8,
+            ),
+            Text("$balance ${coinData.unit}"),
+            SizedBox(
+              height: 16,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                HomeWidgets.quickAction(
+                    icon: Icon(Icons.upload_outlined),
+                    text: "Send",
+                    onPressed: () =>
+                        Get.to(SendPage(coinData: coinData, balance: balance)),
+                    whiteBG: true),
+                HomeWidgets.quickAction(
+                    icon: Icon(Icons.download_outlined),
+                    text: "Receive",
+                    onPressed: () => Get.to(ReceivePage(coinData: coinData)),
+                    whiteBG: true),
+                HomeWidgets.quickAction(
+                    icon: Icon(Icons.copy),
+                    text: "Copy",
+                    onPressed: copyAddress,
+                    whiteBG: true),
+              ],
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            Divider(),
           ],
-        ),
-        SizedBox(height: 16,),
-        Divider(),
-      ],
-    );
+        );
 
     Widget emptyList() {
       return Padding(
@@ -108,15 +133,19 @@ class _CoinPageState extends State<CoinPage> {
               Container(
                 height: Get.width * 0.25,
                 width: Get.width * 0.25,
-                child: FittedBox(
-
-                    child: FlutterLogo()
-                ),
+                child: FittedBox(child: FlutterLogo()),
               ),
-              SizedBox(height: 16,),
+              SizedBox(
+                height: 16,
+              ),
               HomeWidgets.emptyListText("Transactions will appear here"),
               // SizedBox(height: 8,),
-              TextButton(onPressed: () => Get.to(() => BuyPage(coinData: coinData, minimum: 50,)), child: Text("Buy ${coinData.name}"))
+              TextButton(
+                  onPressed: () => Get.to(() => BuyPage(
+                        coinData: coinData,
+                        minimum: 50,
+                      )),
+                  child: Text("Buy ${coinData.name}"))
             ],
           ),
         ),
@@ -128,14 +157,16 @@ class _CoinPageState extends State<CoinPage> {
         body: Container(
           child: ListView.builder(
               itemCount: data.isEmpty ? 2 : data.length + 1,
-              itemBuilder: (context, index){
+              itemBuilder: (context, index) {
                 if (index == 0) return dash();
-                if(isLoading) return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                ); else if (data.isEmpty) return emptyList();
+                if (isLoading)
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                  );
+                else if (data.isEmpty) return emptyList();
                 return ListTile(
                   title: Text("Transaction #$index"),
                 );

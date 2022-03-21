@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
-import 'package:wallet/pages/new_user/new.dart';
+import 'package:wallet/pages/new_user/login.dart';
 
 Future<void> main() async {
   // await initServices();
@@ -21,7 +21,6 @@ class MyApp extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
-
         if (!currentFocus.hasPrimaryFocus) {
           currentFocus.unfocus();
         }
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: lightTheme,
         themeMode: ThemeMode.light,
-        home: NewUserPage(),
+        home: LoginPage(),
       ),
     );
   }

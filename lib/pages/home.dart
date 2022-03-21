@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -8,11 +5,8 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/pages/dapps/index.dart';
 import 'package:wallet/pages/dex/index.dart';
-import 'package:wallet/pages/wallet/notifications.dart';
 import 'package:wallet/pages/settings/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
-import 'package:wallet/widgets/home_widgets.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 

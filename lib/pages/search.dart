@@ -39,7 +39,8 @@ class _SearchPageState extends State<SearchPage> {
     searchFailed = false;
     data.forEach((e) {
       if (query != "") {
-        if (e.name.toLowerCase().contains(query.toLowerCase()) || e.unit.toLowerCase().contains(query.toLowerCase())) {
+        if (e.name.toLowerCase().contains(query.toLowerCase()) ||
+            e.unit.toLowerCase().contains(query.toLowerCase())) {
           print("found ${e.name}");
           found = true;
           searchList.add(e);
@@ -59,7 +60,10 @@ class _SearchPageState extends State<SearchPage> {
     return TextField(
       controller: textEditingController,
       autofocus: widget.searchMode == SearchMode.customize,
-      decoration: InputDecoration(hintText: "Search Tokens", hintStyle: TextStyle(color: Colors.white), border: InputBorder.none),
+      decoration: InputDecoration(
+          hintText: "Search Tokens",
+          hintStyle: TextStyle(color: Colors.white),
+          border: InputBorder.none),
       cursorColor: Colors.white,
       style: TextStyle(color: Colors.white),
       onChanged: searchString,
@@ -90,7 +94,7 @@ class _SearchPageState extends State<SearchPage> {
     Map<CoinData, double> balanceData = balanceCont.getData();
     switch (widget.searchMode) {
       case SearchMode.customize:
-        return SwitchListTile(
+        return SwitchListTile.adaptive(
           value: item.selected,
           // onChanged: (val) => setState(() => item.selected = val),
           onChanged: (val) {
@@ -105,9 +109,11 @@ class _SearchPageState extends State<SearchPage> {
         return ListTile(
           onTap: () {
             Get.bottomSheet(
-                BuyPage(coinData: item, minimum: 50,),
-              isScrollControlled: true
-            );
+                BuyPage(
+                  coinData: item,
+                  minimum: 50,
+                ),
+                isScrollControlled: true);
           },
           title: Text(item.name),
           subtitle: Text(item.unit),
@@ -116,8 +122,11 @@ class _SearchPageState extends State<SearchPage> {
         );
       case SearchMode.send:
         return ListTile(
-          onTap: (){
-            Get.to(() => SendPage(coinData: item, balance: balanceData[item]!,));
+          onTap: () {
+            Get.to(() => SendPage(
+                  coinData: item,
+                  balance: balanceData[item]!,
+                ));
           },
           title: Text(item.name),
           subtitle: Text(item.unit),
@@ -127,7 +136,9 @@ class _SearchPageState extends State<SearchPage> {
       case SearchMode.receive:
         return ListTile(
           onTap: () {
-            Get.to(ReceivePage(coinData: item,));
+            Get.to(ReceivePage(
+              coinData: item,
+            ));
           },
           title: Text(item.name),
           subtitle: Text(item.unit),
@@ -158,20 +169,30 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: searchField(),
-          //brightness: Brightness.dark,
-        ),
-        body: Container(
-          child: searchFailed
-                ? emptyList()
-                : ListView.builder(
-                    itemCount: searchList.isNotEmpty ? searchList.length : isSendMode ? validSendingList.length : list.data.length,
-                    itemBuilder: (context, index) {
-                      // CoinData item = coinData![index];
-                      CoinData item = searchList.isNotEmpty ? searchList[index] : isSendMode ? validSendingList[index] : list.data[index];
-                      return listTile(item, index);
-                    }),
-        ));
+      appBar: AppBar(
+        title: searchField(),
+        //brightness: Brightness.dark,
+      ),
+      body: Container(
+        child: searchFailed
+            ? emptyList()
+            : ListView.builder(
+                itemCount: searchList.isNotEmpty
+                    ? searchList.length
+                    : isSendMode
+                        ? validSendingList.length
+                        : list.data.length,
+                itemBuilder: (context, index) {
+                  // CoinData item = coinData![index];
+                  CoinData item = searchList.isNotEmpty
+                      ? searchList[index]
+                      : isSendMode
+                          ? validSendingList[index]
+                          : list.data[index];
+                  return listTile(item, index);
+                },
+              ),
+      ),
+    );
   }
 }
