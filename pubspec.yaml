@@ -32,6 +32,7 @@ dependencies:
   webview_flutter: any
   local_auth: any
   pinput: ^1.2.1
+  intl_phone_number_input: ^0.7.0+2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

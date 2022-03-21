@@ -52,7 +52,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   onPressed: () {
                     if (isValid) {
                       Navigator.pop(context);
-                      CommonWidgets.snackBar("Feedback Submitted", copyMode: false);
+                      CommonWidgets.snackBar("Feedback Submitted");
                     }
                   },
                   child: Text("SUBMIT"),
@@ -63,6 +63,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           ),
         ));
   }
+
   @override
   void dispose() {
     super.dispose();

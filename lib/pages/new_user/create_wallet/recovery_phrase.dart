@@ -23,7 +23,7 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
   Widget code() {
     List<Widget> wordItems = [];
     for (var i = 0; i < words.length; i++) {
-      wordItems.add(OnboardWidgets.wordItem(words[i], i+1));
+      wordItems.add(OnboardWidgets.wordItem(words[i], i + 1));
     }
     return Container(
       padding: EdgeInsets.only(top: 24),
@@ -35,7 +35,6 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
       ),
     );
   }
-
 
   Widget actions() {
     String wordList = FormatText.wordList(words);
@@ -49,15 +48,17 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: wordList));
                 print(wordList);
-                CommonWidgets.snackBar(wordList);
+                CommonWidgets.snackBar(wordList, copyMode: true);
               },
               child: Text("COPY")),
           SizedBox(
             width: 16,
           ),
-          TextButton(onPressed: () {
-            Get.to(() => QRCreationPage(qrData: wordList));
-          }, child: Text("SHOW QR")),
+          TextButton(
+              onPressed: () {
+                Get.to(() => QRCreationPage(qrData: wordList));
+              },
+              child: Text("SHOW QR")),
         ],
       ),
     );
@@ -84,7 +85,8 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             OnboardWidgets.titleAlt("Your Recovery phrase"),
-            OnboardWidgets.subtitle("Write down or copy these words in the right order and save them somewhere safe"),
+            OnboardWidgets.subtitle(
+                "Write down or copy these words in the right order and save them somewhere safe"),
             code(),
             actions(),
             Spacer(),
@@ -93,7 +95,9 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
                 width: Get.width,
                 padding: EdgeInsets.only(top: 8),
                 child: ElevatedButton(
-                  onPressed: () => Get.to(() => VerifyRecoveryPage(words: words,)),
+                  onPressed: () => Get.to(() => VerifyRecoveryPage(
+                        words: words,
+                      )),
                   child: Text("CONTINUE"),
                   style: MyButtonStyles.onboardStyle,
                 ))
