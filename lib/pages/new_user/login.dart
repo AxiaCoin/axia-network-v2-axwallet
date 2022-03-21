@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/pages/api_testpage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/auth.dart';
@@ -101,9 +103,18 @@ class _LoginPageState extends State<LoginPage> {
         );
     return Scaffold(
         floatingActionButton: kDebugMode
-            ? FloatingActionButton(
-                child: Icon(Icons.next_plan),
-                onPressed: () => Get.offAll(() => HomePage()),
+            ? SpeedDial(
+                animatedIcon: AnimatedIcons.menu_home,
+                children: [
+                  SpeedDialChild(
+                      child: Icon(Icons.next_plan),
+                      label: "HomePage",
+                      onTap: () => Get.offAll(() => HomePage())),
+                  SpeedDialChild(
+                      child: Icon(Icons.api),
+                      label: "API Testing Page",
+                      onTap: () => Get.to(APITestpage()))
+                ],
               )
             : Container(),
         body: SafeArea(

@@ -71,7 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-<<<<<<< HEAD
   equatable:
     dependency: transitive
     description:
@@ -79,8 +78,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.3"
-=======
->>>>>>> SubBranch_PK
   fake_async:
     dependency: transitive
     description:
@@ -114,8 +111,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
-<<<<<<< HEAD
-=======
   flutter_speed_dial:
     dependency: "direct main"
     description:
@@ -123,7 +118,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.0+1"
->>>>>>> SubBranch_PK
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -141,8 +135,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.6.1"
-<<<<<<< HEAD
-=======
   google_fonts:
     dependency: "direct main"
     description:
@@ -164,7 +156,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
->>>>>>> SubBranch_PK
   intl:
     dependency: transitive
     description:
@@ -333,8 +324,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-<<<<<<< HEAD
-=======
   process:
     dependency: transitive
     description:
@@ -342,7 +331,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
->>>>>>> SubBranch_PK
   qr:
     dependency: transitive
     description:
@@ -384,14 +372,14 @@ packages:
       name: share_plus_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   share_plus_platform_interface:
     dependency: transitive
     description:
       name: share_plus_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   share_plus_web:
     dependency: transitive
     description:
@@ -551,17 +539,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.7.1"
-<<<<<<< HEAD
-sdks:
-  dart: ">=2.14.0 <3.0.0"
-=======
   win32:
     dependency: transitive
     description:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.1"
+    version: "2.4.2"
   xdg_directories:
     dependency: transitive
     description:
@@ -571,5 +555,4 @@ sdks:
     version: "0.2.0+1"
 sdks:
   dart: ">=2.15.0 <3.0.0"
->>>>>>> SubBranch_PK
   flutter: ">=2.10.0"
