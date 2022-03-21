@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/pages/api_testpage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/auth.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class NewUserPage extends StatefulWidget {
   const NewUserPage({Key? key}) : super(key: key);
@@ -35,12 +37,25 @@ class _NewUserPageState extends State<NewUserPage> {
     bool isLoginMode = mode == Mode.login;
 
     return Scaffold(
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton(
+      // floatingActionButton: kDebugMode
+      //     ? FloatingActionButton(
+      //         child: Icon(Icons.next_plan),
+      //         onPressed: () => Get.offAll(() => HomePage()),
+      //       )
+      //     : Container(),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_home,
+        children: [
+          SpeedDialChild(
               child: Icon(Icons.next_plan),
-              onPressed: () => Get.offAll(() => HomePage()),
-            )
-          : Container(),
+              label: "HomePage",
+              onTap: () => Get.offAll(() => HomePage())),
+          SpeedDialChild(
+              child: Icon(Icons.api),
+              label: "API Testing Page",
+              onTap: () => Get.to(APITestpage()))
+        ],
+      ),
       body: SafeArea(
         child: Form(
           key: formKey,
