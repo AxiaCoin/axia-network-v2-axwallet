@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/verify.dart';
+import 'package:wallet/services.dart';
 
 class SignupPage extends StatefulWidget {
   final bool resetPassword;
@@ -21,11 +24,65 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
   PhoneNumber phoneNumber = PhoneNumber();
   Mode mode = Mode.phone;
   bool obscurity = true;
+  bool submitting = false;
+
+  onSubmit() async {
+    setState(() {
+      submitting = true;
+    });
+    if (!widget.resetPassword) {
+      var response = await APIServices().signUp(
+        firstName: firstNameController.text,
+        lastName:
+            lastNameController.text == "" ? null : lastNameController.text,
+        email: mode == Mode.email ? emailController.text : null,
+        phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+        phoneCode:
+            mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        password: passwordController.text,
+      );
+      if (response["success"]) {
+        var result = await APIServices().sendVerifyOTP(
+          email: mode == Mode.email ? emailController.text : null,
+          phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+          phoneCode:
+              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        );
+        if (result["success"]) {
+          Get.to(() => VerificationPage(
+                email: mode == Mode.email ? emailController.text : null,
+                phoneNumber: mode == Mode.phone ? phoneNumber : null,
+                resetPassword: widget.resetPassword,
+              ));
+        }
+      }
+    } else {
+      var response = await APIServices().forgotPasswordOtp(
+        email: mode == Mode.email ? emailController.text : null,
+        phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+        phoneCode:
+            mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+      );
+
+      if (response["success"]) {
+        Get.to(() => VerificationPage(
+              email: mode == Mode.email ? emailController.text : null,
+              phoneNumber: mode == Mode.phone ? phoneNumber : null,
+              resetPassword: widget.resetPassword,
+            ));
+      }
+    }
+    setState(() {
+      submitting = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -34,15 +91,20 @@ class _SignupPageState extends State<SignupPage> {
     passwordController.dispose();
     passwordFocus.dispose();
     confirmPasswordFocus.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Widget phoneField() => InternationalPhoneNumberInput(
+          initialValue: PhoneNumber(
+            isoCode: Platform.localeName.split('_').last,
+          ),
           onInputChanged: (PhoneNumber number) {
             phoneNumber = number;
-            print(number.phoneNumber);
+            print(number.parseNumber());
           },
           onInputValidated: (bool value) {
             print(value);
@@ -55,6 +117,7 @@ class _SignupPageState extends State<SignupPage> {
           ignoreBlank: false,
           autoValidateMode: AutovalidateMode.disabled,
           selectorTextStyle: TextStyle(color: Colors.black),
+          keyboardAction: TextInputAction.next,
           // initialValue: number,
           textFieldController: phoneController,
           formatInput: false,
@@ -123,6 +186,42 @@ class _SignupPageState extends State<SignupPage> {
                   ? null
                   : "The passwords do not match",
             ),
+            SizedBox(
+              height: 16,
+            ),
+          ];
+    List<Widget> nameFields = widget.resetPassword
+        ? []
+        : [
+            TextFormField(
+              controller: firstNameController,
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                labelText: "First Name",
+                border: OutlineInputBorder(),
+              ),
+              validator: (val) => val!.isNotEmpty
+                  ? null
+                  : "Please provide at least the first name",
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            TextFormField(
+              controller: lastNameController,
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                labelText: "Last Name",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
           ];
     return Scaffold(
       body: Form(
@@ -164,29 +263,24 @@ class _SignupPageState extends State<SignupPage> {
                   SizedBox(
                     height: 16,
                   ),
+                  ...nameFields,
                   ...passwordFields,
-                  SizedBox(
-                    height: 16,
-                  ),
-                  SizedBox(
-                    width: Get.width,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          Get.to(
-                            () => VerificationPage(
-                              device: mode == Mode.email
-                                  ? emailController.text
-                                  : phoneController.text,
-                              resetPassword: widget.resetPassword,
-                            ),
-                          );
-                        }
-                      },
-                      child: Text("Send Verification Code"),
-                      style: MyButtonStyles.onboardStyle,
-                    ),
-                  ),
+                  submitting
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : SizedBox(
+                          width: Get.width,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                onSubmit();
+                              }
+                            },
+                            child: Text("Send Verification Code"),
+                            style: MyButtonStyles.onboardStyle,
+                          ),
+                        ),
                   SizedBox(
                     height: 32,
                   ),

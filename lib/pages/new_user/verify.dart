@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/auth.dart';
-import 'package:wallet/pages/new_user/change_password.dart';
+import 'package:wallet/pages/new_user/login.dart';
+import 'package:wallet/pages/settings/profile/change_password.dart';
+import 'package:wallet/pages/settings/profile/index.dart';
+import 'package:wallet/services.dart';
 import 'package:wallet/widgets/common.dart';
 
 class VerificationPage extends StatefulWidget {
-  final String device;
+  final String? email;
+  final PhoneNumber? phoneNumber;
   final bool resetPassword;
   const VerificationPage({
     Key? key,
-    required this.device,
+    this.email,
+    this.phoneNumber,
     required this.resetPassword,
   }) : super(key: key);
 
@@ -23,7 +29,7 @@ class VerificationPage extends StatefulWidget {
 
 class _VerificationPageState extends State<VerificationPage> {
   TextEditingController controller = TextEditingController();
-  bool hasEntered = false;
+  bool submitting = false;
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
       border: Border.all(color: appColor),
@@ -32,19 +38,46 @@ class _VerificationPageState extends State<VerificationPage> {
   }
 
   _verifyCode({required String code}) async {
-    await Future.delayed(Duration(milliseconds: 1000));
-    if (code == "123456") {
-      Get.off(() => widget.resetPassword
-          ? ChangePassword(
-              resetPassword: widget.resetPassword,
-            )
-          : AuthPage());
+    if (!widget.resetPassword) {
+      var response = await APIServices().userVerify(
+        email: widget.email,
+        phoneNumber: widget.phoneNumber != null
+            ? widget.phoneNumber!.parseNumber()
+            : null,
+        phoneCode: widget.phoneNumber != null
+            ? widget.phoneNumber!.dialCode!.substring(1)
+            : null,
+        otp: code,
+      );
+      if (response["success"]) {
+        CommonWidgets.snackBar(
+            "Account created successfully. Please login to continue.",
+            duration: 3);
+        Get.offAll(() => LoginPage());
+      } else {
+        setState(() {
+          submitting = false;
+        });
+        // CommonWidgets.snackBar("Incorrect code entered");
+      }
     } else {
+      var response = await APIServices().resetPassword();
+
       setState(() {
-        hasEntered = false;
+        submitting = false;
       });
-      CommonWidgets.snackBar("Incorrect code entered");
     }
+  }
+
+  _sendCode() async {
+    // var response =
+    //     APIServices().signUp(firstName: firstName, password: password);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _sendCode();
   }
 
   @override
@@ -75,7 +108,7 @@ class _VerificationPageState extends State<VerificationPage> {
                 height: 32,
               ),
               Text(
-                "Please enter the verification code sent to ${widget.device}",
+                "Please enter the verification code sent to ${widget.email ?? widget.phoneNumber?.phoneNumber ?? "your device"}",
               ),
               SizedBox(
                 height: 16,
@@ -97,10 +130,10 @@ class _VerificationPageState extends State<VerificationPage> {
                 ),
                 onChanged: (val) {
                   if (controller.text.length == 6) {
-                    hasEntered = true;
+                    submitting = true;
                     _verifyCode(code: controller.text);
                   } else {
-                    hasEntered = false;
+                    submitting = false;
                   }
                   setState(() {});
                 },
@@ -123,7 +156,7 @@ class _VerificationPageState extends State<VerificationPage> {
               SizedBox(
                 height: 16,
               ),
-              hasEntered
+              submitting
                   ? Center(child: CircularProgressIndicator())
                   : Container()
             ],

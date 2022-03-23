@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:wallet/code/storage.dart';
+import 'package:wallet/widgets/common.dart';
 
 class APIServices {
   final ipAddress = "http://13.235.53.197:3000/";
 
-  baseapi(String url, Object body) async {
+  baseapi(String url, Map body) async {
     try {
-      print(Uri.parse(ipAddress + url));
       var response = await http.post(Uri.parse(ipAddress + url),
           headers: {
             'Authorization': 'Basic dGVzdDp0ZXN0',
@@ -16,109 +17,141 @@ class APIServices {
           body: json.encode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
+        print("success");
         Map val = jsonDecode(response.body);
-        print(val);
-        print("result:$val.values");
-        print(val.values);
+        print("result: $val");
         return val;
       } else {
+        print("unsuccessful");
         Map val = jsonDecode(response.body);
-        print("result:$val");
-        print(val.values);
+        print("error: $val");
+        if (val.toString().contains("Auth Token is invalid")) {
+          String sessionID = StorageService.instance.sessionID!;
+          String deviceID = StorageService.instance.deviceID!;
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          if (result["success"]) {
+            String authToken = result["data"]["authToken"];
+            StorageService.instance.updateAuthToken(authToken);
+            body["authToken"] = authToken;
+            return baseapi(url, body);
+          }
+          return;
+        }
+        CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
         return val;
       }
     } on SocketException {
-      return "No internet connection";
+      print("No internet connection");
     } on HttpException {
-      return "Couldn't find post URL";
+      print("Couldn't find post URL");
     } on FormatException {
-      return "Bad response format";
+      print("Bad response format");
     } catch (e) {
-      return "Server response:${e.toString()}";
+      print("Server response:${e.toString()}");
     }
   }
 
-  signUp() async {
+  signUp({
+    required String firstName,
+    String? lastName,
+    String? email,
+    String? phoneNumber,
+    String? phoneCode,
+    required String password,
+  }) async {
     return baseapi(
       "user/sign-up",
       {
-        "firstName": "zaid",
-        "phoneNumber": "8660885125",
-        "phoneCode": "91",
-        "password": "123qwe!@#",
-        "confirmPassword": "123qwe!@#"
+        "firstName": firstName,
+        "lastName": lastName,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+        "email": email,
+        "password": password,
+        "confirmPassword": password
       },
     );
   }
 
-  signIn() async {
+  signIn(
+      {String? email,
+      String? phoneNumber,
+      String? phoneCode,
+      required String password,
+      required String deviceId}) async {
     return baseapi(
       "user/sign-in",
       {
-        "email": "mohd.zaid@zeeve.io",
-        "password": "123qwe!@#",
-        "deviceId": "987654321"
+        "email": email,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+        "password": password,
+        "deviceId": deviceId
       },
     );
   }
 
-  getProfile() async {
+  getProfile({required String authToken}) async {
     return baseapi(
       "user/get-profile",
-      {
-        "authToken":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6ImJjZDk2NjdlLTgyMzctNDAzMC1hNTI5LWY4OTZiZDZjOWZmMiJ9LCJzZXNzaW9uSUQiOiJjZmUyNWY4ZjdmZjNiNTk3NDE0MTkxNGFjNjllYTc2ZmIyZWNjYzE1MGUwMGQyZDFhMjBmODcyY2VjNGViOTRlIiwiaWF0IjoxNjQ3ODQ4MzU2LCJleHAiOjE2NDc4NTE5NTYsImF1ZCI6InpicC11bmlmaWVkLWdhdGV3YXktc2VydmljZSIsInN1YiI6IkFjY2VzcyBNYWluIn0.W-EwMS2WchCtPYr59AusksBy50k8UURSzoGllbKz3MU"
-      },
+      {"authToken": authToken},
     );
   }
 
-  getAuthToken() async {
+  getAuthToken({required String sessionId, required String deviceId}) async {
     return baseapi(
       "user/get-auth-token",
-      {
-        "sessionId":
-            "cfe25f8f7ff3b5974141914ac69ea76fb2eccc150e00d2d1a20f872cec4eb94e",
-        "deviceId": "987654321"
-      },
+      {"sessionId": sessionId, "deviceId": deviceId},
     );
   }
 
-  userMobileVerify() async {
+  userVerify(
+      {String? email,
+      String? phoneNumber,
+      String? phoneCode,
+      required String otp}) async {
     return baseapi(
       "user/verify",
-      {"phoneNumber": "7906706094", "phoneCode": "91", "otp": "855015"},
-    );
-  }
-
-  userNameUpdate() async {
-    return baseapi(
-      "user/update",
       {
-        "lastName": "zaid",
-        "firstName": "mohd1",
-        "authToken":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6ImJjZDk2NjdlLTgyMzctNDAzMC1hNTI5LWY4OTZiZDZjOWZmMiJ9LCJzZXNzaW9uSUQiOiJjZmUyNWY4ZjdmZjNiNTk3NDE0MTkxNGFjNjllYTc2ZmIyZWNjYzE1MGUwMGQyZDFhMjBmODcyY2VjNGViOTRlIiwiaWF0IjoxNjQ3ODQ4MzU2LCJleHAiOjE2NDc4NTE5NTYsImF1ZCI6InpicC11bmlmaWVkLWdhdGV3YXktc2VydmljZSIsInN1YiI6IkFjY2VzcyBNYWluIn0.W-EwMS2WchCtPYr59AusksBy50k8UURSzoGllbKz3MU"
+        "email": email,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+        "otp": otp
       },
     );
   }
 
-  userPasswordUpdate() async {
+  userNameUpdate(
+      {required String firstName,
+      String? lastName,
+      required String authToken}) async {
+    return baseapi(
+      "user/update",
+      {"lastName": lastName, "firstName": firstName, "authToken": authToken},
+    );
+  }
+
+  userPasswordUpdate(
+      {required String currentPassword,
+      required String newPassword,
+      required String authToken}) async {
     return baseapi(
       "user/update-password",
       {
-        "currentPassword": "123qwe!@#",
-        "newPassword": "!@#qwe123",
-        "confirmPassword": "!@#qwe123",
-        "authToken":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6ImJjZDk2NjdlLTgyMzctNDAzMC1hNTI5LWY4OTZiZDZjOWZmMiJ9LCJzZXNzaW9uSUQiOiJjZmUyNWY4ZjdmZjNiNTk3NDE0MTkxNGFjNjllYTc2ZmIyZWNjYzE1MGUwMGQyZDFhMjBmODcyY2VjNGViOTRlIiwiaWF0IjoxNjQ3ODQ4MzU2LCJleHAiOjE2NDc4NTE5NTYsImF1ZCI6InpicC11bmlmaWVkLWdhdGV3YXktc2VydmljZSIsInN1YiI6IkFjY2VzcyBNYWluIn0.W-EwMS2WchCtPYr59AusksBy50k8UURSzoGllbKz3MU"
+        "currentPassword": currentPassword,
+        "newPassword": newPassword,
+        "confirmPassword": newPassword,
+        "authToken": authToken
       },
     );
   }
 
-  forgotPasswordOtp() async {
+  forgotPasswordOtp(
+      {String? email, String? phoneNumber, String? phoneCode}) async {
     return baseapi(
       "user/send-forget-pass-otp",
-      {"email": "mohd.zaid@zeeve.io"},
+      {"email": email, "phoneNumber": phoneNumber, "phoneCode": phoneCode},
     );
   }
 
@@ -134,10 +167,10 @@ class APIServices {
     );
   }
 
-  sendVerifyOTP() async {
+  sendVerifyOTP({String? email, String? phoneNumber, String? phoneCode}) async {
     return baseapi(
       "user/send-verify-otp",
-      {"phoneNumber": "7906706095", "phoneCode": "91"},
+      {"email": email, "phoneNumber": phoneNumber, "phoneCode": phoneCode},
     );
   }
 
@@ -211,14 +244,10 @@ class APIServices {
     );
   }
 
-  logOut() async {
+  logOut({required String sessionId, required String deviceId}) async {
     return baseapi(
       "user/log-out",
-      {
-        "sessionId":
-            "3cb54c6edeb0221e8f414edaf30992f7290a56ac288d57519d551b51c78a9e36",
-        "deviceId": "1234567891"
-      },
+      {"sessionId": sessionId, "deviceId": deviceId},
     );
   }
 }

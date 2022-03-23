@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/pages/new_user/verify.dart';
+import 'package:wallet/services.dart';
 
 class ChangePassword extends StatefulWidget {
   final bool resetPassword;
@@ -31,24 +33,30 @@ class _ChangePasswordState extends State<ChangePassword> {
       setState(() {
         submitting = true;
       });
-      await Future.delayed(Duration(milliseconds: 1000));
+      String authToken = StorageService.instance.authToken!;
+      var response = await APIServices().userPasswordUpdate(
+        authToken: authToken,
+        newPassword: passwordController.text,
+        currentPassword: currentPassController.text,
+      );
       setState(() {
         submitting = false;
       });
-      await Get.dialog(
-        AlertDialog(
-          title: Text("Success"),
-          content:
-              Text("Password Successfully Changed!\nPlease go back to Login"),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text("Okay"),
-            ),
-          ],
-        ),
-      );
-      Get.until((route) => route.isFirst);
+      if (response["success"]) {
+        await Get.dialog(
+          AlertDialog(
+            title: Text("Success"),
+            content: Text("Password Successfully Changed!"),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text("Okay"),
+              ),
+            ],
+          ),
+        );
+        Get.back();
+      }
     }
   }
 
@@ -98,7 +106,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          labelText: "NewPassword",
+          labelText: "New Password",
           border: OutlineInputBorder(),
           suffixIcon: widget.resetPassword
               ? IconButton(
@@ -137,7 +145,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         key: formKey,
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

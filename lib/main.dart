@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
+import 'package:wallet/pages/settings/profile/index.dart';
 
 Future<void> main() async {
-  // await initServices();
+  await initServices();
   runApp(MyApp());
 }
 
 initServices() async {
   // Get.changeTheme(Get.isDarkMode ? darkTheme : lightTheme);
-  Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
+  // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
+  await GetStorage.init();
+  StorageService.instance.init();
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +35,9 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: lightTheme,
         themeMode: ThemeMode.light,
-        home: LoginPage(),
+        home: StorageService.instance.authToken == null
+            ? LoginPage()
+            : ProfilePage(),
       ),
     );
   }

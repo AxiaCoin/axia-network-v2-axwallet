@@ -1,14 +1,21 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/api_testpage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/auth.dart';
+import 'package:wallet/pages/new_user/verify.dart';
+import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
+import 'package:wallet/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -23,18 +30,59 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController =
       new TextEditingController(text: kDebugMode ? "test@test.com" : "");
   TextEditingController passwordController =
-      new TextEditingController(text: kDebugMode ? "test@test.com" : "");
-  TextEditingController phoneController =
-      new TextEditingController(text: kDebugMode ? "1234567890" : "");
+      new TextEditingController(text: kDebugMode ? "1111111q%" : "");
   FocusNode emailFocus = FocusNode();
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
   bool obscurity = true;
+  bool submitting = false;
+  PhoneNumber phoneNumber = PhoneNumber(
+    isoCode: Platform.localeName.split('_').last,
+    phoneNumber: kDebugMode ? "+919879879871" : null,
+  );
 
-  onSubmit() {
+  onSubmit() async {
+    setState(() {
+      submitting = true;
+    });
     if (formKey.currentState!.validate()) {
-      Get.off(() => AuthPage());
+      String deviceId = "";
+      if (Platform.isAndroid) {
+        var deviceInfo = await DeviceInfoPlugin().androidInfo;
+        deviceId = deviceInfo.androidId!;
+      } else {
+        var deviceInfo = await DeviceInfoPlugin().iosInfo;
+        deviceId = deviceInfo.identifierForVendor!;
+      }
+      var response = await APIServices().signIn(
+          email: mode == Mode.email ? emailController.text : null,
+          phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+          phoneCode:
+              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          password: passwordController.text,
+          deviceId: deviceId);
+      if (response["success"]) {
+        StorageService.instance.updateAuthToken(response["data"]["authToken"]);
+        StorageService.instance.updateSessionID(response["data"]["sessionID"]);
+        Get.off(() => ProfilePage());
+      } else if (response.toString().contains("verify")) {
+        var result = await APIServices().sendVerifyOTP(
+          email: mode == Mode.email ? emailController.text : null,
+          phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+          phoneCode:
+              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        );
+        if (result["success"]) {
+          Get.to(() => VerificationPage(
+              email: mode == Mode.email ? emailController.text : null,
+              phoneNumber: mode == Mode.phone ? phoneNumber : null,
+              resetPassword: false));
+        }
+      }
     }
+    setState(() {
+      submitting = false;
+    });
   }
 
   @override
@@ -42,7 +90,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
     passwordController.dispose();
     emailController.dispose();
-    phoneController.dispose();
     emailFocus.dispose();
     passwordFocus.dispose();
     confirmPasswordFocus.dispose();
@@ -51,10 +98,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     bool isPhoneMode = mode == Mode.phone;
-
+    print(Localizations.localeOf(context).countryCode.toString());
     Widget phoneField() => InternationalPhoneNumberInput(
+          initialValue: phoneNumber,
           onInputChanged: (PhoneNumber number) {
-            // phoneNumber = number;
+            phoneNumber = number;
             print(number.phoneNumber);
           },
           onInputValidated: (bool value) {
@@ -69,7 +117,6 @@ class _LoginPageState extends State<LoginPage> {
           autoValidateMode: AutovalidateMode.disabled,
           selectorTextStyle: TextStyle(color: Colors.black),
           // initialValue: number,
-          textFieldController: phoneController,
           formatInput: false,
           keyboardType:
               TextInputType.numberWithOptions(signed: true, decimal: true),
@@ -202,16 +249,20 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 32,
                     ),
-                    Container(
-                      width: Get.width,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          onSubmit();
-                        },
-                        child: Text("LOGIN"),
-                        style: MyButtonStyles.onboardStyle,
-                      ),
-                    ),
+                    submitting
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Container(
+                            width: Get.width,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                onSubmit();
+                              },
+                              child: Text("LOGIN"),
+                              style: MyButtonStyles.onboardStyle,
+                            ),
+                          ),
                     SizedBox(
                       height: 32,
                     ),
