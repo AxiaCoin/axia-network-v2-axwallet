@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/receive.dart';
@@ -13,13 +14,14 @@ class CollectiblesPage extends StatefulWidget {
   _CollectiblesPageState createState() => _CollectiblesPageState();
 }
 
-class _CollectiblesPageState extends State<CollectiblesPage> with AutomaticKeepAliveClientMixin{
+class _CollectiblesPageState extends State<CollectiblesPage>
+    with AutomaticKeepAliveClientMixin {
   bool keepAlive = true;
   @override
   bool get wantKeepAlive => keepAlive;
 
   final TokenData list = Get.find();
-  late CoinData ethCoin;
+  late Currency ethCoin;
   bool isLoading = true;
   bool isRefreshing = false;
   List data = [];
@@ -43,20 +45,23 @@ class _CollectiblesPageState extends State<CollectiblesPage> with AutomaticKeepA
           Container(
             height: Get.width * 0.25,
             width: Get.width * 0.25,
-            child: FittedBox(
-
-                child: FlutterLogo()
-            ),
+            child: FittedBox(child: FlutterLogo()),
           ),
-          SizedBox(height: 16,),
+          SizedBox(
+            height: 16,
+          ),
           HomeWidgets.emptyListText("Collectibles will appear here"),
           // SizedBox(height: 8,),
-          TextButton(onPressed: () async {
-            Get.to(() => ReceivePage(coinData: ethCoin));
-          }, child: Text("Receive")),
-          TextButton(onPressed: () async {
-            Get.to(() => WebViewPage(url: "https://www.google.com/"));
-          }, child: Text("Open on OpenSea.io"))
+          TextButton(
+              onPressed: () async {
+                Get.to(() => ReceivePage(currency: ethCoin));
+              },
+              child: Text("Receive")),
+          TextButton(
+              onPressed: () async {
+                Get.to(() => WebViewPage(url: "https://www.google.com/"));
+              },
+              child: Text("Open on OpenSea.io"))
         ],
       ),
     );
@@ -74,7 +79,9 @@ class _CollectiblesPageState extends State<CollectiblesPage> with AutomaticKeepA
     return Scaffold(
       body: Container(
         child: Center(
-          child: isLoading ? Center(child: CircularProgressIndicator.adaptive()) : emptyList(),
+          child: isLoading
+              ? Center(child: CircularProgressIndicator.adaptive())
+              : emptyList(),
         ),
       ),
     );

@@ -2,36 +2,37 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
 
 class TokenData extends GetxController {
-  var data = currencyList.map((e) => e.coinData).toList().obs;
-  var selected;
+  RxList<Currency> data = currencyList.map((e) => e).toList().obs;
+  List<Currency>? selected;
   changeSelection(int index, bool value) {
-    CoinData coin = data[index];
+    CoinData coin = data[index].coinData;
     coin.selected = value;
     StorageService.instance.updateDefaultWallets(coin.unit, isSelected: value);
-    selected = data.where((e) => e.selected).toList();
+    selected = data.where((e) => e.coinData.selected).toList();
   }
 
   defaultSelection() {
     List<String> defaultWallets = StorageService.instance.defaultWallets!;
     data.forEach((e) {
-      if (defaultWallets.contains(e.unit)) {
-        e.selected = true;
+      if (defaultWallets.contains(e.coinData.unit)) {
+        e.coinData.selected = true;
       } else {
-        e.selected = false;
+        e.coinData.selected = false;
       }
     });
-    return selected = data.where((e) => e.selected).toList();
+    return selected = data.where((e) => e.coinData.selected).toList();
   }
 }
 
 class BalanceData extends GetxController {
   final TokenData tokenData = Get.put(TokenData());
-  Map<CoinData, double>? data;
-  Map<CoinData, double> getData() => data ??= {
+  Map<Currency, double>? data;
+  Map<Currency, double> getData() => data ??= {
         for (var item in tokenData.data)
           // if (Random().nextInt(100) < 50)
           if (true)

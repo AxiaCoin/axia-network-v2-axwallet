@@ -18,7 +18,7 @@ class Ethereum implements Currency {
     name: "Ethereum",
     unit: "ETH",
     coinType: isTestNet ? 1 : 60,
-    value: 1,
+    rate: 1,
     change: "1",
   );
 

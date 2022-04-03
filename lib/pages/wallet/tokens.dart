@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/search.dart';
@@ -26,8 +27,8 @@ class _TokensPageState extends State<TokensPage>
 
   bool isLoading = true;
   bool isRefreshing = false;
-  List<CoinData> data = [];
-  Map<CoinData, double> balanceInfo = {};
+  List<Currency> data = [];
+  Map<Currency, double> balanceInfo = {};
   final TokenData list = Get.find();
   final BalanceData balanceData = Get.find();
 
@@ -41,6 +42,7 @@ class _TokensPageState extends State<TokensPage>
         isLoading = false;
         isRefreshing = false;
       });
+      print("balance is $balanceInfo");
     }
   }
 
@@ -61,7 +63,7 @@ class _TokensPageState extends State<TokensPage>
       double totalBalance = 0.0;
       if (balanceInfo.isNotEmpty) {
         balanceInfo.forEach((key, value) {
-          if (key.selected) totalBalance += value * key.value;
+          if (key.coinData.selected) totalBalance += value * key.coinData.rate;
         });
       }
       return Container(
@@ -133,7 +135,7 @@ class _TokensPageState extends State<TokensPage>
         await refreshData();
       },
       child: ListView.builder(
-        itemCount: isLoading ? 2 : list.selected.length + 1,
+        itemCount: isLoading ? 2 : list.selected!.length + 1,
         itemBuilder: (context, index) {
           if (isLoading || index == 0) {
             if (index == 0) return dash();
@@ -143,12 +145,13 @@ class _TokensPageState extends State<TokensPage>
               child: CircularProgressIndicator.adaptive(),
             ));
           }
-          CoinData item = list.selected[index - 1];
+          Currency currency = list.selected![index - 1];
+          CoinData item = currency.coinData;
           String name = item.name;
           String unit = item.unit;
-          String value = "\$${item.value} ";
+          String value = "\$${item.rate} ";
           String change = item.change;
-          String balance = "${balanceInfo[item]} $unit";
+          String balance = "${balanceInfo[currency]} $unit";
           var rand = Random().nextInt(2);
           String ticker = "-$change%";
           if (rand == 0) {
@@ -167,8 +170,8 @@ class _TokensPageState extends State<TokensPage>
             onTap: () => pushNewScreen(
               context,
               screen: CoinPage(
-                coinData: item,
-                balance: balanceInfo[item]!,
+                currency: currency,
+                balance: balanceInfo[currency]!,
               ),
             ),
           );

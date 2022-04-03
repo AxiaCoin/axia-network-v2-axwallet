@@ -11,7 +11,7 @@ class Bitcoin implements Currency {
     name: "Bitcoin",
     unit: "BTC",
     coinType: isTestNet ? 1 : 0,
-    value: 1.23,
+    rate: 1.23,
     change: "1",
     selected: true,
   );

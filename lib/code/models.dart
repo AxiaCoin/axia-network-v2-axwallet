@@ -81,14 +81,14 @@ class CoinData {
   String name;
   String unit;
   int coinType;
-  double value;
+  double rate;
   String change;
   bool selected;
   CoinData({
     required this.name,
     required this.unit,
     required this.coinType,
-    this.value = 1,
+    this.rate = 1,
     this.change = "",
     this.selected = false,
   });
@@ -98,7 +98,7 @@ class CoinData {
       name: "Coin $i",
       unit: "XCN$i",
       coinType: 1,
-      value: 123.45,
+      rate: 123.45,
       change: "1.2",
       selected: false,
     );
