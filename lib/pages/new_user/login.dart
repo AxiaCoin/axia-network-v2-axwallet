@@ -11,11 +11,11 @@ import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/api_testpage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/signup.dart';
-import 'package:wallet/pages/new_user/auth.dart';
+import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
-import 'package:wallet/services.dart';
+import 'package:wallet/code/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);

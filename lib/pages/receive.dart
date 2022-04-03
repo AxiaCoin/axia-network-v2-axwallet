@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
@@ -20,8 +21,8 @@ class _ReceivePageState extends State<ReceivePage> {
   late String shareableAddress;
 
   copyAddress() {
-    Clipboard.setData(ClipboardData(text: coinData.address));
-    CommonWidgets.snackBar(coinData.address, copyMode: true);
+    Clipboard.setData(ClipboardData(text: dummyAddress));
+    CommonWidgets.snackBar(dummyAddress, copyMode: true);
   }
 
   //TODO: Build set amount function and widget
@@ -37,7 +38,7 @@ class _ReceivePageState extends State<ReceivePage> {
   void initState() {
     super.initState();
     coinData = widget.coinData;
-    shareableAddress = coinData.address;
+    shareableAddress = dummyAddress;
   }
 
   @override
@@ -68,13 +69,13 @@ class _ReceivePageState extends State<ReceivePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     QrImage(
-                      data: coinData.address,
+                      data: dummyAddress,
                     ),
                     SizedBox(
                       height: 16,
                     ),
                     Text(
-                      coinData.address,
+                      dummyAddress,
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(

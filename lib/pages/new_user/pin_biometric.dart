@@ -1,20 +1,24 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 
-class AuthPage extends StatefulWidget {
-  const AuthPage({Key? key}) : super(key: key);
+class PinBiometricPage extends StatefulWidget {
+  const PinBiometricPage({Key? key}) : super(key: key);
 
   @override
-  _AuthPageState createState() => _AuthPageState();
+  _PinBiometricPageState createState() => _PinBiometricPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
+class _PinBiometricPageState extends State<PinBiometricPage> {
   final TextEditingController controller = TextEditingController();
   var localAuth = LocalAuthentication();
   bool canCheckBiometrics = false;
@@ -22,13 +26,13 @@ class _AuthPageState extends State<AuthPage> {
   bool isValid = false;
 
   initAuthentication() async {
-    canCheckBiometrics = await localAuth.canCheckBiometrics;
+    canCheckBiometrics = await Services().canCheckBiometrics();
     setState(() {});
   }
 
   onSubmit() async {
     if (isValid) {
-      if (useBiometric) {
+      if (useBiometric && canCheckBiometrics) {
         try {
           bool success = await localAuth.authenticate(
               localizedReason: "Please authenticate to continue to wallet",
@@ -43,6 +47,7 @@ class _AuthPageState extends State<AuthPage> {
           }
         }
       }
+      StorageService.instance.updatePIN(controller.text);
       Get.offAll(OnboardPage());
     }
   }
@@ -71,7 +76,7 @@ class _AuthPageState extends State<AuthPage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                "Create a PIN for easy access",
+                "Create a PIN for secure and easy access",
                 style: context.textTheme.headline3,
               ),
               SizedBox(

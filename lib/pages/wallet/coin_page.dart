@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/buy.dart';
 import 'package:wallet/pages/receive.dart';
@@ -36,8 +37,8 @@ class _CoinPageState extends State<CoinPage> {
   }
 
   copyAddress() {
-    Clipboard.setData(ClipboardData(text: coinData.address));
-    CommonWidgets.snackBar(coinData.address, copyMode: true);
+    Clipboard.setData(ClipboardData(text: dummyAddress));
+    CommonWidgets.snackBar(dummyAddress, copyMode: true);
   }
 
   @override

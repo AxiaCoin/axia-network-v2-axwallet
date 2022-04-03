@@ -1,8 +1,75 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
+// import 'package:axiawallet_sdk/api/api.dart';
+// import 'package:axiawallet_sdk/api/apiAccount.dart';
+// import 'package:axiawallet_sdk/api/apiKeyring.dart';
+// import 'package:axiawallet_sdk/axiawallet_sdk.dart';
+// import 'package:axiawallet_sdk/service/account.dart';
+// import 'package:axiawallet_sdk/service/index.dart';
+// import 'package:axiawallet_sdk/storage/keyring.dart';
+import 'package:coinslib/coinslib.dart';
 import 'package:http/http.dart' as http;
+import 'package:local_auth/local_auth.dart';
+import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:bip39/bip39.dart' as bip39;
+
+class IsolateParams {
+  String mnemonic;
+  SendPort sendPort;
+  IsolateParams(
+    this.mnemonic,
+    this.sendPort,
+  );
+}
+
+Services services = Services();
+
+class Services {
+  HDWallet? hdWallet;
+
+  // WalletSDK walletSDK = WalletSDK();
+  // var _keyring = Keyring();
+  // generateAXIAMnemonic() async {
+  //   await _keyring.init([0]);
+  //   if (walletSDK.api == null) await walletSDK.init(_keyring);
+  //   SubstrateService subService = SubstrateService();
+  //   ServiceAccount service = ServiceAccount(subService);
+  //   AXIAWalletApi apiRoot = AXIAWalletApi(subService);
+  //   // var data = ApiAccount(apiRoot, service).apiRoot.keyring.generateMnemonic();
+  //   var data = await walletSDK.api.keyring.generateMnemonic();
+  //   print(data);
+  // }
+
+  String generateMnemonic() {
+    String mnemonic = bip39.generateMnemonic();
+    return mnemonic;
+  }
+
+  Future<void> initWallet(String mnemonic) async {
+    void toSeed(IsolateParams isolateParams) {
+      var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
+      isolateParams.sendPort.send(seed);
+    }
+
+    var receivePort = ReceivePort();
+    await Isolate.spawn(toSeed, IsolateParams(mnemonic, receivePort.sendPort));
+    var seed = await receivePort.first;
+    receivePort.close();
+    hdWallet = new HDWallet.fromSeed(seed);
+    print("wallet created");
+    currencyList.forEach(
+      (e) => e.getWallet(),
+    );
+  }
+
+  Future<bool> canCheckBiometrics() async {
+    var localAuth = LocalAuthentication();
+    return await localAuth.canCheckBiometrics;
+  }
+}
 
 class APIServices {
   final ipAddress = "http://13.235.53.197:3000/";

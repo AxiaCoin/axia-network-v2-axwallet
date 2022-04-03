@@ -61,7 +61,7 @@ class _TokensPageState extends State<TokensPage>
       double totalBalance = 0.0;
       if (balanceInfo.isNotEmpty) {
         balanceInfo.forEach((key, value) {
-          totalBalance += value;
+          if (key.selected) totalBalance += value * key.value;
         });
       }
       return Container(
