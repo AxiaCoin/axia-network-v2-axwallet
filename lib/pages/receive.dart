@@ -2,26 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ReceivePage extends StatefulWidget {
-  final CoinData coinData;
-  const ReceivePage({Key? key, required this.coinData}) : super(key: key);
+  final Currency currency;
+  const ReceivePage({Key? key, required this.currency}) : super(key: key);
 
   @override
   _ReceivePageState createState() => _ReceivePageState();
 }
 
 class _ReceivePageState extends State<ReceivePage> {
-  late CoinData coinData;
+  late Currency currency;
   late String shareableAddress;
+  late CryptoWallet wallet;
 
   copyAddress() {
-    Clipboard.setData(ClipboardData(text: coinData.address));
-    CommonWidgets.snackBar(coinData.address, copyMode: true);
+    Clipboard.setData(ClipboardData(text: wallet.address));
+    CommonWidgets.snackBar(wallet.address, copyMode: true);
   }
 
   //TODO: Build set amount function and widget
@@ -29,22 +32,27 @@ class _ReceivePageState extends State<ReceivePage> {
 
   shareAddress() {
     String message =
-        "Hello, you can send me ${coinData.name} at my wallet address- $shareableAddress}";
+        "Hello, you can send me ${currency.coinData.name} at my wallet address- $shareableAddress}";
     Share.share(message);
+  }
+
+  getWallet() {
+    wallet = currency.getWallet();
   }
 
   @override
   void initState() {
     super.initState();
-    coinData = widget.coinData;
-    shareableAddress = coinData.address;
+    currency = widget.currency;
+    getWallet();
+    shareableAddress = wallet.address;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Receive ${coinData.name}"),
+        title: Text("Receive ${currency.coinData.name}"),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -68,13 +76,13 @@ class _ReceivePageState extends State<ReceivePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     QrImage(
-                      data: coinData.address,
+                      data: wallet.address,
                     ),
                     SizedBox(
                       height: 16,
                     ),
                     Text(
-                      coinData.address,
+                      wallet.address,
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(
@@ -89,7 +97,7 @@ class _ReceivePageState extends State<ReceivePage> {
           Text.rich(
             TextSpan(text: "Send only ", children: [
               TextSpan(
-                  text: "${coinData.name} ",
+                  text: "${currency.coinData.name} ",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:

@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/verify.dart';
-import 'package:wallet/services.dart';
+import 'package:wallet/code/services.dart';
 
 class SignupPage extends StatefulWidget {
   final bool resetPassword;
@@ -100,7 +101,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     Widget phoneField() => InternationalPhoneNumberInput(
           initialValue: PhoneNumber(
-            isoCode: Platform.localeName.split('_').last,
+            isoCode: kIsWeb ? null : Platform.localeName.split('_').last,
           ),
           onInputChanged: (PhoneNumber number) {
             phoneNumber = number;

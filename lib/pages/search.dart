@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/buy.dart';
@@ -19,12 +20,12 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController textEditingController = TextEditingController();
   final TokenData list = Get.find();
   final BalanceData balanceCont = Get.find();
-  List<CoinData> searchList = [];
-  List<CoinData> validSendingList = [];
+  List<Currency> searchList = [];
+  List<Currency> validSendingList = [];
   bool searchFailed = false;
   late bool isSendMode;
 
-  List<CoinData> getValidTokensForSending() {
+  List<Currency> getValidTokensForSending() {
     if (validSendingList.isEmpty)
       balanceCont.getData().forEach((key, value) {
         if (value != 0.0) validSendingList.add(key);
@@ -33,15 +34,15 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   searchString(String query) {
-    List<CoinData> data = isSendMode ? validSendingList : list.data;
+    List<Currency> data = isSendMode ? validSendingList : list.data;
     searchList.clear();
     bool found = false;
     searchFailed = false;
     data.forEach((e) {
       if (query != "") {
-        if (e.name.toLowerCase().contains(query.toLowerCase()) ||
-            e.unit.toLowerCase().contains(query.toLowerCase())) {
-          print("found ${e.name}");
+        if (e.coinData.name.toLowerCase().contains(query.toLowerCase()) ||
+            e.coinData.unit.toLowerCase().contains(query.toLowerCase())) {
+          print("found ${e.coinData.name}");
           found = true;
           searchList.add(e);
         }
@@ -90,72 +91,55 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget listTile(CoinData item, int index) {
-    Map<CoinData, double> balanceData = balanceCont.getData();
-    switch (widget.searchMode) {
-      case SearchMode.customize:
-        return SwitchListTile.adaptive(
-          value: item.selected,
-          // onChanged: (val) => setState(() => item.selected = val),
-          onChanged: (val) {
-            list.changeSelection(index, val);
-            setState(() {});
-          },
-          title: Text(item.name),
-          subtitle: Text(item.unit),
-          secondary: FlutterLogo(),
-        );
-      case SearchMode.buy:
-        return ListTile(
-          onTap: () {
-            Get.bottomSheet(
-                BuyPage(
-                  coinData: item,
-                  minimum: 50,
-                ),
-                isScrollControlled: true);
-          },
-          title: Text(item.name),
-          subtitle: Text(item.unit),
-          leading: FlutterLogo(),
-          trailing: Text("${balanceData[item]} ${item.unit}"),
-        );
-      case SearchMode.send:
-        return ListTile(
-          onTap: () {
-            Get.to(() => SendPage(
-                  coinData: item,
-                  balance: balanceData[item]!,
-                ));
-          },
-          title: Text(item.name),
-          subtitle: Text(item.unit),
-          leading: FlutterLogo(),
-          trailing: Text("${balanceData[item]} ${item.unit}"),
-        );
-      case SearchMode.receive:
-        return ListTile(
-          onTap: () {
-            Get.to(ReceivePage(
-              coinData: item,
-            ));
-          },
-          title: Text(item.name),
-          subtitle: Text(item.unit),
-          leading: FlutterLogo(),
-          trailing: Text("${balanceData[item]} ${item.unit}"),
-        );
-      case SearchMode.swap:
-        return ListTile(
-          onTap: () {
-            print("back");
-            Get.back(result: item);
-          },
-          title: Text(item.name),
-          subtitle: Text(item.unit),
-          leading: FlutterLogo(),
-          trailing: Text("${balanceData[item]} ${item.unit}"),
-        );
+  Widget listTile(Currency item, int index) {
+    Map<Currency, double> balanceData = balanceCont.getData();
+    if (widget.searchMode == SearchMode.customize) {
+      return SwitchListTile.adaptive(
+        value: item.coinData.selected,
+        // onChanged: (val) => setState(() => item.selected = val),
+        onChanged: (val) {
+          list.changeSelection(index, val);
+          setState(() {});
+        },
+        title: Text(item.coinData.name),
+        subtitle: Text(item.coinData.unit),
+        secondary: FlutterLogo(),
+      );
+    } else {
+      return ListTile(
+        onTap: () {
+          switch (widget.searchMode) {
+            case SearchMode.customize:
+              break;
+            case SearchMode.send:
+              Get.to(() => SendPage(
+                    currency: item,
+                    balance: balanceData[item]!,
+                  ));
+              break;
+            case SearchMode.receive:
+              Get.to(() => ReceivePage(
+                    currency: item,
+                  ));
+              break;
+            case SearchMode.buy:
+              Get.bottomSheet(
+                  BuyPage(
+                    currency: item,
+                    minimum: 50,
+                  ),
+                  isScrollControlled: true);
+              break;
+            case SearchMode.swap:
+              Get.back(result: item);
+              break;
+          }
+        },
+        title: Text(item.coinData.name),
+        subtitle: Text(item.coinData.unit),
+        leading: FlutterLogo(),
+        trailing: Text("${balanceData[item]} ${item.coinData.unit}"),
+      );
     }
   }
 
@@ -184,7 +168,7 @@ class _SearchPageState extends State<SearchPage> {
                         : list.data.length,
                 itemBuilder: (context, index) {
                   // CoinData item = coinData![index];
-                  CoinData item = searchList.isNotEmpty
+                  Currency item = searchList.isNotEmpty
                       ? searchList[index]
                       : isSendMode
                           ? validSendingList[index]

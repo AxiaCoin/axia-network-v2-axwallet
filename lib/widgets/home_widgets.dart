@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/dapps/see_all.dart';
@@ -141,16 +142,16 @@ class HomeWidgets {
   }
 
   static Widget financeList(BuildContext context,
-      {required String title, required List<CoinData> data}) {
+      {required String title, required List<Currency> data}) {
     List<Widget> widgets = [];
     final BalanceData balanceData = Get.find();
     final balanceInfo = balanceData.getData();
 
-    Widget listItem(CoinData item) => ListTile(
-          title: Text("${item.name} (${item.unit})"),
+    Widget listItem(Currency item) => ListTile(
+          title: Text("${item.coinData.name} (${item.coinData.unit})"),
           leading: FlutterLogo(),
           onTap: () {
-            Get.to(() => CoinPage(coinData: item, balance: balanceInfo[item]!));
+            Get.to(() => CoinPage(currency: item, balance: balanceInfo[item]!));
           },
         );
 

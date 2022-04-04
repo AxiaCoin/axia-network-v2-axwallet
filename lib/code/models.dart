@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class OnboardItemData {
@@ -7,23 +9,122 @@ class OnboardItemData {
   OnboardItemData(this.title, this.subtitle, this.icon);
 }
 
+class UserModel {
+  String userId;
+  String firstName;
+  String? lastName;
+  String? email;
+  String? phoneNumber;
+  String? phoneCode;
+  bool verified;
+  bool blocked;
+  bool userForgetPass;
+  String otpId;
+  String createdAt;
+  String updatedAt;
+  UserModel({
+    required this.userId,
+    required this.firstName,
+    this.lastName,
+    this.email,
+    this.phoneNumber,
+    this.phoneCode,
+    required this.verified,
+    required this.blocked,
+    required this.userForgetPass,
+    required this.otpId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'phoneCode': phoneCode,
+      'verified': verified,
+      'blocked': blocked,
+      'userForgetPass': userForgetPass,
+      'otpId': otpId,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      userId: map['userId'] ?? '',
+      firstName: map['firstName'] ?? '',
+      lastName: map['lastName'],
+      email: map['email'],
+      phoneNumber: map['phoneNumber'],
+      phoneCode: map['phoneCode'],
+      verified: map['verified'] ?? false,
+      blocked: map['blocked'] ?? false,
+      userForgetPass: map['userForgetPass'] ?? false,
+      otpId: map['otpId'] ?? '',
+      createdAt: map['createdAt'] ?? '',
+      updatedAt: map['updatedAt'] ?? '',
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory UserModel.fromJson(String source) =>
+      UserModel.fromMap(json.decode(source));
+}
+
 class CoinData {
   String name;
   String unit;
-  double value;
+  int coinType;
+  double rate;
   String change;
-  bool selected = true;
-  String address = "KxQ4qn3TsZ3ZpeAhTa38VovPgYLchxbZfNvs5zioK7zZQYMKnyq5";
-  CoinData(this.name, this.unit, this.value, this.change);
+  bool selected;
+  CoinData({
+    required this.name,
+    required this.unit,
+    required this.coinType,
+    this.rate = 1,
+    this.change = "",
+    this.selected = false,
+  });
+
+  factory CoinData.dummyCoin(int i) {
+    return CoinData(
+      name: "Coin $i",
+      unit: "XCN$i",
+      coinType: 1,
+      rate: 123.45,
+      change: "1.2",
+      selected: false,
+    );
+  }
 }
 
-enum SearchMode {
-  customize,
-  send,
-  receive,
-  buy,
-  swap
+class CryptoWallet {
+  String address;
+  String privKey;
+  String pubKey;
+  CryptoWallet({
+    required this.address,
+    required this.privKey,
+    required this.pubKey,
+  });
+
+  factory CryptoWallet.dummyWallet() {
+    return CryptoWallet(
+      address: "",
+      privKey: "",
+      pubKey: "",
+    );
+  }
 }
+
+enum SearchMode { customize, send, receive, buy, swap }
 
 class DAppsTile {
   String title;

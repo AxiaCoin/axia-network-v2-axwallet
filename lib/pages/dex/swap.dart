@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
@@ -20,7 +21,7 @@ class _SwapPageState extends State<SwapPage> {
   TextEditingController getController = TextEditingController();
   final TokenData tokenData = Get.find();
   final BalanceData balanceData = Get.find();
-  Map<CoinData, double> balanceInfo = {};
+  Map<Currency, double> balanceInfo = {};
   late CoinData payToken;
   late CoinData getToken;
   bool isValid = false;
@@ -30,13 +31,13 @@ class _SwapPageState extends State<SwapPage> {
   @override
   void initState() {
     super.initState();
-    payToken = tokenData.data[0];
-    getToken = tokenData.data[1];
+    payToken = tokenData.data[0].coinData;
+    getToken = tokenData.data[1].coinData;
     balanceInfo = balanceData.getData();
     payController.addListener(() {
       if (payController.text != "" && focusMode == FocusMode.pay) {
-        double payValue = payToken.value;
-        double getValue = getToken.value;
+        double payValue = payToken.rate;
+        double getValue = getToken.rate;
         // double exchangeValue = (getValue / payValue) * double.parse(payController.text);
         String exchangeValue =
             FormatText.exchangeValue(payValue, getValue, payController.text);
@@ -53,8 +54,8 @@ class _SwapPageState extends State<SwapPage> {
     });
     getController.addListener(() {
       if (getController.text != "" && focusMode == FocusMode.get) {
-        double payValue = payToken.value;
-        double getValue = getToken.value;
+        double payValue = payToken.rate;
+        double getValue = getToken.rate;
         // double exchangeValue = (getValue / payValue) * double.parse(payController.text);
         String exchangeValue =
             FormatText.exchangeValue(getValue, payValue, getController.text);
@@ -149,9 +150,9 @@ class _SwapPageState extends State<SwapPage> {
                       Get.to(() => SearchPage(searchMode: SearchMode.swap))!
                           .then((value) => setState(() {
                                 if (payMode) {
-                                  payToken = value;
+                                  payToken = value.coinData;
                                 } else {
-                                  getToken = value;
+                                  getToken = value.coinData;
                                 }
                               }));
                     },

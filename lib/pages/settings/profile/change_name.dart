@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/services.dart';
+import 'package:wallet/code/services.dart';
 
 class ChangeUserProfile extends StatefulWidget {
   final String? firstName;

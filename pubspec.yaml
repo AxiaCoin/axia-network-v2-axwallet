@@ -43,6 +43,14 @@ dependencies:
   http: ^0.13.4
   animations: ^2.0.2
   flutter_speed_dial: ^5.0.0+1
+  coinslib: ^3.1.1
+  bip39: ^1.0.6
+  bip32: ^2.0.0
+  web3dart: ^2.3.5
+  encrypt: ^5.0.1
+  hex: ^0.2.0
+  # axiawallet_sdk:
+  #   git: https://github.com/ashishbeck/sdk
 
 dev_dependencies:
   flutter_test:

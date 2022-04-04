@@ -1,14 +1,18 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/currencies/bitcoin.dart';
+import 'package:wallet/currencies/ethereum.dart';
 import 'package:wallet/pages/settings/profile/change_name.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
 import 'package:wallet/pages/new_user/login.dart';
-import 'package:wallet/services.dart';
+import 'package:wallet/code/services.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -19,6 +23,7 @@ class ProfilePage extends StatefulWidget {
 
 class ProfilePageState extends State<ProfilePage> {
   String user = "";
+  UserModel? userModel;
   String userName = "user";
   String? firstName;
   String? lastName;
@@ -39,9 +44,10 @@ class ProfilePageState extends State<ProfilePage> {
     var response = await APIServices()
         .getProfile(authToken: StorageService.instance.authToken!);
     if (response["success"]) {
+      userModel = UserModel.fromMap(response["data"]);
       user = response.toString();
-      firstName = response["data"]["firstName"];
-      lastName = response["data"]["lastName"];
+      firstName = userModel!.firstName;
+      lastName = userModel!.lastName;
       userName = "$firstName ${lastName ?? ""}";
     }
     setState(() {
@@ -79,7 +85,9 @@ class ProfilePageState extends State<ProfilePage> {
                 SizedBox(
                   height: 16,
                 ),
-                Text(user),
+                userModel == null
+                    ? Container()
+                    : Text(userModel!.toMap().toString()),
                 SizedBox(
                   height: 16,
                 ),
@@ -127,6 +135,28 @@ class ProfilePageState extends State<ProfilePage> {
                     style: MyButtonStyles.onboardStyle,
                   ),
                 ),
+                kDebugMode
+                    ? SizedBox(
+                        height: 16,
+                      )
+                    : SizedBox.shrink(),
+                kDebugMode
+                    ? SizedBox(
+                        width: Get.width,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // services.generateAXIAMnemonic();
+                            // currencyList.forEach(
+                            //   (e) => e.generateWalletAddress(),
+                            // );
+                            currencyList.last.getBalance();
+                          },
+                          child: Text("Test"),
+                          style: MyButtonStyles.onboardStyle,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+                // CircularProgressIndicator(),
               ],
             ),
           ),

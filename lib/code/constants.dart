@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wallet/code/currency.dart';
+import 'package:wallet/currencies/bitcoin.dart';
+import 'package:wallet/currencies/ethereum.dart';
 
 MaterialColor appColor = Colors.pink;
 Color tickerRed = Colors.red[900]!;
@@ -27,3 +30,12 @@ class MyButtonStyles {
             enabled ? InkRipple.splashFactory : NoSplash.splashFactory,
       );
 }
+
+bool isTestNet = false;
+List<Currency> currencyList = [
+  Bitcoin(),
+  Ethereum(),
+];
+
+String encKey = "keyForEncryptingMnemonic";
+String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";

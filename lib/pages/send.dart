@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/number_keyboard.dart';
 
 class SendPage extends StatefulWidget {
-  final CoinData coinData;
+  final Currency currency;
   final double balance;
-  const SendPage({Key? key, required this.coinData, required this.balance})
+  const SendPage({Key? key, required this.currency, required this.balance})
       : super(key: key);
 
   @override
@@ -17,7 +18,7 @@ class SendPage extends StatefulWidget {
 }
 
 class _SendPageState extends State<SendPage> {
-  late CoinData coinData;
+  late Currency currency;
   TextEditingController recipientController = new TextEditingController();
   TextEditingController amountController = new TextEditingController();
   bool isCurrencyMode = false;
@@ -49,14 +50,14 @@ class _SendPageState extends State<SendPage> {
   @override
   void initState() {
     super.initState();
-    coinData = widget.coinData;
+    currency = widget.currency;
   }
 
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
           //brightness: Brightness.dark,
-          title: Text("Send ${coinData.name}"),
+          title: Text("Send ${currency.coinData.name}"),
           centerTitle: true,
           actions: [
             TextButton(
@@ -115,7 +116,7 @@ class _SendPageState extends State<SendPage> {
                     },
                   );
                 },
-                child: Text(isCurrencyMode ? "USD" : coinData.unit))
+                child: Text(isCurrencyMode ? "USD" : currency.coinData.unit))
           ],
         );
 
@@ -184,7 +185,7 @@ class _SendPageState extends State<SendPage> {
                     decoration: InputDecoration(
                       labelText: "Amount " +
                           "(" +
-                          (isCurrencyMode ? "USD" : coinData.unit) +
+                          (isCurrencyMode ? "USD" : currency.coinData.unit) +
                           ")",
                       border: OutlineInputBorder(),
                     ),
@@ -204,7 +205,7 @@ class _SendPageState extends State<SendPage> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(top: 4),
                   child: Text(
-                    "Balance: ${widget.balance} ${coinData.unit}",
+                    "Balance: ${widget.balance} ${currency.coinData.unit}",
                     style: context.textTheme.caption,
                     textAlign: TextAlign.start,
                   )),

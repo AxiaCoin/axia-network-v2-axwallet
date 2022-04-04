@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/widgets/number_keyboard.dart';
 
 class BuyPage extends StatefulWidget {
-  final CoinData coinData;
+  final Currency currency;
   final double minimum;
-  const BuyPage({Key? key, required this.coinData, required this.minimum})
+  const BuyPage({Key? key, required this.currency, required this.minimum})
       : super(key: key);
 
   @override
@@ -16,7 +17,7 @@ class BuyPage extends StatefulWidget {
 }
 
 class _BuyPageState extends State<BuyPage> {
-  late CoinData coinData;
+  late Currency currency;
   late double minimum;
   late TextEditingController controller;
   bool isValid = true;
@@ -28,7 +29,7 @@ class _BuyPageState extends State<BuyPage> {
   @override
   void initState() {
     super.initState();
-    coinData = widget.coinData;
+    currency = widget.currency;
     minimum = widget.minimum;
     controller = new TextEditingController(text: minimum.toStringAsFixed(0));
     controller.addListener(
@@ -41,7 +42,7 @@ class _BuyPageState extends State<BuyPage> {
   @override
   Widget build(BuildContext context) {
     String exchangeRate =
-        FormatText.exchangeValue(coinData.value, 1, controller.text);
+        FormatText.exchangeValue(currency.coinData.rate, 1, controller.text);
     double currentInput =
         double.parse(controller.text == "" ? "0" : controller.text);
     if (currentInput < minimum) {
@@ -60,7 +61,7 @@ class _BuyPageState extends State<BuyPage> {
 
     AppBar appBar() => AppBar(
           //brightness: Brightness.dark,
-          title: Text("Buy ${coinData.unit}"),
+          title: Text("Buy ${currency.coinData.unit}"),
           centerTitle: true,
           actions: [
             IconButton(onPressed: () {}, icon: Icon(Icons.info_outline))
@@ -156,7 +157,7 @@ class _BuyPageState extends State<BuyPage> {
                   ? "\$$minimum Minimum Purchase"
                   : isHigher
                       ? "\$20000 Maximum Purchase"
-                      : "~$exchangeRate ${coinData.unit}",
+                      : "~$exchangeRate ${currency.coinData.unit}",
               style:
                   context.textTheme.subtitle2!.copyWith(color: Colors.black45),
             ),

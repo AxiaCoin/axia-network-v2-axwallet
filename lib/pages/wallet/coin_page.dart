@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/buy.dart';
 import 'package:wallet/pages/receive.dart';
@@ -9,9 +11,9 @@ import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 
 class CoinPage extends StatefulWidget {
-  final CoinData coinData;
+  final Currency currency;
   final double balance;
-  const CoinPage({Key? key, required this.coinData, required this.balance})
+  const CoinPage({Key? key, required this.currency, required this.balance})
       : super(key: key);
 
   @override
@@ -19,7 +21,7 @@ class CoinPage extends StatefulWidget {
 }
 
 class _CoinPageState extends State<CoinPage> {
-  late CoinData coinData;
+  late Currency currency;
   late double balance;
   bool isLoading = true;
   bool isRefreshing = false;
@@ -36,14 +38,14 @@ class _CoinPageState extends State<CoinPage> {
   }
 
   copyAddress() {
-    Clipboard.setData(ClipboardData(text: coinData.address));
-    CommonWidgets.snackBar(coinData.address, copyMode: true);
+    Clipboard.setData(ClipboardData(text: dummyAddress));
+    CommonWidgets.snackBar(dummyAddress, copyMode: true);
   }
 
   @override
   void initState() {
     super.initState();
-    coinData = widget.coinData;
+    currency = widget.currency;
     balance = widget.balance;
     refreshData();
   }
@@ -52,11 +54,11 @@ class _CoinPageState extends State<CoinPage> {
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
           // //brightness: Brightness.dark,
-          title: Text("${coinData.name} (${coinData.unit})"),
+          title: Text("${currency.coinData.name} (${currency.coinData.unit})"),
           actions: [
             TextButton(
                 onPressed: () => Get.to(() => BuyPage(
-                      coinData: coinData,
+                      currency: currency,
                       minimum: 50,
                     )),
                 child: Text(
@@ -74,8 +76,9 @@ class _CoinPageState extends State<CoinPage> {
           children: [
             HomeWidgets.coinPageHeaderText("COIN"),
             Spacer(),
-            HomeWidgets.coinPageHeaderText("\$${coinData.value} "),
-            HomeWidgets.coinPageHeaderText(coinData.change, isTicker: true)
+            HomeWidgets.coinPageHeaderText("\$${currency.coinData.rate} "),
+            HomeWidgets.coinPageHeaderText(currency.coinData.change,
+                isTicker: true)
           ],
         ),
       );
@@ -91,7 +94,7 @@ class _CoinPageState extends State<CoinPage> {
             SizedBox(
               height: 8,
             ),
-            Text("$balance ${coinData.unit}"),
+            Text("$balance ${currency.coinData.unit}"),
             SizedBox(
               height: 16,
             ),
@@ -101,13 +104,14 @@ class _CoinPageState extends State<CoinPage> {
                 HomeWidgets.quickAction(
                     icon: Icon(Icons.upload_outlined),
                     text: "Send",
-                    onPressed: () =>
-                        Get.to(SendPage(coinData: coinData, balance: balance)),
+                    onPressed: () => Get.to(
+                        () => SendPage(currency: currency, balance: balance)),
                     whiteBG: true),
                 HomeWidgets.quickAction(
                     icon: Icon(Icons.download_outlined),
                     text: "Receive",
-                    onPressed: () => Get.to(ReceivePage(coinData: coinData)),
+                    onPressed: () =>
+                        Get.to(() => ReceivePage(currency: currency)),
                     whiteBG: true),
                 HomeWidgets.quickAction(
                     icon: Icon(Icons.copy),
@@ -142,10 +146,10 @@ class _CoinPageState extends State<CoinPage> {
               // SizedBox(height: 8,),
               TextButton(
                   onPressed: () => Get.to(() => BuyPage(
-                        coinData: coinData,
+                        currency: currency,
                         minimum: 50,
                       )),
-                  child: Text("Buy ${coinData.name}"))
+                  child: Text("Buy ${currency.coinData.name}"))
             ],
           ),
         ),

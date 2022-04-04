@@ -5,11 +5,11 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/pages/new_user/auth.dart';
+import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
-import 'package:wallet/services.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
 
 class VerificationPage extends StatefulWidget {
