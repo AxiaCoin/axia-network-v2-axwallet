@@ -63,6 +63,7 @@ class Ethereum implements Currency {
     // print(coinData.address);
     // print(coinData.privKey);
     // print(coinData.pubKey);
+    print(ethWallet.address.hexEip55);
     return CryptoWallet(
         address: ethWallet.address.hexEip55,
         privKey: "0x${wallet.privKey}",

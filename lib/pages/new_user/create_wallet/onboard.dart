@@ -69,7 +69,9 @@ class _OnboardPageState extends State<OnboardPage>
       //       child: Icon(Icons.light_mode),
       //       onPressed: () => Get.changeTheme(lightTheme),
       //     ),
-      //     SizedBox(height: 8,),
+      //     SizedBox(
+      //       height: 8,
+      //     ),
       //     FloatingActionButton(
       //       child: Icon(Icons.dark_mode),
       //       onPressed: () => Get.changeTheme(darkTheme),

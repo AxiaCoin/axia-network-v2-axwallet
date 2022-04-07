@@ -84,7 +84,7 @@ class Bitcoin implements Currency {
         print("success");
         Map val = jsonDecode(response.body);
         print("result: $val");
-        return val;
+        return val.values;
       } else {
         print("unsuccessful");
         Map val = jsonDecode(response.body);
