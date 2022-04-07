@@ -11,7 +11,6 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/signup.dart';

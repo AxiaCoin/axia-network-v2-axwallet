@@ -47,9 +47,7 @@ class Services {
   // }
 
   String generateMnemonic() {
-    String mnemonic = bip39.generateMnemonic();
-    print(mnemonic);
-    return mnemonic;
+    return bip39.generateMnemonic();
   }
 
   Future<void> initWallet(String mnemonic) async {
@@ -94,7 +92,7 @@ class APIServices {
     try {
       var response = await http.post(Uri.parse(ipAddress + url),
           headers: {'Content-Type': 'application/json'},
-          body: json.encode(body));
+          body: jsonEncode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -158,7 +156,6 @@ class APIServices {
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
-            body["authToken"] = authToken;
             return patchbaseAPI(url, body);
           }
           return;

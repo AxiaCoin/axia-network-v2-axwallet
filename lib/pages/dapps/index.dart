@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
-import 'package:wallet/pages/webview.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 
 class DAppsPage extends StatefulWidget {

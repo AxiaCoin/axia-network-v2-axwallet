@@ -94,6 +94,8 @@ class StorageService {
     box.remove("sessionID");
     box.remove("mnemonic");
     box.remove("pin");
+    box.remove("defaultWallets");
+    box.remove("useBiometric");
   }
 
   // initBalances() {
@@ -109,7 +111,7 @@ class StorageService {
 
   storeMnemonic(String mnemonic) {
     var iv = IV.fromLength(16);
-    var key = Key.fromUtf8(sessionID!);
+    var key = Key.fromUtf8(encKey);
     var encrypter = Encrypter(AES(key));
     var encrypted = encrypter.encrypt(mnemonic, iv: iv);
     box.write("mnemonic", encrypted.base16);
@@ -119,7 +121,7 @@ class StorageService {
     String? mnemonic = box.read("mnemonic");
     if (mnemonic == null) return null;
     var iv = IV.fromLength(16);
-    var key = Key.fromUtf8(sessionID!);
+    var key = Key.fromUtf8(encKey);
     var encrypter = Encrypter(AES(key));
     var decrypted = encrypter.decrypt16(mnemonic, iv: iv);
     return decrypted;

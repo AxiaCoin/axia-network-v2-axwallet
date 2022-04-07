@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -8,11 +6,11 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
 import 'package:wallet/pages/search.dart';
 import 'package:wallet/pages/wallet/finance.dart';
-import 'package:wallet/pages/wallet/notifications.dart';
 import 'package:wallet/pages/wallet/tokens.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/sidebar.dart';
@@ -244,6 +242,7 @@ class _WalletPageState extends State<WalletPage> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      print(StorageService.instance.readMnemonic());
                       pushNewScreen(context,
                           screen: SearchPage(
                             searchMode: SearchMode.customize,

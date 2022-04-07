@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -8,7 +7,6 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
-import 'package:wallet/pages/dapps/see_all.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/finance.dart';
 import 'package:wallet/pages/webview.dart';

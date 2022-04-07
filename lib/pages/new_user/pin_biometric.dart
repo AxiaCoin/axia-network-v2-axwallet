@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
-import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:wallet/widgets/common.dart';
 
 class PinBiometricPage extends StatefulWidget {
-  const PinBiometricPage({Key? key}) : super(key: key);
+  final String mnemonic;
+  const PinBiometricPage({
+    Key? key,
+    required this.mnemonic,
+  }) : super(key: key);
 
   @override
   _PinBiometricPageState createState() => _PinBiometricPageState();
@@ -38,9 +43,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
               localizedReason: "Please authenticate to continue to wallet",
               biometricOnly: false);
           if (success) {
-            StorageService.instance.updatePIN(controller.text);
-            StorageService.instance.updateBiometricPreference(useBiometric);
-            Get.offAll(() => HomePage());
+            finishInitialization();
           } else {
             CommonWidgets.snackBar("Authentication failed. Please try again");
           }
@@ -52,10 +55,17 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
           }
         }
       }
-      StorageService.instance.updateBiometricPreference(useBiometric);
-      StorageService.instance.updatePIN(controller.text);
-      Get.offAll(() => HomePage());
+      finishInitialization();
     }
+  }
+
+  finishInitialization() {
+    StorageService.instance.updateBiometricPreference(useBiometric);
+    StorageService.instance.updatePIN(controller.text);
+    StorageService.instance.storeMnemonic(widget.mnemonic);
+    print(widget.mnemonic);
+    services.initWallet(widget.mnemonic);
+    Get.offAll(() => HomePage());
   }
 
   BoxDecoration get _pinPutDecoration {
