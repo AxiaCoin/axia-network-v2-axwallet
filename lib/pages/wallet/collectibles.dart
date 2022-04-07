@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
-import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/webview.dart';
 import 'package:wallet/widgets/home_widgets.dart';

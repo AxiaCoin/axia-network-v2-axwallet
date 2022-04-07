@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
@@ -35,10 +34,9 @@ class BalanceData extends GetxController {
   Map<Currency, double> getData() => data ??= {
         for (var item in tokenData.data)
           // if (Random().nextInt(100) < 50)
-          if (true)
-            item: (((Random().nextDouble() * 10000).toInt()) / 100)
-          else
-            item: 0.0
+          if (true) item: (((Random().nextDouble() * 10000).toInt()) / 100)
+        // else
+        // item: 0.0
       };
 }
 

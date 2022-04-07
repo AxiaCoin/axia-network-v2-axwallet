@@ -101,12 +101,24 @@ class _SearchPageState extends State<SearchPage> {
           list.changeSelection(index, val);
           setState(() {});
         },
-        title: Text(item.coinData.name),
+        title: Text(
+          item.coinData.name,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         subtitle: Text(item.coinData.unit),
-        secondary: FlutterLogo(),
+        secondary: Image.asset(
+          "assets/currencies/${item.coinData.unit}.png",
+          height: 40,
+          width: 40,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+        ),
       );
     } else {
-      return ListTile(
+      return HomeWidgets.coinTile(
         onTap: () {
           switch (widget.searchMode) {
             case SearchMode.customize:
@@ -135,10 +147,9 @@ class _SearchPageState extends State<SearchPage> {
               break;
           }
         },
-        title: Text(item.coinData.name),
-        subtitle: Text(item.coinData.unit),
-        leading: FlutterLogo(),
-        trailing: Text("${balanceData[item]} ${item.coinData.unit}"),
+        balance: "${balanceData[item]} ${item.coinData.unit}",
+        unit: item.coinData.unit,
+        name: item.coinData.name,
       );
     }
   }

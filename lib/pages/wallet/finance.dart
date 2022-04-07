@@ -1,11 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
-import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 

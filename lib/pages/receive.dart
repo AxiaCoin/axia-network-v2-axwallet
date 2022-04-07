@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/widgets/common.dart';
@@ -27,7 +26,6 @@ class _ReceivePageState extends State<ReceivePage> {
     CommonWidgets.snackBar(wallet.address, copyMode: true);
   }
 
-  //TODO: Build set amount function and widget
   setAmount() {}
 
   shareAddress() {
@@ -110,17 +108,17 @@ class _ReceivePageState extends State<ReceivePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.copy),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Copy",
                   onPressed: copyAddress,
                   whiteBG: true),
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.local_offer_outlined),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Set Amount",
                   onPressed: () {},
                   whiteBG: true),
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.adaptive.share),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Share",
                   onPressed: shareAddress,
                   whiteBG: true)

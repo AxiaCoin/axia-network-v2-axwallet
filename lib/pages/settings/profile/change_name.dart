@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/services.dart';
 
 class ChangeUserProfile extends StatefulWidget {
@@ -29,9 +27,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
       setState(() {
         submitting = true;
       });
-      String authToken = StorageService.instance.authToken!;
       var response = await APIServices().userNameUpdate(
-        authToken: authToken,
         firstName: firstNameController.text,
         lastName:
             lastNameController.text == "" ? null : lastNameController.text,
@@ -127,7 +123,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                         )
                       : SizedBox(
                           width: Get.width,
-                          child: ElevatedButton(
+                          child: TextButton(
                             onPressed: () {
                               _changeName();
                             },

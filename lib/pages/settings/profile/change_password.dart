@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/new_user/login.dart';
-import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -34,7 +32,8 @@ class _ChangePasswordState extends State<ChangePassword> {
         submitting = true;
       });
       String authToken = StorageService.instance.authToken!;
-      var response = await APIServices().userPasswordUpdate(
+      var response = await APIServices().resetPassword(
+        email: emailController.text,
         authToken: authToken,
         newPassword: passwordController.text,
         currentPassword: currentPassController.text,
@@ -188,7 +187,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       )
                     : SizedBox(
                         width: Get.width,
-                        child: ElevatedButton(
+                        child: TextButton(
                           onPressed: () {
                             _changePassword();
                           },
