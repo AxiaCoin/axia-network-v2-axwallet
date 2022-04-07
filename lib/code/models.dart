@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coinslib/coinslib.dart';
 import 'package:flutter/material.dart';
 
 class OnboardItemData {
@@ -109,10 +110,12 @@ class CryptoWallet {
   String address;
   String privKey;
   String pubKey;
+  ECPair? keyPair;
   CryptoWallet({
     required this.address,
     required this.privKey,
     required this.pubKey,
+    required this.keyPair,
   });
 
   factory CryptoWallet.dummyWallet() {
@@ -120,6 +123,7 @@ class CryptoWallet {
       address: "",
       privKey: "",
       pubKey: "",
+      keyPair: null,
     );
   }
 }

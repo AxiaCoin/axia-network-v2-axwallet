@@ -8,13 +8,11 @@ import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/api_testpage.dart';
+import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/signup.dart';
-import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
-import 'package:wallet/pages/wallet/index.dart';
 import 'package:wallet/code/services.dart';
 
 class LoginPage extends StatefulWidget {
@@ -56,9 +54,9 @@ class _LoginPageState extends State<LoginPage> {
       }
       var response = await APIServices().signIn(
           email: mode == Mode.email ? emailController.text : null,
-          phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-          phoneCode:
-              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          // phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+          // phoneCode:
+          //     mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
           password: passwordController.text,
           deviceId: deviceId);
       if (response["success"]) {
@@ -67,7 +65,6 @@ class _LoginPageState extends State<LoginPage> {
         Get.off(() => ProfilePage());
       } else if (response.toString().contains("verify")) {
         var result = await APIServices().sendVerifyOTP(
-          email: mode == Mode.email ? emailController.text : null,
           phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
           phoneCode:
               mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
@@ -158,9 +155,16 @@ class _LoginPageState extends State<LoginPage> {
                       label: "HomePage",
                       onTap: () => Get.offAll(() => HomePage())),
                   SpeedDialChild(
-                      child: Icon(Icons.api),
-                      label: "API Testing Page",
-                      onTap: () => Get.to(APITestpage()))
+                    child: Icon(Icons.send),
+                    label: "Send",
+                    onTap: () =>
+                        // Bitcoin().getBalance()
+                        Bitcoin().sendTransaction(
+                            1000,
+                            Bitcoin().getWallet().keyPair!,
+                            Bitcoin().getWallet().address,
+                            "mgJ7pCKX8kHyimHTik9GaPGkgKnt4xTjo2"),
+                  ),
                 ],
               )
             : Container(),

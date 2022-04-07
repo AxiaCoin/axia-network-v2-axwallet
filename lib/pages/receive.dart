@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/widgets/common.dart';
@@ -27,7 +26,6 @@ class _ReceivePageState extends State<ReceivePage> {
     CommonWidgets.snackBar(wallet.address, copyMode: true);
   }
 
-  //TODO: Build set amount function and widget
   setAmount() {}
 
   shareAddress() {

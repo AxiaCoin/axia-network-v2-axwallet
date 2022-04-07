@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
-import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/buy.dart';
 import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/send.dart';

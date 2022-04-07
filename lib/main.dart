@@ -5,9 +5,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
-import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
-import 'package:wallet/pages/settings/profile/index.dart';
 
 Future<void> main() async {
   await initServices();

@@ -51,7 +51,6 @@ class _SignupPageState extends State<SignupPage> {
       );
       if (response["success"]) {
         var result = await APIServices().sendVerifyOTP(
-          email: mode == Mode.email ? emailController.text : null,
           phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
           phoneCode:
               mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
@@ -67,9 +66,9 @@ class _SignupPageState extends State<SignupPage> {
     } else {
       var response = await APIServices().forgotPasswordOtp(
         email: mode == Mode.email ? emailController.text : null,
-        phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-        phoneCode:
-            mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        // phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+        // phoneCode:
+        //     mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
       );
 
       if (response["success"]) {
