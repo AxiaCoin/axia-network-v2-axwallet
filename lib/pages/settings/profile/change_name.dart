@@ -127,7 +127,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                         )
                       : SizedBox(
                           width: Get.width,
-                          child: ElevatedButton(
+                          child: TextButton(
                             onPressed: () {
                               _changeName();
                             },

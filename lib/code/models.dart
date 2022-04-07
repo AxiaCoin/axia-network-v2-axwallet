@@ -129,7 +129,7 @@ enum SearchMode { customize, send, receive, buy, swap }
 class DAppsTile {
   String title;
   String subtitle;
-  Widget image;
+  Widget? image;
   String url;
 
   DAppsTile(this.title, this.subtitle, this.image, this.url);

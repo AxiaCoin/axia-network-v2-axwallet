@@ -10,6 +10,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
+import 'package:wallet/widgets/common.dart';
 
 class PinBiometricPage extends StatefulWidget {
   const PinBiometricPage({Key? key}) : super(key: key);
@@ -69,69 +70,84 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
   Widget build(BuildContext context) {
     isValid = controller.text.length == 6;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Security"),
+        centerTitle: true,
+      ),
       body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(
-                "Create a PIN for secure and easy access",
-                style: context.textTheme.headline3,
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              PinPut(
-                fieldsCount: 6,
-                autofocus: true,
-                controller: controller,
-                pinAnimationType: PinAnimationType.slide,
-                obscureText: "*",
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                submittedFieldDecoration: _pinPutDecoration.copyWith(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                selectedFieldDecoration: _pinPutDecoration,
-                followingFieldDecoration: _pinPutDecoration.copyWith(
-                  borderRadius: BorderRadius.circular(5.0),
-                  border: Border.all(
-                    color: appColor.withOpacity(.5),
+        child: Stack(
+          children: [
+            Container(
+              height: Get.height * 0.15,
+              color: appColor[600],
+            ),
+            CommonWidgets.elevatedContainer(
+              padding: 16,
+              margin: 16,
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Create a PIN for secure and easy access",
+                    style: context.textTheme.headline5,
                   ),
-                ),
-                onChanged: (val) {
-                  setState(() {});
-                },
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              canCheckBiometrics
-                  ? SizedBox(
-                      width: Get.width * 0.9,
-                      child: SwitchListTile.adaptive(
-                        value: useBiometric,
-                        onChanged: (val) => setState(() => useBiometric = val),
-                        title: Text(
-                            "Enable FaceID/Fingerprint for even easier access"),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  PinPut(
+                    fieldsCount: 6,
+                    autofocus: true,
+                    controller: controller,
+                    pinAnimationType: PinAnimationType.slide,
+                    obscureText: "*",
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    submittedFieldDecoration: _pinPutDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    selectedFieldDecoration: _pinPutDecoration,
+                    followingFieldDecoration: _pinPutDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(5.0),
+                      border: Border.all(
+                        color: appColor.withOpacity(.5),
                       ),
-                    )
-                  : Container(),
-              SizedBox(
-                height: 32,
+                    ),
+                    onChanged: (val) {
+                      setState(() {});
+                    },
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  canCheckBiometrics
+                      ? SizedBox(
+                          width: Get.width * 0.9,
+                          child: SwitchListTile.adaptive(
+                            value: useBiometric,
+                            onChanged: (val) =>
+                                setState(() => useBiometric = val),
+                            title: Text(
+                                "Enable FaceID/Fingerprint for even easier access"),
+                          ),
+                        )
+                      : Container(),
+                  SizedBox(
+                    height: 32,
+                  ),
+                  SizedBox(
+                    width: Get.width,
+                    child: TextButton(
+                      onPressed: () {
+                        onSubmit();
+                      },
+                      child: Text("CONTINUE"),
+                      style: MyButtonStyles.statefulStyle(isValid),
+                    ),
+                  )
+                ],
               ),
-              SizedBox(
-                width: Get.width,
-                child: ElevatedButton(
-                  onPressed: () {
-                    onSubmit();
-                  },
-                  child: Text("CONTINUE"),
-                  style: MyButtonStyles.statefulStyle(isValid),
-                ),
-              )
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

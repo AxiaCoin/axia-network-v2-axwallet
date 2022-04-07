@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
@@ -57,7 +58,7 @@ class _TokensPageState extends State<TokensPage>
     super.build(context);
     double width = Get.width;
     double height = Get.height;
-    List tickerColor = [Colors.green[900], Colors.red[800]];
+    List tickerColor = [tickerGreen, tickerRed];
 
     Widget dash() {
       double totalBalance = 0.0;
@@ -70,43 +71,83 @@ class _TokensPageState extends State<TokensPage>
           // height: Get.height * 0.25,
           width: width,
           constraints: BoxConstraints(maxHeight: height * 0.50),
-          color: appColor,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(20),
+            ),
+            gradient: LinearGradient(
+                colors: [appColor[600]!, appColor],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight),
+          ),
           child: Container(
-              padding: EdgeInsets.only(top: width * 0.05, bottom: width * 0.03),
+              padding: EdgeInsets.only(
+                top: width * 0.04,
+                bottom: width * 0.04,
+                left: width * 0.04,
+                right: width * 0.03,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                        color: appColor[300]),
+                    child: Text(
+                      "+2.5%",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
                   Text(
-                    "\$${totalBalance.toStringAsFixed(2)}",
-                    style: TextStyle(color: Colors.white, fontSize: 48),
+                    "WALLET 1",
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
                     height: 4,
                   ),
                   Text(
-                    "Wallet 1",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    "\$${totalBalance.toStringAsFixed(2)}",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
-                    height: 16,
+                    height: height * 0.04,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      Text.rich(
+                        TextSpan(
+                          text: "More",
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          children: [
+                            WidgetSpan(
+                              child: Icon(
+                                Icons.keyboard_arrow_right,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Spacer(),
                       HomeWidgets.quickAction(
-                          icon: Icon(Icons.upload_outlined),
-                          text: "Send",
-                          onPressed: () {
-                            pushNewScreen(
-                              context,
-                              screen: SearchPage(searchMode: SearchMode.send),
-                            );
-                          }),
-                      HomeWidgets.quickAction(
-                          icon: Icon(Icons.download_outlined),
-                          text: "Receive",
+                          icon: "assets/icons/receive_dash.svg",
+                          // text: "Receive",
                           onPressed: () {
                             pushNewScreen(
                               context,
@@ -114,15 +155,30 @@ class _TokensPageState extends State<TokensPage>
                                   SearchPage(searchMode: SearchMode.receive),
                             );
                           }),
+                      SizedBox(
+                        width: width * 0.03,
+                      ),
                       HomeWidgets.quickAction(
-                          icon: Icon(Icons.local_offer_outlined),
-                          text: "Buy",
+                          icon: "assets/icons/send_dash.svg",
+                          // text: "Send",
                           onPressed: () {
                             pushNewScreen(
                               context,
-                              screen: SearchPage(searchMode: SearchMode.buy),
+                              screen: SearchPage(searchMode: SearchMode.send),
                             );
-                          })
+                          }),
+                      SizedBox(
+                        width: width * 0.03,
+                      ),
+                      // HomeWidgets.quickAction(
+                      //     icon: Icon(Icons.local_offer_outlined),
+                      //     text: "Buy",
+                      //     onPressed: () {
+                      //       pushNewScreen(
+                      //         context,
+                      //         screen: SearchPage(searchMode: SearchMode.buy),
+                      //       );
+                      //     })
                     ],
                   )
                 ],
@@ -134,51 +190,148 @@ class _TokensPageState extends State<TokensPage>
         isRefreshing = true;
         await refreshData();
       },
-      child: ListView.builder(
-        itemCount: isLoading ? 2 : list.selected!.length + 1,
-        itemBuilder: (context, index) {
-          if (isLoading || index == 0) {
-            if (index == 0) return dash();
-            return Center(
-                child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: CircularProgressIndicator.adaptive(),
-            ));
-          }
-          Currency currency = list.selected![index - 1];
-          CoinData item = currency.coinData;
-          String name = item.name;
-          String unit = item.unit;
-          String value = "\$${item.rate} ";
-          String change = item.change;
-          String balance = "${balanceInfo[currency]} $unit";
-          var rand = Random().nextInt(2);
-          String ticker = "-$change%";
-          if (rand == 0) {
-            ticker = "+$change%";
-          }
-          return ListTile(
-            leading: FlutterLogo(),
-            trailing: Text(balance),
-            title: Text(name),
-            subtitle: Text.rich(
-              TextSpan(text: value, children: [
-                TextSpan(
-                    text: ticker, style: TextStyle(color: tickerColor[rand]))
-              ]),
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: dash(),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Your Portfolio",
+                  style: TextStyle(fontSize: 18),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    pushNewScreen(context,
+                        screen: SearchPage(
+                          searchMode: SearchMode.customize,
+                        )).then(
+                      (value) {
+                        tokensKey.currentState?.setState(() {});
+                      },
+                    );
+                  },
+                  child: Text(
+                    "Edit Assets",
+                    style: TextStyle(color: appColor, fontSize: 16),
+                  ),
+                ),
+              ],
             ),
-            onTap: () => pushNewScreen(
-              context,
-              screen: CoinPage(
-                currency: currency,
-                balance: balanceInfo[currency]!,
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(16),
               ),
+              color: Colors.grey[50],
             ),
-          );
-        },
-        // children: [
-        //   dash(),
-        // ],
+            child: ListView.builder(
+              itemCount: isLoading ? 1 : list.selected!.length,
+              shrinkWrap: true,
+              primary: false,
+              itemBuilder: (context, index) {
+                if (isLoading) {
+                  return Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator.adaptive(),
+                  ));
+                }
+                Currency currency = list.selected![index];
+                CoinData item = currency.coinData;
+                String name = item.name;
+                String unit = item.unit;
+                String rate = "\$${item.rate} ";
+                String change = item.change;
+                String balance = "${balanceInfo[currency]} $unit";
+                String value = "\$" +
+                    (item.rate * balanceInfo[currency]!).toStringAsFixed(2);
+                var rand = Random().nextInt(2);
+                String ticker = "-$change%";
+                if (rand == 0) {
+                  ticker = "+$change%";
+                }
+                return HomeWidgets.coinTile(
+                  balance: balance,
+                  name: name,
+                  rate: rate,
+                  ticker: ticker,
+                  unit: unit,
+                  value: value,
+                  onTap: () => pushNewScreen(
+                    context,
+                    screen: CoinPage(
+                      currency: currency,
+                      balance: balanceInfo[currency]!,
+                    ),
+                  ),
+                );
+                // return ListTile(
+                //   leading: Image.asset(
+                //     "assets/currencies/$unit.png",
+                //     height: 40,
+                //     width: 40,
+                //     fit: BoxFit.contain,
+                //     filterQuality: FilterQuality.high,
+                //   ),
+                //   trailing: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.end,
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       Text(
+                //         balance,
+                //         style: TextStyle(
+                //           fontSize: 16,
+                //           fontWeight: FontWeight.w500,
+                //         ),
+                //       ),
+                //       Text(
+                //         value,
+                //         style: TextStyle(
+                //           fontSize: 14,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                //   title: Text(
+                //     name,
+                //     style: TextStyle(
+                //       fontSize: 16,
+                //       fontWeight: FontWeight.w500,
+                //     ),
+                //   ),
+                //   subtitle: Text.rich(
+                //     TextSpan(
+                //       text: rate,
+                //       children: [
+                //         TextSpan(
+                //             text: ticker,
+                //             style: TextStyle(color: tickerColor[rand]))
+                //       ],
+                //     ),
+                //   ),
+                //   onTap: () => pushNewScreen(
+                //     context,
+                //     screen: CoinPage(
+                //       currency: currency,
+                //       balance: balanceInfo[currency]!,
+                //     ),
+                //   ),
+                // );
+              },
+              // children: [
+              //   dash(),
+              // ],
+            ),
+          ),
+        ],
       ),
     );
   }

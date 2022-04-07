@@ -110,17 +110,17 @@ class _ReceivePageState extends State<ReceivePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.copy),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Copy",
                   onPressed: copyAddress,
                   whiteBG: true),
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.local_offer_outlined),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Set Amount",
                   onPressed: () {},
                   whiteBG: true),
               HomeWidgets.quickAction(
-                  icon: Icon(Icons.adaptive.share),
+                  icon: "assets/icons/receive_dash.svg",
                   text: "Share",
                   onPressed: shareAddress,
                   whiteBG: true)

@@ -16,6 +16,7 @@ import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/widgets/common.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -148,189 +149,215 @@ class _LoginPageState extends State<LoginPage> {
             passwordFocus.requestFocus();
           },
         );
-    return Scaffold(
-        floatingActionButton: kDebugMode
-            ? SpeedDial(
-                animatedIcon: AnimatedIcons.menu_home,
-                children: [
-                  SpeedDialChild(
-                      child: Icon(Icons.next_plan),
-                      label: "HomePage",
-                      onTap: () => Get.offAll(() => HomePage())),
-                  SpeedDialChild(
-                      child: Icon(Icons.api),
-                      label: "API Testing Page",
-                      onTap: () => Get.to(APITestpage()))
-                ],
-              )
-            : Container(),
-        body: SafeArea(
-            child: Form(
-          key: formKey,
-          child: Container(
-              padding: EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+          floatingActionButton: kDebugMode
+              ? SpeedDial(
+                  animatedIcon: AnimatedIcons.menu_home,
                   children: [
-                    SizedBox(
-                        height: Get.width * 0.2,
-                        width: Get.width * 0.2,
-                        child: FlutterLogo()),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Text(
-                      "Login",
-                      style: context.textTheme.headline4,
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Text(
-                      "Welcome to your Wallet",
-                      style: context.textTheme.caption!.copyWith(fontSize: 24),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    isPhoneMode ? phoneField() : emailField(),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    TextFormField(
-                      controller: passwordController,
-                      focusNode: passwordFocus,
-                      obscureText: obscurity,
-                      keyboardType: TextInputType.visiblePassword,
-                      textInputAction: isPhoneMode
-                          ? TextInputAction.done
-                          : TextInputAction.next,
-                      decoration: InputDecoration(
-                          labelText: "Password",
-                          border: OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: Icon(obscurity
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                            onPressed: () =>
-                                setState(() => obscurity = !obscurity),
-                          )),
-                      validator: (val) => passwordController.text.length < 8
-                          ? "The password should be 8 characters long"
-                          : null,
-                      onFieldSubmitted: (val) {
-                        if (!isPhoneMode) confirmPasswordFocus.requestFocus();
-                      },
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    // isPhoneMode
-                    //     ? Container()
-                    //     : TextFormField(
-                    //         focusNode: confirmPasswordFocus,
-                    //         obscureText: obscurity,
-                    //         keyboardType: TextInputType.visiblePassword,
-                    //         textInputAction: TextInputAction.done,
-                    //         decoration: InputDecoration(
-                    //           labelText: "Confirm Password",
-                    //           border: OutlineInputBorder(),
-                    //         ),
-                    //         validator: (val) => val == passwordController.text
-                    //             ? null
-                    //             : "The passwords do not match",
-                    //       ),
-                    // isPhoneMode
-                    //     ? Container()
-                    //     : SizedBox(
-                    //         height: 16,
-                    //       ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    submitting
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Container(
-                            width: Get.width,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                onSubmit();
-                              },
-                              child: Text("LOGIN"),
-                              style: MyButtonStyles.onboardStyle,
+                    SpeedDialChild(
+                        child: Icon(Icons.next_plan),
+                        label: "HomePage",
+                        onTap: () => Get.offAll(() => HomePage())),
+                    SpeedDialChild(
+                        child: Icon(Icons.api),
+                        label: "API Testing Page",
+                        onTap: () => Get.to(APITestpage()))
+                  ],
+                )
+              : Container(),
+          appBar: AppBar(
+            title: Text("Login"),
+            centerTitle: true,
+            elevation: 0,
+          ),
+          body: SafeArea(
+              child: Form(
+            key: formKey,
+            child: Stack(
+              children: [
+                Container(
+                  height: Get.height * 0.15,
+                  color: appColor[600],
+                ),
+                Container(
+                    padding: EdgeInsets.all(16),
+                    child: SingleChildScrollView(
+                      child: CommonWidgets.elevatedContainer(
+                        padding: 16,
+                        margin: 0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                                height: Get.width * 0.2,
+                                width: Get.width * 0.2,
+                                child: FlutterLogo()),
+                            SizedBox(
+                              height: 16,
                             ),
-                          ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Center(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => setState(() {
-                          mode = mode == Mode.phone ? Mode.email : Mode.phone;
-                        }),
-                        child: Text(
-                          mode == Mode.phone
-                              ? "Use email insead"
-                              : "Use phone number instead",
-                          style: context.textTheme.caption!.copyWith(),
+                            // Text(
+                            //   "Login",
+                            //   style: context.textTheme.headline4,
+                            // ),
+                            // SizedBox(
+                            //   height: 32,
+                            // ),
+                            Text(
+                              "Welcome to your Wallet",
+                              style: context.textTheme.caption!
+                                  .copyWith(fontSize: 24),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            isPhoneMode ? phoneField() : emailField(),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            TextFormField(
+                              controller: passwordController,
+                              focusNode: passwordFocus,
+                              obscureText: obscurity,
+                              keyboardType: TextInputType.visiblePassword,
+                              textInputAction: isPhoneMode
+                                  ? TextInputAction.done
+                                  : TextInputAction.next,
+                              decoration: InputDecoration(
+                                  labelText: "Password",
+                                  border: OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(obscurity
+                                        ? Icons.visibility_off
+                                        : Icons.visibility),
+                                    onPressed: () =>
+                                        setState(() => obscurity = !obscurity),
+                                  )),
+                              validator: (val) => passwordController
+                                          .text.length <
+                                      8
+                                  ? "The password should be 8 characters long"
+                                  : null,
+                              onFieldSubmitted: (val) {
+                                if (!isPhoneMode)
+                                  confirmPasswordFocus.requestFocus();
+                              },
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            // isPhoneMode
+                            //     ? Container()
+                            //     : TextFormField(
+                            //         focusNode: confirmPasswordFocus,
+                            //         obscureText: obscurity,
+                            //         keyboardType: TextInputType.visiblePassword,
+                            //         textInputAction: TextInputAction.done,
+                            //         decoration: InputDecoration(
+                            //           labelText: "Confirm Password",
+                            //           border: OutlineInputBorder(),
+                            //         ),
+                            //         validator: (val) => val == passwordController.text
+                            //             ? null
+                            //             : "The passwords do not match",
+                            //       ),
+                            // isPhoneMode
+                            //     ? Container()
+                            //     : SizedBox(
+                            //         height: 16,
+                            //       ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            submitting
+                                ? Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : Container(
+                                    width: Get.width,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        onSubmit();
+                                      },
+                                      child: Text("LOGIN"),
+                                      style: MyButtonStyles.onboardStyle,
+                                    ),
+                                  ),
+                            SizedBox(
+                              height: 32,
+                            ),
+                            Center(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => setState(() {
+                                  mode = mode == Mode.phone
+                                      ? Mode.email
+                                      : Mode.phone;
+                                }),
+                                child: Text(
+                                  mode == Mode.phone
+                                      ? "Use email insead"
+                                      : "Use phone number instead",
+                                  style: context.textTheme.caption!.copyWith(),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text.rich(TextSpan(
+                                text: "Not yet registered? ",
+                                style: context.textTheme.caption!
+                                    .copyWith(color: Colors.black),
+                                children: [
+                                  WidgetSpan(
+                                      child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    // onTap: () => setState(() => mode =
+                                    //     isLoginMode ? Mode.register : Mode.login),
+                                    onTap: () => Get.to(() => SignupPage()),
+                                    child: Text(
+                                      "Create Account",
+                                      style: context.textTheme.caption!
+                                          .copyWith(color: appColor),
+                                    ),
+                                  ))
+                                ])),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text.rich(TextSpan(
+                                text: "Forgot Password? ",
+                                style: context.textTheme.caption!
+                                    .copyWith(color: Colors.black),
+                                children: [
+                                  WidgetSpan(
+                                      child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    // onTap: () => setState(() => mode =
+                                    //     isLoginMode ? Mode.register : Mode.login),
+                                    onTap: () => Get.to(() => SignupPage(
+                                          resetPassword: true,
+                                        )),
+                                    child: Text(
+                                      "Reset it",
+                                      style: context.textTheme.caption!
+                                          .copyWith(color: appColor),
+                                    ),
+                                  ))
+                                ])),
+                            SizedBox(
+                              height: 16,
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Text.rich(TextSpan(
-                        text: "Not yet registered? ",
-                        style: context.textTheme.caption!
-                            .copyWith(color: Colors.black),
-                        children: [
-                          WidgetSpan(
-                              child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            // onTap: () => setState(() => mode =
-                            //     isLoginMode ? Mode.register : Mode.login),
-                            onTap: () => Get.to(() => SignupPage()),
-                            child: Text(
-                              "Create Account",
-                              style: context.textTheme.caption!
-                                  .copyWith(color: appColor),
-                            ),
-                          ))
-                        ])),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Text.rich(TextSpan(
-                        text: "Forgot Password? ",
-                        style: context.textTheme.caption!
-                            .copyWith(color: Colors.black),
-                        children: [
-                          WidgetSpan(
-                              child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            // onTap: () => setState(() => mode =
-                            //     isLoginMode ? Mode.register : Mode.login),
-                            onTap: () => Get.to(() => SignupPage(
-                                  resetPassword: true,
-                                )),
-                            child: Text(
-                              "Reset it",
-                              style: context.textTheme.caption!
-                                  .copyWith(color: appColor),
-                            ),
-                          ))
-                        ])),
-                    SizedBox(
-                      height: 16,
-                    ),
-                  ],
-                ),
-              )),
-        )));
+                    )),
+              ],
+            ),
+          ))),
+    );
   }
 }
 

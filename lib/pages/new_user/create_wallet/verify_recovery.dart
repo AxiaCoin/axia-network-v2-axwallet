@@ -106,7 +106,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
               Container(
                 width: Get.width,
                 padding: EdgeInsets.only(top: 8),
-                child: ElevatedButton(
+                child: TextButton(
                   onPressed: () {
                     if (isValid) {
                       Get.offAll(() => HomePage());

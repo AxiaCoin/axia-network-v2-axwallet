@@ -188,7 +188,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       )
                     : SizedBox(
                         width: Get.width,
-                        child: ElevatedButton(
+                        child: TextButton(
                           onPressed: () {
                             _changePassword();
                           },

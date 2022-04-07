@@ -50,4 +50,10 @@ class Bitcoin implements Currency {
     // TODO: implement importWallet
     throw UnimplementedError();
   }
+
+  @override
+  sendTransaction() {
+    // TODO: implement sendTransaction
+    throw UnimplementedError();
+  }
 }

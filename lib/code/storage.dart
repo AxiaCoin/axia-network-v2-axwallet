@@ -19,6 +19,7 @@ class StorageService {
   List<String>? defaultWallets;
 
   init() {
+    // box.remove("authToken");
     authToken = box.read("authToken");
     sessionID = box.read("sessionID");
     deviceID = box.read("deviceID");

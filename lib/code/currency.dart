@@ -12,4 +12,6 @@ abstract class Currency {
   getBalance() => null;
 
   getTransactions() => null;
+
+  sendTransaction() async => null;
 }

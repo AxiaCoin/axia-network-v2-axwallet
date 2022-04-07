@@ -27,10 +27,10 @@ class Ethereum implements Currency {
     coinslib.HDWallet hdWallet = services.hdWallet!;
     var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
     var ethWallet = EthPrivateKey.fromHex("0x${wallet.privKey}");
-    // var client = Web3Client(
-    //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
-    //     Client());
-    // client.getGasPrice().then((value) => print(value.getInWei));
+    var client = Web3Client(
+        "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+        Client());
+    client.getGasPrice().then((value) => print(value.getInWei));
     // var signedData = await client.signTransaction(
     //   ethWallet,
     //   Transaction(
@@ -94,5 +94,34 @@ class Ethereum implements Currency {
   importWallet() {
     // TODO: implement importWallet
     throw UnimplementedError();
+  }
+
+  @override
+  sendTransaction() async {
+    coinslib.HDWallet hdWallet = services.hdWallet!;
+    var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
+    var ethWallet = EthPrivateKey.fromHex("0x${wallet.privKey}");
+    print("address is ${ethWallet.address.hexEip55}");
+    var client = Web3Client(
+        "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+        Client());
+    var gasPrice = await client.getGasPrice();
+    var signedData = await client.signTransaction(
+      ethWallet,
+      Transaction(
+        to: EthereumAddress.fromHex(
+            '0xF98863D856b1Dca7627E98CeA960BA40958774f6'),
+        gasPrice: gasPrice,
+        maxGas: 100000,
+        value: EtherAmount.fromUnitAndValue(EtherUnit.szabo, BigInt.one),
+      ),
+      fetchChainIdFromNetworkId: true,
+      chainId: null,
+    );
+    var hex = HexEncoder().convert(signedData);
+    print("signed hex is 0x$hex");
+    //TODO: send transaction
+    var sent = await client.sendRawTransaction(signedData);
+    print("hash is $sent");
   }
 }

@@ -93,7 +93,7 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(
                   width: Get.width,
-                  child: ElevatedButton(
+                  child: TextButton(
                     onPressed: () {
                       Get.to(() => ChangeUserProfile(
                                 firstName: firstName,
@@ -114,7 +114,7 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(
                   width: Get.width,
-                  child: ElevatedButton(
+                  child: TextButton(
                     onPressed: () {
                       Get.to(() => ChangePassword(resetPassword: false));
                     },
@@ -127,7 +127,7 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(
                   width: Get.width,
-                  child: ElevatedButton(
+                  child: TextButton(
                     onPressed: () {
                       logOut();
                     },
@@ -143,7 +143,7 @@ class ProfilePageState extends State<ProfilePage> {
                 kDebugMode
                     ? SizedBox(
                         width: Get.width,
-                        child: ElevatedButton(
+                        child: TextButton(
                           onPressed: () {
                             // services.generateAXIAMnemonic();
                             // currencyList.forEach(

@@ -8,6 +8,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/widgets/common.dart';
 
 class SignupPage extends StatefulWidget {
   final bool resetPassword;
@@ -224,83 +225,93 @@ class _SignupPageState extends State<SignupPage> {
               height: 16,
             ),
           ];
-    return Scaffold(
-      body: Form(
-        key: formKey,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => Get.back(),
-                    child: Text(
-                      "← Back to Login",
-                      style:
-                          context.textTheme.caption!.copyWith(color: appColor),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Text(
-                    widget.resetPassword ? "Reset Password" : "Sign up",
-                    style: context.textTheme.headline4,
-                  ),
-                  SizedBox(
-                    height: 32,
-                  ),
-                  Text(
-                    "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
-                    style: context.textTheme.caption!.copyWith(fontSize: 24),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  mode == Mode.phone ? phoneField() : emailField(),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  ...nameFields,
-                  ...passwordFields,
-                  submitting
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : SizedBox(
-                          width: Get.width,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                onSubmit();
-                              }
-                            },
-                            child: Text("Send Verification Code"),
-                            style: MyButtonStyles.onboardStyle,
-                          ),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.resetPassword ? "Reset Password" : "Sign up"),
+          centerTitle: true,
+          leading: CommonWidgets.backButton(context),
+        ),
+        body: Form(
+          key: formKey,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Container(
+                  height: Get.height * 0.15,
+                  color: appColor[600],
+                ),
+                CommonWidgets.elevatedContainer(
+                  padding: 16,
+                  margin: 16,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 16,
                         ),
-                  SizedBox(
-                    height: 32,
-                  ),
-                  Center(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => setState(() {
-                        mode = mode == Mode.phone ? Mode.email : Mode.phone;
-                      }),
-                      child: Text(
-                        mode == Mode.phone
-                            ? "Use email insead"
-                            : "Use phone number instead",
-                        style: context.textTheme.caption!.copyWith(),
-                      ),
+                        // Text(
+                        //   widget.resetPassword ? "Reset Password" : "Sign up",
+                        //   style: context.textTheme.headline4,
+                        // ),
+                        // SizedBox(
+                        //   height: 32,
+                        // ),
+                        Text(
+                          "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
+                          style:
+                              context.textTheme.caption!.copyWith(fontSize: 24),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        mode == Mode.phone ? phoneField() : emailField(),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        ...nameFields,
+                        ...passwordFields,
+                        submitting
+                            ? Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : SizedBox(
+                                width: Get.width,
+                                child: TextButton(
+                                  onPressed: () {
+                                    if (formKey.currentState!.validate()) {
+                                      onSubmit();
+                                    }
+                                  },
+                                  child: Text("Send Verification Code"),
+                                  style: MyButtonStyles.onboardStyle,
+                                ),
+                              ),
+                        SizedBox(
+                          height: 32,
+                        ),
+                        Center(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => setState(() {
+                              mode =
+                                  mode == Mode.phone ? Mode.email : Mode.phone;
+                            }),
+                            child: Text(
+                              mode == Mode.phone
+                                  ? "Use email insead"
+                                  : "Use phone number instead",
+                              style: context.textTheme.caption!.copyWith(),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
