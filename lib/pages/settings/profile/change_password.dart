@@ -31,16 +31,14 @@ class _ChangePasswordState extends State<ChangePassword> {
       setState(() {
         submitting = true;
       });
-      String authToken = StorageService.instance.authToken!;
-      var response = await APIServices().resetPassword(
-        email: emailController.text,
-        authToken: authToken,
+      var response = await APIServices().userPasswordUpdate(
         newPassword: passwordController.text,
         currentPassword: currentPassController.text,
       );
       setState(() {
         submitting = false;
       });
+      print(response);
       if (response["success"]) {
         await Get.dialog(
           AlertDialog(

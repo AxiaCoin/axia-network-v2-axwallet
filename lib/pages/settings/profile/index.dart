@@ -95,7 +95,7 @@ class ProfilePageState extends State<ProfilePage> {
                               ))!
                           .then((value) {
                         if (value != null && value) {
-                          // getProfile();
+                          getProfile();
                         }
                       });
                     },

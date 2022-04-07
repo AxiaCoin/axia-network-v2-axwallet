@@ -44,9 +44,7 @@ class Services {
   // }
 
   String generateMnemonic() {
-    String mnemonic = bip39.generateMnemonic();
-    print(mnemonic);
-    return mnemonic;
+    return bip39.generateMnemonic();
   }
 
   Future<void> initWallet(String mnemonic) async {
@@ -77,7 +75,7 @@ class APIServices {
     try {
       var response = await http.post(Uri.parse(ipAddress + url),
           headers: {'Content-Type': 'application/json'},
-          body: json.encode(body));
+          body: jsonEncode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -117,13 +115,12 @@ class APIServices {
 
   patchbaseAPI(String url, Map body) async {
     try {
-      var response = await http.patch(
-        Uri.parse(ipAddress + url),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
-          'Content-Type': 'application/json'
-        },
-      );
+      var response = await http.patch(Uri.parse(ipAddress + url),
+          headers: {
+            'Authorization': 'Bearer ' + StorageService.instance.authToken!,
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -142,7 +139,6 @@ class APIServices {
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
-            body["authToken"] = authToken;
             return patchbaseAPI(url, body);
           }
           return;
@@ -230,11 +226,19 @@ class APIServices {
 
   signIn(
       {String? email,
+      String? phoneNumber,
+      String? phoneCode,
       required String password,
       required String deviceId}) async {
     return noAuthbaseAPI(
       "user/sign-in",
-      {"email": email, "password": password, "deviceId": deviceId},
+      {
+        "email": email,
+        "password": password,
+        "deviceId": deviceId,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+      },
     );
   }
 
@@ -310,7 +314,7 @@ class APIServices {
     required String currentPassword,
     required String newPassword,
   }) async {
-    return patchbaseAPI("user/update", {
+    return patchbaseAPI("user/password", {
       "currentPassword": currentPassword,
       "newPassword": newPassword,
       "confirmPassword": newPassword,

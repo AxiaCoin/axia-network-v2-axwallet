@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/verify.dart';
@@ -55,9 +54,9 @@ class _LoginPageState extends State<LoginPage> {
       }
       var response = await APIServices().signIn(
           email: mode == Mode.email ? emailController.text : null,
-          // phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-          // phoneCode:
-          //     mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
+          phoneCode:
+              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
           password: passwordController.text,
           deviceId: deviceId);
       if (response["success"]) {

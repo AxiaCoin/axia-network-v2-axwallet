@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/qr_scan.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class ImportWalletPage extends StatefulWidget {
@@ -112,10 +115,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   child: ElevatedButton(
                       // style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(30)))),
                       style: MyButtonStyles.statefulStyle(isValid),
-                      onPressed: () {
-                        // if (isValid) Get.offAll(() => HomePage());
-                        if (isValid) Get.offAll(() => HomePage());
-                      },
+                      onPressed: onsubmit,
                       child: Text("IMPORT")),
                 ),
               ),
@@ -131,5 +131,14 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     phraseController.dispose();
     nameController.dispose();
     super.dispose();
+  }
+
+  void onsubmit() {
+    if (isValid) {
+      StorageService.instance.storeMnemonic(phraseController.text);
+      services.initWallet(phraseController.text);
+      Get.offAll(() => HomePage());
+    } else
+      CommonWidgets.snackBar("Error while importing");
   }
 }

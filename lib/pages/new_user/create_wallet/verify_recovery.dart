@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/home.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class VerifyRecoveryPage extends StatefulWidget {
@@ -107,11 +111,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                 width: Get.width,
                 padding: EdgeInsets.only(top: 8),
                 child: TextButton(
-                  onPressed: () {
-                    if (isValid) {
-                      Get.offAll(() => HomePage());
-                    }
-                  },
+                  onPressed: onsubmit,
                   child: Text("DONE"),
                   style: MyButtonStyles.statefulStyle(isValid),
                 ),
@@ -121,5 +121,16 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
         ),
       ),
     );
+  }
+
+  void onsubmit() {
+    if (isValid) {
+      String mnemonic = FormatText.wordList(widget.words);
+      print(mnemonic);
+      StorageService.instance.storeMnemonic(mnemonic);
+      services.initWallet(mnemonic);
+      Get.offAll(() => HomePage());
+    } else
+      CommonWidgets.snackBar("Error while importing");
   }
 }
