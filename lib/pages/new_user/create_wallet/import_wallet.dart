@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/home.dart';
+import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/qr_scan.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class ImportWalletPage extends StatefulWidget {
@@ -33,6 +35,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       appBar: AppBar(
         //brightness: Brightness.dark,
         title: Text("Import Wallet"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
         actions: [
           IconButton(
             icon: Icon(Icons.qr_code_scanner),
@@ -56,6 +60,13 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 child: Column(
                   // mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Align(alignment: Alignment.centerLeft, child: Text("Name")),
+                    SizedBox(
+                      height: 8,
+                    ),
                     TextFormField(
                       controller: nameController,
                       validator: (val) => val == ""
@@ -63,18 +74,29 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                           : null,
                       autovalidateMode: AutovalidateMode.always,
                       decoration: InputDecoration(
-                          labelText: "Name", border: OutlineInputBorder()),
+                        hintText: "Name",
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                      ),
                       onChanged: (val) => setState(() {}),
                     ),
                     SizedBox(
                       height: 16,
                     ),
+                    Align(
+                        alignment: Alignment.centerLeft, child: Text("Phrase")),
+                    SizedBox(
+                      height: 8,
+                    ),
                     TextFormField(
                       controller: phraseController,
                       decoration: InputDecoration(
-                        labelText: "Phrase",
+                        hintText: "Phrase",
                         alignLabelWithHint: true,
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
                       ),
                       onChanged: (val) => setState(() {}),
                       minLines: 4,
@@ -114,7 +136,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       style: MyButtonStyles.statefulStyle(isValid),
                       onPressed: () {
                         // if (isValid) Get.offAll(() => HomePage());
-                        if (isValid) Get.offAll(() => HomePage());
+                        if (isValid) Get.offAll(() => PinBiometricPage());
                       },
                       child: Text("IMPORT")),
                 ),

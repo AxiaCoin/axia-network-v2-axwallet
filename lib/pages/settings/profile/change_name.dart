@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/widgets/common.dart';
 
 class ChangeUserProfile extends StatefulWidget {
   final String? firstName;
@@ -63,14 +64,19 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
   @override
   Widget build(BuildContext context) {
     List<Widget> nameFields = [
+      Align(alignment: Alignment.centerLeft, child: Text("First Name")),
+      SizedBox(
+        height: 8,
+      ),
       TextFormField(
         controller: firstNameController,
         keyboardType: TextInputType.name,
         textCapitalization: TextCapitalization.words,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          labelText: "First Name",
-          border: OutlineInputBorder(),
+          hintText: "First Name",
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
         validator: (val) =>
             val!.isNotEmpty ? null : "Please provide at least the first name",
@@ -78,14 +84,19 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
       SizedBox(
         height: 16,
       ),
+      Align(alignment: Alignment.centerLeft, child: Text("Last Name")),
+      SizedBox(
+        height: 8,
+      ),
       TextFormField(
         controller: lastNameController,
         keyboardType: TextInputType.name,
         textCapitalization: TextCapitalization.words,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          labelText: "Last Name",
-          border: OutlineInputBorder(),
+          hintText: "Last Name",
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
       ),
       SizedBox(
@@ -94,6 +105,11 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
     ];
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Change Name"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
+      ),
       body: Form(
         key: formKey,
         child: SafeArea(
@@ -106,13 +122,13 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                   SizedBox(
                     height: 16,
                   ),
-                  Text(
-                    "Change name",
-                    style: context.textTheme.headline4,
-                  ),
-                  SizedBox(
-                    height: 32,
-                  ),
+                  // Text(
+                  //   "Change name",
+                  //   style: context.textTheme.headline4,
+                  // ),
+                  // SizedBox(
+                  //   height: 32,
+                  // ),
                   ...nameFields,
                   SizedBox(
                     height: 16,
@@ -127,7 +143,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                             onPressed: () {
                               _changeName();
                             },
-                            child: Text("Change Name"),
+                            child: Text("Save Changes"),
                             style: MyButtonStyles.onboardStyle,
                           ),
                         ),

@@ -38,6 +38,23 @@ class UserModel {
     required this.updatedAt,
   });
 
+  factory UserModel.none() {
+    return UserModel(
+      userId: '',
+      firstName: '',
+      lastName: null,
+      email: null,
+      phoneNumber: null,
+      phoneCode: null,
+      verified: false,
+      blocked: false,
+      userForgetPass: false,
+      otpId: '',
+      createdAt: '',
+      updatedAt: '',
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
+import 'package:wallet/pages/new_user/pin_biometric.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class VerifyRecoveryPage extends StatefulWidget {
@@ -66,6 +69,11 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Create Wallet"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
+      ),
       body: SafeArea(
         child: Container(
           padding: EdgeInsets.all(16.0),
@@ -109,7 +117,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                 child: TextButton(
                   onPressed: () {
                     if (isValid) {
-                      Get.offAll(() => HomePage());
+                      Get.offAll(() => PinBiometricPage());
                     }
                   },
                   child: Text("DONE"),

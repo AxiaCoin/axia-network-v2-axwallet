@@ -9,9 +9,12 @@ import 'dart:isolate';
 // import 'package:axiawallet_sdk/service/index.dart';
 // import 'package:axiawallet_sdk/storage/keyring.dart';
 import 'package:coinslib/coinslib.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/database.dart';
+import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -70,6 +73,20 @@ class Services {
     var localAuth = LocalAuthentication();
     return await localAuth.canCheckBiometrics;
   }
+
+  loadUser({bool loadController = true}) async {
+    var response = await APIServices().getProfile();
+    if (response["success"]) {
+      UserModel userModel = UserModel.fromMap(response["data"]);
+      if (loadController) {
+        final User user = Get.put(User());
+        user.updateUser(userModel);
+      } else {
+        User user = Get.find();
+        user.updateUser(userModel);
+      }
+    }
+  }
 }
 
 class APIServices {
@@ -117,13 +134,12 @@ class APIServices {
 
   patchbaseAPI(String url, Map body) async {
     try {
-      var response = await http.patch(
-        Uri.parse(ipAddress + url),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
-          'Content-Type': 'application/json'
-        },
-      );
+      var response = await http.patch(Uri.parse(ipAddress + url),
+          headers: {
+            'Authorization': 'Bearer ' + StorageService.instance.authToken!,
+            'Content-Type': 'application/json'
+          },
+          body: json.encode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -230,11 +246,19 @@ class APIServices {
 
   signIn(
       {String? email,
+      String? phoneNumber,
+      String? phoneCode,
       required String password,
       required String deviceId}) async {
     return noAuthbaseAPI(
       "user/sign-in",
-      {"email": email, "password": password, "deviceId": deviceId},
+      {
+        "email": email,
+        "password": password,
+        "deviceId": deviceId,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+      },
     );
   }
 
@@ -310,7 +334,7 @@ class APIServices {
     required String currentPassword,
     required String newPassword,
   }) async {
-    return patchbaseAPI("user/update", {
+    return patchbaseAPI("user/password", {
       "currentPassword": currentPassword,
       "newPassword": newPassword,
       "confirmPassword": newPassword,

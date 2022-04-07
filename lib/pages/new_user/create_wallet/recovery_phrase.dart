@@ -80,6 +80,11 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Create Wallet"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
+      ),
       body: SafeArea(
         child: Container(
           padding: EdgeInsets.all(16.0),

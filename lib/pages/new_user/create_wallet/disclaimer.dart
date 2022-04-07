@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/pages/new_user/create_wallet/recovery_phrase.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class DisclaimerPage extends StatefulWidget {
@@ -17,6 +18,11 @@ class _DisclaimerPageState extends State<DisclaimerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Create Wallet"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

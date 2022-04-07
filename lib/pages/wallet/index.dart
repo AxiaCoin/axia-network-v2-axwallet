@@ -41,10 +41,11 @@ class _WalletPageState extends State<WalletPage> {
       data = list.data;
       balanceInfo = balanceData.getData();
       if (list.selected == null) list.defaultSelection();
-      setState(() {
-        isLoading = false;
-        isRefreshing = false;
-      });
+      if (mounted)
+        setState(() {
+          isLoading = false;
+          isRefreshing = false;
+        });
       print("balance is $balanceInfo");
     }
   }

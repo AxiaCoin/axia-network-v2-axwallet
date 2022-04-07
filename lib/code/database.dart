@@ -52,3 +52,11 @@ class SettingsState extends GetxController {
     }
   }
 }
+
+class User extends GetxController {
+  var userModel = UserModel.none().obs;
+
+  updateUser(UserModel user) {
+    userModel.value = user;
+  }
+}

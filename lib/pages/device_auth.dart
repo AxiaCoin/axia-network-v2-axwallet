@@ -9,52 +9,47 @@ import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
+import 'package:wallet/pages/wallet/index.dart';
 import 'package:wallet/widgets/common.dart';
 
-class PinBiometricPage extends StatefulWidget {
-  const PinBiometricPage({Key? key}) : super(key: key);
+class DeviceAuthPage extends StatefulWidget {
+  const DeviceAuthPage({Key? key}) : super(key: key);
 
   @override
-  _PinBiometricPageState createState() => _PinBiometricPageState();
+  State<DeviceAuthPage> createState() => _DeviceAuthPageState();
 }
 
-class _PinBiometricPageState extends State<PinBiometricPage> {
+class _DeviceAuthPageState extends State<DeviceAuthPage> {
+  late String? mnemonic;
   final TextEditingController controller = TextEditingController();
   var localAuth = LocalAuthentication();
   bool canCheckBiometrics = false;
-  bool useBiometric = true;
   bool isValid = false;
 
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
+    if (canCheckBiometrics && StorageService.instance.useBiometric!) {
+      bool success = await localAuth.authenticate(
+          localizedReason: "Please authenticate to continue to wallet",
+          biometricOnly: false);
+      if (success)
+        Get.offAll(() => HomePage());
+      else
+        return;
+    }
     setState(() {});
   }
 
   onSubmit() async {
     if (isValid) {
-      if (useBiometric && canCheckBiometrics) {
-        try {
-          bool success = await localAuth.authenticate(
-              localizedReason: "Please authenticate to continue to wallet",
-              biometricOnly: false);
-          if (success) {
-            StorageService.instance.updatePIN(controller.text);
-            StorageService.instance.updateBiometricPreference(useBiometric);
-            Get.offAll(() => HomePage());
-          } else {
-            CommonWidgets.snackBar("Authentication failed. Please try again");
-          }
-          return;
-        } on PlatformException catch (e) {
-          if (e.code == auth_error.notAvailable) {
-            print("Fingerprint Not Available");
-            return;
-          }
-        }
+      if (controller.text == StorageService.instance.pin) {
+        Get.offAll(() => HomePage());
+      } else {
+        CommonWidgets.snackBar("Incorrect PIN, try again");
+        setState(() {
+          controller.clear();
+        });
       }
-      StorageService.instance.updateBiometricPreference(useBiometric);
-      StorageService.instance.updatePIN(controller.text);
-      Get.offAll(() => HomePage());
     }
   }
 
@@ -68,6 +63,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
   @override
   void initState() {
     super.initState();
+    mnemonic = StorageService.instance.readMnemonic();
     initAuthentication();
   }
 
@@ -76,7 +72,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
     isValid = controller.text.length == 6;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Security"),
+        title: Text("Security Check"),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -94,7 +90,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Create a PIN for secure and easy access",
+                    "Enter your PIN to access the wallet",
                     style: context.textTheme.headline5,
                   ),
                   SizedBox(
@@ -122,21 +118,6 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                     },
                   ),
                   SizedBox(
-                    height: 16,
-                  ),
-                  canCheckBiometrics
-                      ? SizedBox(
-                          width: Get.width * 0.9,
-                          child: SwitchListTile.adaptive(
-                            value: useBiometric,
-                            onChanged: (val) =>
-                                setState(() => useBiometric = val),
-                            title: Text(
-                                "Enable FaceID/Fingerprint for even easier access"),
-                          ),
-                        )
-                      : Container(),
-                  SizedBox(
                     height: 32,
                   ),
                   SizedBox(
@@ -156,11 +137,5 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }

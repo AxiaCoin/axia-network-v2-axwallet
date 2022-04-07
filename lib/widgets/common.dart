@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/models.dart';
 
 class CommonWidgets {
   CommonWidgets._();
@@ -53,5 +55,29 @@ class CommonWidgets {
           ],
         ),
         child: child,
+      );
+
+  static Widget profileItem(
+    BuildContext context, {
+    required String key,
+    required String value,
+    Function()? onPressed,
+  }) =>
+      Row(
+        // crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            key,
+            style: context.textTheme.caption!.copyWith(fontSize: 16),
+          ),
+          Text(
+            value,
+            style: context.textTheme.caption!
+                .copyWith(fontSize: 20, color: appColor),
+          ),
+          onPressed == null
+              ? Container()
+              : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
+        ],
       );
 }
