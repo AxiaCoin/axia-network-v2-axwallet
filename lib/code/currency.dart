@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:wallet/code/models.dart';
 
 abstract class Currency {
@@ -9,9 +7,9 @@ abstract class Currency {
 
   importWallet() => null;
 
-  getBalance() => null;
+  getBalance(List<String> address) => null;
 
-  getTransactions() => null;
+  sendTransaction(double amount, String recieveraddress) async => null;
 
-  sendTransaction() async => null;
+  getTransactions(String address) => null;
 }

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
-import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/number_keyboard.dart';
 

@@ -1,14 +1,9 @@
-import 'dart:io';
-
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/currencies/bitcoin.dart';
-import 'package:wallet/currencies/ethereum.dart';
 import 'package:wallet/pages/settings/profile/change_name.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
 import 'package:wallet/pages/new_user/login.dart';
@@ -41,8 +36,7 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   getProfile() async {
-    var response = await APIServices()
-        .getProfile(authToken: StorageService.instance.authToken!);
+    var response = await APIServices().getProfile();
     if (response["success"]) {
       userModel = UserModel.fromMap(response["data"]);
       user = response.toString();
@@ -101,7 +95,7 @@ class ProfilePageState extends State<ProfilePage> {
                               ))!
                           .then((value) {
                         if (value != null && value) {
-                          getProfile();
+                          // getProfile();
                         }
                       });
                     },
@@ -149,7 +143,7 @@ class ProfilePageState extends State<ProfilePage> {
                             // currencyList.forEach(
                             //   (e) => e.generateWalletAddress(),
                             // );
-                            currencyList.last.getBalance();
+                            // currencyList.last.getBalance();
                           },
                           child: Text("Test"),
                           style: MyButtonStyles.onboardStyle,

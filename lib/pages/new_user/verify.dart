@@ -5,10 +5,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/new_user/login.dart';
-import 'package:wallet/pages/settings/profile/change_password.dart';
-import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
 
@@ -40,7 +37,6 @@ class _VerificationPageState extends State<VerificationPage> {
   _verifyCode({required String code}) async {
     if (!widget.resetPassword) {
       var response = await APIServices().userVerify(
-        email: widget.email,
         phoneNumber: widget.phoneNumber != null
             ? widget.phoneNumber!.parseNumber()
             : null,
@@ -61,7 +57,7 @@ class _VerificationPageState extends State<VerificationPage> {
         // CommonWidgets.snackBar("Incorrect code entered");
       }
     } else {
-      var response = await APIServices().resetPassword();
+      // var response = await APIServices().resetPassword();
 
       setState(() {
         submitting = false;
