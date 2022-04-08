@@ -146,12 +146,12 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        widget.showClose
-            ? Icon(
-                Icons.cancel,
-                color: appColor,
-              )
-            : Container(),
+        // widget.showClose
+        //     ? Icon(
+        //         Icons.cancel,
+        //         color: appColor,
+        //       )
+        //     : Container(),
         Container(
           // color: Colors.white,
           height: Get.height * widget.viewFraction,

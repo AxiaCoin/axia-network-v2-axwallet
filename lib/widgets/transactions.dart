@@ -64,7 +64,7 @@ class TransactionsPage extends StatelessWidget {
                   height: 4,
                 ),
                 OnboardWidgets.subtitle(
-                    "Fee: ${transaction.fee} ${coinData.unit}"),
+                    "Fee: ${FormatText.roundOff(transaction.fee)} ${coinData.unit}"),
               ],
             ),
           ),

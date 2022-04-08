@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:wallet/code/constants.dart';
@@ -25,13 +26,16 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   var localAuth = LocalAuthentication();
   bool canCheckBiometrics = false;
   bool isValid = false;
+  bool isSettingUp = Get.currentRoute == "/";
 
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
     setState(() {});
     if (canCheckBiometrics && StorageService.instance.useBiometric!) {
       bool success = await localAuth.authenticate(
-          localizedReason: "Please authenticate to continue to wallet",
+          localizedReason: isSettingUp
+              ? "Please authenticate to continue to wallet"
+              : "Please authenticate this Transaction",
           biometricOnly: false);
       if (success) {
         successful();
@@ -58,7 +62,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   }
 
   successful() async {
-    if (Get.currentRoute == "/") {
+    if (isSettingUp) {
       String mnemonic = StorageService.instance.readMnemonic()!;
       CommonWidgets.waitDialog();
       await services.initWallet(mnemonic);
@@ -91,6 +95,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
       appBar: AppBar(
         title: Text("Security Check"),
         centerTitle: true,
+        leading: CommonWidgets.backButton(context),
       ),
       body: SafeArea(
         child: Stack(
@@ -107,7 +112,9 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Enter your PIN to access the wallet",
+                    isSettingUp
+                        ? "Enter your PIN to access your Wallet"
+                        : "Enter your PIN to authenticate to authenticate this Transaction",
                     style: context.textTheme.headline5,
                   ),
                   SizedBox(

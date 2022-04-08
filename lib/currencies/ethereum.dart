@@ -17,6 +17,7 @@ class Ethereum implements Currency {
     coinType: 60,
     rate: 1,
     change: "1",
+    selected: true,
   );
 
   @override
@@ -110,7 +111,7 @@ class Ethereum implements Currency {
           time: DateTime.fromMillisecondsSinceEpoch(
               int.parse(e["timeStamp"]) * 1000),
           hash: e["hash"],
-          fee: double.parse(e["gasUsed"]) / wei,
+          fee: double.parse(e["gasUsed"]) * double.parse(e["gasPrice"]) / wei,
         ),
       );
     });
