@@ -125,6 +125,7 @@ class Bitcoin implements Currency {
     String address = wallet.address;
     ECPair keypairtemp = wallet.keyPair!;
     try {
+      amount = amount * 100000000;
       print("Start");
       final txb =
           new TransactionBuilder(network: isTestNet ? testnet : bitcoin);

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -30,28 +32,55 @@ class _ChangePasswordState extends State<ChangePassword> {
       setState(() {
         submitting = true;
       });
-      var response = await APIServices().userPasswordUpdate(
-        newPassword: passwordController.text,
-        currentPassword: currentPassController.text,
-      );
-      setState(() {
-        submitting = false;
-      });
-      print(response);
-      if (response["success"]) {
-        await Get.dialog(
-          AlertDialog(
-            title: Text("Success"),
-            content: Text("Password Successfully Changed!"),
-            actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text("Okay"),
-              ),
-            ],
-          ),
+      if (!widget.resetPassword) {
+        var response = await APIServices().userPasswordUpdate(
+          newPassword: passwordController.text,
+          currentPassword: currentPassController.text,
         );
-        Get.back();
+        setState(() {
+          submitting = false;
+        });
+        print(response);
+        if (response["success"]) {
+          await Get.dialog(
+            AlertDialog(
+              title: Text("Success"),
+              content: Text("Password Successfully Changed!"),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text("Okay"),
+                ),
+              ],
+            ),
+          );
+          Get.back();
+        }
+      } else {
+        print(StorageService.instance.authToken);
+        var response = await APIServices().resetPassword(
+          newPassword: passwordController.text,
+          authToken: StorageService.instance.authToken!,
+        );
+        setState(() {
+          submitting = false;
+        });
+        print(response);
+        if (response["success"]) {
+          await Get.dialog(
+            AlertDialog(
+              title: Text("Success"),
+              content: Text(
+                  "Password Successfully Changed!, Please Login to continue."),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.offAll(() => LoginPage()),
+                  child: Text("Okay"),
+                ),
+              ],
+            ),
+          );
+        }
       }
     }
   }
@@ -161,7 +190,9 @@ class _ChangePasswordState extends State<ChangePassword> {
       appBar: AppBar(
         title: Text("Change Password"),
         centerTitle: true,
-        leading: CommonWidgets.backButton(context),
+        leading: widget.resetPassword
+            ? Container()
+            : CommonWidgets.backButton(context),
       ),
       body: Form(
         key: formKey,

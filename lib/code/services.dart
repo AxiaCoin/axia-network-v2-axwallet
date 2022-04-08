@@ -279,30 +279,35 @@ class APIServices {
     );
   }
 
-  forgotPasswordOtp({String? email}) async {
+  forgotPasswordOtp(
+      {String? email, String? phoneNumber, String? phoneCode}) async {
     return noAuthbaseAPI(
       "user/send-forget-pass-otp",
-      {"email": email},
+      {"email": email, "phoneNumber": phoneNumber, "phoneCode": phoneCode},
     );
   }
 
-  verifyforgotPasswordOtp({String? email, required String otp}) {
+  verifyforgotPasswordOtp(
+      {String? email,
+      required String otp,
+      String? phoneNumber,
+      String? phoneCode}) {
     return noAuthbaseAPI(
       "user/verify-forget-pass-otp",
-      {"email": email, "otp": otp},
+      {
+        "email": email,
+        "otp": otp,
+        "phoneNumber": phoneNumber,
+        "phoneCode": phoneCode,
+      },
     );
   }
 
   resetPassword(
-      {required String email,
-      required String currentPassword,
-      required String newPassword,
-      required String authToken}) async {
+      {required String newPassword, required String authToken}) async {
     return noAuthbaseAPI(
-      "user/update-password",
+      "user/reset-password",
       {
-        "email": email,
-        "currentPassword": currentPassword,
         "newPassword": newPassword,
         "confirmPassword": newPassword,
         "authToken": authToken

@@ -4,12 +4,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/device_auth.dart';
-import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
-import 'package:wallet/pages/new_user/pin_biometric.dart';
-import 'package:wallet/pages/settings/profile/index.dart';
-import 'package:wallet/pages/wallet/index.dart';
 
 Future<void> main() async {
   await initServices();
@@ -21,6 +17,7 @@ initServices() async {
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
   await GetStorage.init();
   StorageService.instance.init();
+  StorageService.instance.clearTokens();
   // earn opinion sketch humble turn unaware keep defy what clay tip tribe
   // bone erase document label member evolve sense absent smoke dumb foster daring
 }
