@@ -51,6 +51,8 @@ class _ReceivePageState extends State<ReceivePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Receive ${currency.coinData.name}"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -107,21 +109,27 @@ class _ReceivePageState extends State<ReceivePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Copy",
-                  onPressed: copyAddress,
-                  whiteBG: true),
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Set Amount",
-                  onPressed: () {},
-                  whiteBG: true),
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Share",
-                  onPressed: shareAddress,
-                  whiteBG: true)
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon: "assets/icons/receive_dash.svg",
+                    text: "Copy",
+                    onPressed: copyAddress,
+                    whiteBG: true),
+              ),
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon: "assets/icons/receive_dash.svg",
+                    text: "Set Amount",
+                    onPressed: () {},
+                    whiteBG: true),
+              ),
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon: "assets/icons/receive_dash.svg",
+                    text: "Share",
+                    onPressed: shareAddress,
+                    whiteBG: true),
+              )
             ],
           )
         ],

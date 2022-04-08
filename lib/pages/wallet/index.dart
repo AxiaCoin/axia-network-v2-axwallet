@@ -7,6 +7,7 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
 import 'package:wallet/pages/search.dart';
@@ -58,6 +59,7 @@ class _WalletPageState extends State<WalletPage> {
   Widget build(BuildContext context) {
     double width = Get.width;
     double height = Get.height;
+    // currencyList.last.getBalance(["address"]);
     List tickerColor = [tickerGreen, tickerRed];
     double totalBalance = 0.0;
     if (balanceInfo.isNotEmpty) {
@@ -114,13 +116,15 @@ class _WalletPageState extends State<WalletPage> {
                   SizedBox(
                     height: 4,
                   ),
-                  Text(
-                    "\$${totalBalance.toStringAsFixed(2)}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.center,
+                  Obx(
+                    () => Text(
+                      "\$${balanceData.totalBalance.toStringAsFixed(2)}",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   SizedBox(
                     height: height * 0.04,
@@ -248,7 +252,7 @@ class _WalletPageState extends State<WalletPage> {
                             searchMode: SearchMode.customize,
                           )).then(
                         (value) {
-                          tokensKey.currentState?.setState(() {});
+                          setState(() {});
                         },
                       );
                     },
@@ -286,26 +290,32 @@ class _WalletPageState extends State<WalletPage> {
                   String unit = item.unit;
                   String rate = "\$${item.rate} ";
                   String change = item.change;
-                  String balance = "${balanceInfo[currency]} $unit";
-                  String value = "\$" +
-                      (item.rate * balanceInfo[currency]!).toStringAsFixed(2);
+                  // double balance = balanceInfo[currency]!;
+                  // String balance = "${balanceInfo[currency]} $unit";
+                  // String value = "\$" +
+                  //     (item.rate * balanceInfo[currency]!).toStringAsFixed(2);
                   var rand = Random().nextInt(2);
                   String ticker = "-$change%";
                   if (rand == 0) {
                     ticker = "+$change%";
                   }
-                  return HomeWidgets.coinTile(
-                    balance: balance,
-                    name: name,
-                    rate: rate,
-                    ticker: ticker,
-                    unit: unit,
-                    value: value,
-                    onTap: () => pushNewScreen(
-                      context,
-                      screen: CoinPage(
-                        currency: currency,
-                        balance: balanceInfo[currency]!,
+                  return Obx(
+                    () => HomeWidgets.coinTile(
+                      balance:
+                          FormatText.roundOff((balanceData.data![currency])!) +
+                              " $unit",
+                      name: name,
+                      rate: rate,
+                      ticker: ticker,
+                      unit: unit,
+                      value: "\$" +
+                          (item.rate * balanceData.data![currency]!)
+                              .toStringAsFixed(2),
+                      onTap: () => pushNewScreen(
+                        context,
+                        screen: CoinPage(
+                          currency: currency,
+                        ),
                       ),
                     ),
                   );

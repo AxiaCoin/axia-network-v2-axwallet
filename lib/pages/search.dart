@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/buy.dart';
 import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/send.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 
 class SearchPage extends StatefulWidget {
@@ -118,38 +120,40 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     } else {
-      return HomeWidgets.coinTile(
-        onTap: () {
-          switch (widget.searchMode) {
-            case SearchMode.customize:
-              break;
-            case SearchMode.send:
-              Get.to(() => SendPage(
-                    currency: item,
-                    balance: balanceData[item]!,
-                  ));
-              break;
-            case SearchMode.receive:
-              Get.to(() => ReceivePage(
-                    currency: item,
-                  ));
-              break;
-            case SearchMode.buy:
-              Get.bottomSheet(
-                  BuyPage(
-                    currency: item,
-                    minimum: 50,
-                  ),
-                  isScrollControlled: true);
-              break;
-            case SearchMode.swap:
-              Get.back(result: item);
-              break;
-          }
-        },
-        balance: "${balanceData[item]} ${item.coinData.unit}",
-        unit: item.coinData.unit,
-        name: item.coinData.name,
+      return Obx(
+        () => HomeWidgets.coinTile(
+          onTap: () {
+            switch (widget.searchMode) {
+              case SearchMode.customize:
+                break;
+              case SearchMode.send:
+                Get.to(() => SendPage(
+                      currency: item,
+                    ));
+                break;
+              case SearchMode.receive:
+                Get.to(() => ReceivePage(
+                      currency: item,
+                    ));
+                break;
+              case SearchMode.buy:
+                Get.bottomSheet(
+                    BuyPage(
+                      currency: item,
+                      minimum: 50,
+                    ),
+                    isScrollControlled: true);
+                break;
+              case SearchMode.swap:
+                Get.back(result: item);
+                break;
+            }
+          },
+          balance:
+              "${FormatText.roundOff((balanceCont.data![item])!)} ${item.coinData.unit}",
+          unit: item.coinData.unit,
+          name: item.coinData.name,
+        ),
       );
     }
   }
@@ -166,6 +170,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         title: searchField(),
+        leading: CommonWidgets.backButton(context),
         //brightness: Brightness.dark,
       ),
       body: Container(

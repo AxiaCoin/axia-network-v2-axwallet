@@ -5,11 +5,9 @@ abstract class Currency {
 
   CryptoWallet getWallet() => CryptoWallet.dummyWallet();
 
-  importWallet() => null;
-
   getBalance(List<String> address) => null;
 
-  sendTransaction(double amount, String recieveraddress) async => null;
+  sendTransaction(double amount, String receiveraddress) async => null;
 
-  getTransactions(String address) => null;
+  getTransactions({required int offset, required int limit}) => null;
 }

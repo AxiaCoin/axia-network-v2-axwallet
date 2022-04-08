@@ -22,6 +22,25 @@ class CommonWidgets {
     ));
   }
 
+  static waitDialog({String text = "Accessing Wallet"}) {
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [CircularProgressIndicator.adaptive(), Text(text)],
+          ),
+        ),
+      ),
+      // barrierDismissible: false,
+    );
+  }
+
+  static bottomSheet(Widget bottomsheet) {
+    Get.bottomSheet(bottomsheet);
+  }
+
   static backButton(BuildContext context) => IconButton(
       icon: Icon(
         Icons.keyboard_arrow_left,

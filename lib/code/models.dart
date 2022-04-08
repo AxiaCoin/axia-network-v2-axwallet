@@ -99,6 +99,7 @@ class CoinData {
   String name;
   String unit;
   int coinType;
+  String prefix;
   double rate;
   String change;
   bool selected;
@@ -106,6 +107,7 @@ class CoinData {
     required this.name,
     required this.unit,
     required this.coinType,
+    required this.prefix,
     this.rate = 1,
     this.change = "",
     this.selected = false,
@@ -115,6 +117,7 @@ class CoinData {
     return CoinData(
       name: "Coin $i",
       unit: "XCN$i",
+      prefix: "",
       coinType: 1,
       rate: 123.45,
       change: "1.2",
@@ -162,3 +165,20 @@ class DAppsTile {
 //   bool selected;
 //   RecoveryPhrase(this.index, this.word, {this.selected = true});
 // }
+
+class TransactionModel {
+  String from;
+  String to;
+  double amount;
+  DateTime time;
+  String hash;
+  double fee;
+  TransactionModel({
+    required this.from,
+    required this.to,
+    required this.amount,
+    required this.time,
+    required this.hash,
+    required this.fee,
+  });
+}

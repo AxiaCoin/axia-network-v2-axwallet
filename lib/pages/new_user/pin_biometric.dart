@@ -59,12 +59,12 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
     }
   }
 
-  finishInitialization() {
+  finishInitialization() async {
     StorageService.instance.updateBiometricPreference(useBiometric);
     StorageService.instance.updatePIN(controller.text);
     StorageService.instance.storeMnemonic(widget.mnemonic);
-    print(widget.mnemonic);
-    services.initWallet(widget.mnemonic);
+    CommonWidgets.waitDialog();
+    await services.initWallet(widget.mnemonic);
     Get.offAll(() => HomePage());
   }
 

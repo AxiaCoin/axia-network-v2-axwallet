@@ -28,28 +28,44 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
 
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
+    setState(() {});
     if (canCheckBiometrics && StorageService.instance.useBiometric!) {
       bool success = await localAuth.authenticate(
           localizedReason: "Please authenticate to continue to wallet",
           biometricOnly: false);
-      if (success)
-        Get.offAll(() => HomePage());
-      else
-        return;
+      if (success) {
+        successful();
+      } else {
+        StorageService.instance.updateBiometricPreference(false);
+      }
+      return;
     }
     setState(() {});
   }
 
   onSubmit() async {
+    await Future.delayed(Duration(milliseconds: 100));
     if (isValid) {
       if (controller.text == StorageService.instance.pin) {
-        Get.offAll(() => HomePage());
+        successful();
       } else {
         CommonWidgets.snackBar("Incorrect PIN, try again");
         setState(() {
           controller.clear();
         });
       }
+    }
+  }
+
+  successful() async {
+    if (Get.currentRoute == "/") {
+      String mnemonic = StorageService.instance.readMnemonic()!;
+      CommonWidgets.waitDialog();
+      await services.initWallet(mnemonic);
+      Get.offAll(() => HomePage());
+    } else {
+      Get.back(result: true);
+      return;
     }
   }
 
@@ -70,6 +86,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   @override
   Widget build(BuildContext context) {
     isValid = controller.text.length == 6;
+    onSubmit();
     return Scaffold(
       appBar: AppBar(
         title: Text("Security Check"),
@@ -94,7 +111,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                     style: context.textTheme.headline5,
                   ),
                   SizedBox(
-                    height: 8,
+                    height: 32,
                   ),
                   PinPut(
                     fieldsCount: 6,
@@ -117,19 +134,27 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                       setState(() {});
                     },
                   ),
-                  SizedBox(
-                    height: 32,
-                  ),
-                  SizedBox(
-                    width: Get.width,
-                    child: TextButton(
-                      onPressed: () {
-                        onSubmit();
-                      },
-                      child: Text("CONTINUE"),
-                      style: MyButtonStyles.statefulStyle(isValid),
-                    ),
-                  )
+                  canCheckBiometrics
+                      ? SizedBox(
+                          height: 32,
+                        )
+                      : Container(),
+                  canCheckBiometrics
+                      ? GestureDetector(
+                          onTap: (() {
+                            StorageService.instance
+                                .updateBiometricPreference(true);
+                            initAuthentication();
+                          }),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Use Biometrics"),
+                              Icon(Icons.fingerprint)
+                            ],
+                          ),
+                        )
+                      : Container()
                 ],
               ),
             ),

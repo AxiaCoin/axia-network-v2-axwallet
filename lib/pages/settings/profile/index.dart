@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -24,6 +25,20 @@ class ProfilePageState extends State<ProfilePage> {
   late String lastName = userModel.lastName ?? "";
   late String userName = "$firstName $lastName";
   bool isLoading = true;
+  var localAuth = LocalAuthentication();
+  bool canCheckBiometrics = false;
+
+  initAuthentication() async {
+    canCheckBiometrics = await Services().canCheckBiometrics();
+    setState(() {});
+  }
+
+  void toggleBiometrics(bool value) async {
+    bool success = await localAuth.authenticate(
+        localizedReason: "Please authenticate to toggle", biometricOnly: true);
+    if (success) StorageService.instance.updateBiometricPreference(value);
+    setState(() {});
+  }
 
   logOut() async {
     String sessionID = StorageService.instance.sessionID!;
@@ -54,6 +69,7 @@ class ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     // getProfile();
+    initAuthentication();
   }
 
   @override
@@ -68,7 +84,7 @@ class ProfilePageState extends State<ProfilePage> {
         title: Text("Account Details"),
         centerTitle: true,
         elevation: 0,
-        leading: CommonWidgets.backButton(context),
+        // leading: CommonWidgets.backButton(context),
       ),
       body: SafeArea(
         child: Stack(
@@ -154,6 +170,17 @@ class ProfilePageState extends State<ProfilePage> {
                     // SizedBox(
                     //   height: 16,
                     // ),
+
+                    canCheckBiometrics
+                        ? SizedBox(
+                            width: Get.width * 0.9,
+                            child: SwitchListTile.adaptive(
+                              value: StorageService.instance.useBiometric!,
+                              onChanged: toggleBiometrics,
+                              title: Text("Enable FaceID/Fingerprint"),
+                            ),
+                          )
+                        : Container(),
                     SizedBox(
                       width: Get.width,
                       child: TextButton(
@@ -164,19 +191,19 @@ class ProfilePageState extends State<ProfilePage> {
                         style: MyButtonStyles.onboardStyle,
                       ),
                     ),
-                    // SizedBox(
-                    //   height: 16,
-                    // ),
-                    // SizedBox(
-                    //   width: Get.width,
-                    //   child: TextButton(
-                    //     onPressed: () {
-                    //       logOut();
-                    //     },
-                    //     child: Text("Logout"),
-                    //     style: MyButtonStyles.onboardStyle,
-                    //   ),
-                    // ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    SizedBox(
+                      width: Get.width,
+                      child: TextButton(
+                        onPressed: () {
+                          logOut();
+                        },
+                        child: Text("Logout"),
+                        style: MyButtonStyles.onboardStyle,
+                      ),
+                    ),
                     // kDebugMode
                     //     ? SizedBox(
                     //         height: 16,

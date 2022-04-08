@@ -268,7 +268,6 @@ class _TokensPageState extends State<TokensPage>
                     context,
                     screen: CoinPage(
                       currency: currency,
-                      balance: balanceInfo[currency]!,
                     ),
                   ),
                 );

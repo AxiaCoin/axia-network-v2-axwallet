@@ -7,6 +7,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/dapps/index.dart';
 import 'package:wallet/pages/dex/index.dart';
 import 'package:wallet/pages/settings/index.dart';
+import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   int pageIndex = 0;
 
-  List<Widget> pages = [WalletPage(), DAppsPage(), DEXPage(), SettingsPage()];
+  List<Widget> pages = [WalletPage(), DAppsPage(), ProfilePage()];
   List<PersistentBottomNavBarItem> bottomNavBarItems = [
     PersistentBottomNavBarItem(
         icon: Icon(Icons.shield),
@@ -38,14 +39,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         title: "DApps",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
+    // PersistentBottomNavBarItem(
+    //     icon: Icon(Icons.swap_horiz),
+    //     title: "DEX",
+    //     activeColorPrimary: appColor,
+    //     inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.swap_horiz),
-        title: "DEX",
-        activeColorPrimary: appColor,
-        inactiveColorPrimary: Colors.grey),
-    PersistentBottomNavBarItem(
-        icon: Icon(Icons.settings),
-        title: "Settings",
+        icon: Icon(Icons.account_circle),
+        title: "Profile",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
   ];
@@ -58,6 +59,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     Services().loadUser();
+    Services().updateBalances();
   }
 
   @override

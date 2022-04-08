@@ -209,7 +209,7 @@ class HomeWidgets {
           title: Text("${item.coinData.name} (${item.coinData.unit})"),
           leading: FlutterLogo(),
           onTap: () {
-            Get.to(() => CoinPage(currency: item, balance: balanceInfo[item]!));
+            Get.to(() => CoinPage(currency: item));
           },
         );
 

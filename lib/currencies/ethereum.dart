@@ -5,6 +5,7 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:coinslib/coinslib.dart' as coinslib;
 import 'package:wallet/code/services.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Ethereum implements Currency {
@@ -12,7 +13,8 @@ class Ethereum implements Currency {
   CoinData coinData = CoinData(
     name: "Ethereum",
     unit: "ETH",
-    coinType: isTestNet ? 1 : 60,
+    prefix: "0x",
+    coinType: 60,
     rate: 1,
     change: "1",
   );
@@ -21,11 +23,12 @@ class Ethereum implements Currency {
   CryptoWallet getWallet() {
     coinslib.HDWallet hdWallet = services.hdWallet!;
     var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
-    var ethWallet = EthPrivateKey.fromHex("0x${wallet.privKey}");
-    var client = Web3Client(
-        "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
-        Client());
-    client.getGasPrice().then((value) => print(value.getInWei));
+    var ethWallet =
+        EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
+    // var client = Web3Client(
+    //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+    //     Client());
+    // client.getGasPrice().then((value) => print(value.getInWei));
     // var signedData = await client.signTransaction(
     //   ethWallet,
     //   Transaction(
@@ -63,38 +66,61 @@ class Ethereum implements Currency {
     // print(coinData.address);
     // print(coinData.privKey);
     // print(coinData.pubKey);
-    print(ethWallet.address.hexEip55);
+    // print(ethWallet.address.hexEip55);
     return CryptoWallet(
         address: ethWallet.address.hexEip55,
-        privKey: "0x${wallet.privKey}",
-        pubKey: "0x${wallet.pubKey}",
+        privKey: "${coinData.prefix}${wallet.privKey}",
+        pubKey: "${coinData.prefix}${wallet.pubKey}",
         keyPair: null);
   }
 
   @override
-  getBalance(List address) {
+  getBalance(List address) async {
+    // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
+    // var client = Web3Client(
+    //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+    //     Client());
+    // return await client.getBalance(ethWallet.address);
+    var amount =
+        await APIServices().getBalance([getWallet().address], coinData.unit);
+    double balance = amount["data"].first["confirmed"];
+    // print(amount);
+    // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");
+    return balance;
+  }
+
+  @override
+  getTransactions({required int offset, required int limit}) async {
+    var response = await APIServices().getTransactions(
+      getWallet().address,
+      coinData.unit,
+      offset: offset,
+      limit: limit,
+    );
+    var data = response["data"]["list"];
+    int total = response["data"]["total"];
+    List<TransactionModel> transactions = [];
+    // print("data is $data");
+    data.forEach((e) {
+      transactions.add(
+        TransactionModel(
+          from: e["from"],
+          to: e["to"],
+          amount: double.parse(e["value"]) / wei,
+          time: DateTime.fromMillisecondsSinceEpoch(
+              int.parse(e["timeStamp"]) * 1000),
+          hash: e["hash"],
+          fee: double.parse(e["gasUsed"]) / wei,
+        ),
+      );
+    });
+    // print(response);
+    return [total, transactions];
+  }
+
+  @override
+  sendTransaction(double amount, String receiverAddress) async {
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
-    var client = Web3Client(
-        "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
-        Client());
-    client.getBalance(ethWallet.address).then((value) => print(value.getInWei));
-  }
-
-  @override
-  getTransactions(String address) {
-    throw UnimplementedError();
-  }
-
-  @override
-  importWallet() {
-    throw UnimplementedError();
-  }
-
-  @override
-  sendTransaction(double amount, String recieveraddress) async {
-    coinslib.HDWallet hdWallet = services.hdWallet!;
-    var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
-    var ethWallet = EthPrivateKey.fromHex("0x${wallet.privKey}");
     print("address is ${ethWallet.address.hexEip55}");
     var client = Web3Client(
         "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
@@ -103,8 +129,7 @@ class Ethereum implements Currency {
     var signedData = await client.signTransaction(
       ethWallet,
       Transaction(
-        to: EthereumAddress.fromHex(
-            '0xF98863D856b1Dca7627E98CeA960BA40958774f6'),
+        to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
         maxGas: 100000,
         value: EtherAmount.fromUnitAndValue(EtherUnit.szabo, BigInt.one),
@@ -112,10 +137,18 @@ class Ethereum implements Currency {
       fetchChainIdFromNetworkId: true,
       chainId: null,
     );
-    var hex = HexEncoder().convert(signedData);
-    print("signed hex is 0x$hex");
-    //TODO: send transaction
-    var sent = await client.sendRawTransaction(signedData);
-    print("hash is $sent");
+    var hex = coinData.prefix + HexEncoder().convert(signedData);
+    print("signed hex is $hex");
+    Map body = {
+      "network": network,
+      "currency": coinData.unit,
+      "fromAddress": getWallet().address,
+      "toAddress": receiverAddress,
+      "amount": amount,
+      "signedRawTransaction": hex
+    };
+    var response = await APIServices().sendTransaction(body);
+    print(response);
+    return response;
   }
 }

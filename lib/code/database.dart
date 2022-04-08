@@ -31,13 +31,21 @@ class TokenData extends GetxController {
 class BalanceData extends GetxController {
   final TokenData tokenData = Get.put(TokenData());
   Map<Currency, double>? data;
+  var totalBalance = 0.0.obs;
   Map<Currency, double> getData() => data ??= {
         for (var item in tokenData.data)
-          // if (Random().nextInt(100) < 50)
-          if (true) item: (((Random().nextDouble() * 10000).toInt()) / 100)
-        // else
-        // item: 0.0
-      };
+          if (true) item: 0.0
+        // if (true) item: (((Random().nextDouble() * 10000).toInt()) / 100)
+      }.obs;
+
+  updateBalance(Currency currency, double value) {
+    getData()[currency] = value;
+    totalBalance.value = 0;
+    data!.forEach((key, value) {
+      if (key.coinData.selected)
+        totalBalance.value += value * key.coinData.rate;
+    });
+  }
 }
 
 class SettingsState extends GetxController {
