@@ -80,3 +80,5 @@ String encKey = "keyForEncryptingMnemonic";
 String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";
 const ipAddress = "http://13.235.53.197:3000/";
 String network = isTestNet ? "TESTNET" : "MAINNET";
+int satoshi = 100000000;
+int wei = 1000000000000000000;

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/buy.dart';
@@ -10,12 +12,12 @@ import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/send.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:wallet/widgets/transactions.dart';
 
 class CoinPage extends StatefulWidget {
   final Currency currency;
-  final double balance;
-  const CoinPage({Key? key, required this.currency, required this.balance})
-      : super(key: key);
+  const CoinPage({Key? key, required this.currency}) : super(key: key);
 
   @override
   _CoinPageState createState() => _CoinPageState();
@@ -23,18 +25,34 @@ class CoinPage extends StatefulWidget {
 
 class _CoinPageState extends State<CoinPage> {
   late Currency currency;
-  late double balance;
   bool isLoading = true;
   bool isRefreshing = false;
-  List data = [];
+  int total = 0;
+  int offset = 0;
+  List<TransactionModel> transactions = [];
+  final BalanceData balanceData = Get.find();
+  final ScrollController scrollController = ScrollController();
 
   Future refreshData() async {
+    print("fetching");
     if (isLoading || isRefreshing) {
-      await 1.delay();
+      // await 1.delay();
+      var data = await currency.getTransactions(
+        offset: isRefreshing ? 0 : offset,
+        limit: 10,
+      );
+      if (isRefreshing) {
+        offset = 0;
+        transactions = data[1];
+      } else {
+        transactions.addAll(data[1]);
+      }
+      total = data[0];
       setState(() {
         isLoading = false;
         isRefreshing = false;
       });
+      print(total);
     }
   }
 
@@ -48,8 +66,27 @@ class _CoinPageState extends State<CoinPage> {
   void initState() {
     super.initState();
     currency = widget.currency;
-    balance = widget.balance;
+    scrollController.addListener(
+      () {
+        if (scrollController.offset >
+                scrollController.position.maxScrollExtent - 50 &&
+            transactions.isNotEmpty &&
+            transactions.length < total &&
+            !isLoading &&
+            !isRefreshing) {
+          isLoading = true;
+          offset += 10;
+          refreshData();
+        }
+      },
+    );
     refreshData();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -101,109 +138,116 @@ class _CoinPageState extends State<CoinPage> {
               color: appColor[600],
             ),
             CommonWidgets.elevatedContainer(
-              child: Column(
-                children: [
-                  // header(),
-                  // SizedBox(
-                  //   height: 4,
-                  // ),
-                  SizedBox(
-                      width: Get.width * 0.15,
-                      height: Get.width * 0.15,
-                      child: Image.asset(
-                          "assets/currencies/${currency.coinData.unit}.png")),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    currency.coinData.name,
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                  ),
-                  header(),
-                  SizedBox(
-                    height: height * 0.02,
-                  ),
-                  Text(
-                    "$balance ${currency.coinData.unit}",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    "Portfolio Worth: \$${(balance * currency.coinData.rate).toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  GestureDetector(
-                    onTap: copyAddress,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          FormatText.address(currency.getWallet().address),
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5),
-                              ),
-                              color: Colors.grey[100]),
-                          child: Text(
-                            "COPY",
+              child: Obx(
+                () => Column(
+                  children: [
+                    // header(),
+                    // SizedBox(
+                    //   height: 4,
+                    // ),
+                    SizedBox(
+                        width: Get.width * 0.15,
+                        height: Get.width * 0.15,
+                        child: Image.asset(
+                            "assets/currencies/${currency.coinData.unit}.png")),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      currency.coinData.name,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                    header(),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    Text(
+                      FormatText.roundOff((balanceData.data![currency])!,
+                              maxDecimals: 8) +
+                          " ${currency.coinData.unit}",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      "Portfolio Worth: \$${(balanceData.data![currency]! * currency.coinData.rate).toStringAsFixed(2)}",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    GestureDetector(
+                      onTap: copyAddress,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            FormatText.address(currency.getWallet().address),
                             style: TextStyle(color: Colors.grey),
                           ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                                color: Colors.grey[100]),
+                            child: Text(
+                              "COPY",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: HomeWidgets.quickAction(
+                              icon: "assets/icons/deposit.svg",
+                              text: "Deposit",
+                              onPressed: () =>
+                                  Get.to(() => ReceivePage(currency: currency)),
+                              whiteBG: true),
+                        ),
+                        Expanded(
+                          child: HomeWidgets.quickAction(
+                              icon: "assets/icons/buy.svg",
+                              text: "Buy",
+                              onPressed: () => Get.to(() =>
+                                  BuyPage(currency: currency, minimum: 50)),
+                              whiteBG: true),
+                        ),
+                        Expanded(
+                          child: HomeWidgets.quickAction(
+                              icon: "assets/icons/send.svg",
+                              text: "Send",
+                              onPressed: () => Get.to(() => SendPage(
+                                    currency: currency,
+                                  )),
+                              whiteBG: true),
+                        ),
+                        Expanded(
+                          child: HomeWidgets.quickAction(
+                              icon: "assets/icons/swap.svg",
+                              text: "Swap",
+                              onPressed: () {},
+                              whiteBG: true),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: HomeWidgets.quickAction(
-                            icon: "assets/icons/deposit.svg",
-                            text: "Deposit",
-                            onPressed: () =>
-                                Get.to(() => ReceivePage(currency: currency)),
-                            whiteBG: true),
-                      ),
-                      Expanded(
-                        child: HomeWidgets.quickAction(
-                            icon: "assets/icons/buy.svg",
-                            text: "Buy",
-                            onPressed: () => Get.to(
-                                () => BuyPage(currency: currency, minimum: 50)),
-                            whiteBG: true),
-                      ),
-                      Expanded(
-                        child: HomeWidgets.quickAction(
-                            icon: "assets/icons/send.svg",
-                            text: "Send",
-                            onPressed: () => Get.to(() =>
-                                SendPage(currency: currency, balance: balance)),
-                            whiteBG: true),
-                      ),
-                      Expanded(
-                        child: HomeWidgets.quickAction(
-                            icon: "assets/icons/swap.svg",
-                            text: "Swap",
-                            onPressed: copyAddress,
-                            whiteBG: true),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                ],
+                    SizedBox(
+                      height: 16,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -244,28 +288,77 @@ class _CoinPageState extends State<CoinPage> {
     return Scaffold(
         appBar: appBar(),
         body: Container(
-          child: ListView(
-            children: [
-              dash(),
-              ListView.builder(
-                  itemCount: data.isEmpty ? 1 : data.length,
-                  shrinkWrap: true,
-                  primary: false,
-                  itemBuilder: (context, index) {
-                    // if (index == 0) return dash();
-                    if (isLoading) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
-                      );
-                    } else if (data.isEmpty) return emptyList();
-                    return ListTile(
-                      title: Text("Transaction #$index"),
-                    );
-                  }),
-            ],
+          child: RefreshIndicator(
+            onRefresh: () async {
+              isRefreshing = true;
+              await refreshData();
+            },
+            child: ListView(
+              controller: scrollController,
+              children: [
+                dash(),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(16),
+                    ),
+                    color: Colors.grey[50],
+                  ),
+                  child: ListView.builder(
+                      itemCount: transactions.isEmpty
+                          ? 1
+                          : total != transactions.length
+                              ? transactions.length + 1
+                              : transactions.length,
+                      shrinkWrap: true,
+                      primary: false,
+                      itemBuilder: (context, index) {
+                        // if (index == 0) return dash();
+                        if (isLoading) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: CircularProgressIndicator.adaptive(),
+                            ),
+                          );
+                        } else if (transactions.isEmpty) return emptyList();
+                        if (index == transactions.length &&
+                            transactions.isNotEmpty &&
+                            total != transactions.length) {
+                          return Center(
+                              child: CircularProgressIndicator.adaptive());
+                        }
+                        TransactionModel item = transactions[index];
+                        bool isReceived = item.to.toLowerCase() ==
+                            currency.getWallet().address.toLowerCase();
+                        return ListTile(
+                          title: Text(
+                              "${isReceived ? "Received from" : "Sent to"}: ${FormatText.address(isReceived ? item.from : item.to)}"),
+                          subtitle: Text(
+                              DateFormat.yMMMd().format(item.time.toLocal()) +
+                                  " at " +
+                                  DateFormat.jm().format(item.time.toLocal())),
+                          trailing: Text(FormatText.roundOff(item.amount) +
+                              " ${currency.coinData.unit}"),
+                          leading: SvgPicture.asset(
+                            "assets/icons/${isReceived ? "receive" : "send"}_dash.svg",
+                            color: appColor,
+                            height: 35,
+                          ),
+                          onTap: () {
+                            CommonWidgets.bottomSheet(TransactionsPage(
+                              transaction: item,
+                              coinData: currency.coinData,
+                              isReceived: isReceived,
+                            ));
+                          },
+                        );
+                      }),
+                ),
+              ],
+            ),
           ),
         ));
   }

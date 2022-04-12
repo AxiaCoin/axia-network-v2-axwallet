@@ -14,6 +14,7 @@ class StorageService {
   String? sessionID;
   String? deviceID;
   String? pin;
+  bool? useBiometric;
   // Map<String, double> balances = {};
   // Map<String, String> currencies = {};
   List<String>? defaultWallets;
@@ -24,6 +25,7 @@ class StorageService {
     sessionID = box.read("sessionID");
     deviceID = box.read("deviceID");
     pin = box.read("pin");
+    useBiometric = box.read("useBiometric") ?? true;
     if (deviceID == null) getDeviceID();
 
     List<dynamic>? wallets = box.read("defaultWallets");
@@ -71,6 +73,11 @@ class StorageService {
     box.write("pin", value);
   }
 
+  updateBiometricPreference(bool value) {
+    useBiometric = value;
+    box.write("useBiometric", value);
+  }
+
   updateDefaultWallets(String wallet, {required isSelected}) {
     if (isSelected && !defaultWallets!.contains(wallet)) {
       defaultWallets!.add(wallet);
@@ -87,6 +94,8 @@ class StorageService {
     box.remove("sessionID");
     box.remove("mnemonic");
     box.remove("pin");
+    box.remove("defaultWallets");
+    box.remove("useBiometric");
   }
 
   // initBalances() {
@@ -108,8 +117,9 @@ class StorageService {
     box.write("mnemonic", encrypted.base16);
   }
 
-  readMnemonic() {
-    String mnemonic = box.read("mnemonic");
+  String? readMnemonic() {
+    String? mnemonic = box.read("mnemonic");
+    if (mnemonic == null) return null;
     var iv = IV.fromLength(16);
     var key = Key.fromUtf8(encKey);
     var encrypter = Encrypter(AES(key));

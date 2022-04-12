@@ -62,6 +62,10 @@ class _OnboardPageState extends State<OnboardPage>
   Widget build(BuildContext context) {
     List<Widget> items = itemData.map((e) => item(e)).toList();
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Welcome"),
+        centerTitle: true,
+      ),
       // floatingActionButton: Column(
       //   mainAxisAlignment: MainAxisAlignment.end,
       //   children: [
@@ -69,7 +73,9 @@ class _OnboardPageState extends State<OnboardPage>
       //       child: Icon(Icons.light_mode),
       //       onPressed: () => Get.changeTheme(lightTheme),
       //     ),
-      //     SizedBox(height: 8,),
+      //     SizedBox(
+      //       height: 8,
+      //     ),
       //     FloatingActionButton(
       //       child: Icon(Icons.dark_mode),
       //       onPressed: () => Get.changeTheme(darkTheme),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/widgets/common.dart';
 
 class QRScanPage extends StatefulWidget {
   const QRScanPage({Key? key}) : super(key: key);
@@ -44,6 +45,24 @@ class _QRScanPageState extends State<QRScanPage> {
               cutOutSize: Get.width * 0.6,
             ),
           ),
+          Align(
+            alignment: Alignment(-0.9, -0.9),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x4040401A),
+                    offset: Offset(0, 4),
+                    spreadRadius: 0,
+                    blurRadius: 32,
+                  ),
+                ],
+              ),
+              child: CommonWidgets.backButton(context),
+            ),
+          )
         ],
       ),
     );

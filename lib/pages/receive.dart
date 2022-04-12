@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -51,6 +53,8 @@ class _ReceivePageState extends State<ReceivePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Receive ${currency.coinData.name}"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -107,21 +111,28 @@ class _ReceivePageState extends State<ReceivePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Copy",
-                  onPressed: copyAddress,
-                  whiteBG: true),
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Set Amount",
-                  onPressed: () {},
-                  whiteBG: true),
-              HomeWidgets.quickAction(
-                  icon: "assets/icons/receive_dash.svg",
-                  text: "Share",
-                  onPressed: shareAddress,
-                  whiteBG: true)
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon: "assets/icons/copy.svg",
+                    text: "Copy",
+                    onPressed: copyAddress,
+                    whiteBG: true),
+              ),
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon: "assets/icons/tag.svg",
+                    text: "Set Amount",
+                    onPressed: () {},
+                    whiteBG: true),
+              ),
+              Expanded(
+                child: HomeWidgets.quickAction(
+                    icon:
+                        "assets/icons/share_${Platform.isAndroid ? "android" : "ios"}.svg",
+                    text: "Share",
+                    onPressed: shareAddress,
+                    whiteBG: true),
+              )
             ],
           )
         ],

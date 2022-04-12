@@ -25,6 +25,7 @@ class Bitcoin implements Currency {
   CoinData coinData = CoinData(
     name: "Bitcoin",
     unit: "BTC",
+    prefix: "",
     coinType: isTestNet ? 1 : 0,
     rate: 1.23,
     change: "1",
@@ -38,10 +39,6 @@ class Bitcoin implements Currency {
     var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
     ECPair keyPair = ECPair.fromWIF(wallet.wif.toString());
     keyPair.network = isTestNet ? testnet : bitcoin;
-    print("Bitcoin Address:${wallet.address}");
-    print(wallet.privKey);
-    print(wallet.pubKey);
-    print(keyPair);
     return CryptoWallet(
       address: wallet.address!,
       privKey: wallet.privKey!,
@@ -51,85 +48,55 @@ class Bitcoin implements Currency {
   }
 
   @override
-  getBalance(List<String> address) async {
-    var response = await http.get(
-      Uri.parse(
-          "$ipAddress/address/balance?network=$network&addresses=$address&currency=${coinData.unit}"),
-      headers: {
-        'Authorization': 'Bearer ' + StorageService.instance.authToken!
-      },
-    );
-    print(response.body);
-    var amount = jsonDecode(response.body);
-    print(amount["data"]);
+  getBalance(List address) async {
+    var amount =
+        await APIServices().getBalance([getWallet().address], coinData.unit);
     var data = amount["data"];
     var bal = data[0];
     var b = bal["confirmed"];
-    print(b);
-    return b;
+    return b / satoshi;
   }
 
   @override
-  getTransactions(String address) async {
-    try {
-      String url = ipAddress +
-          'address/$address/transactions?network=$network&currency=${coinData.unit}&offset=0&limit=10&sort=asc';
-      var response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!
-        },
+  getTransactions({required int offset, required int limit}) async {
+    var response = await APIServices().getTransactions(
+      getWallet().address,
+      coinData.unit,
+      offset: offset,
+      limit: limit,
+    );
+    // print(response);
+    var data = response["data"]["list"];
+    int total = response["data"]["total"];
+    List<TransactionModel> transactions = [];
+    // print("data is $data");
+    data.forEach((e) {
+      transactions.add(
+        TransactionModel(
+          from: e["inputs"][0]["address"],
+          to: e["outputs"][0]["address"],
+          amount: (e["outputs"][0]["value"]).toDouble() / satoshi,
+          time: DateTime.fromMillisecondsSinceEpoch(e["time"] * 1000),
+          hash: e["txid"],
+          fee: e["fee"] / satoshi,
+        ),
       );
-      if (response.statusCode == 200) {
-        print("success");
-        Map val = jsonDecode(response.body);
-        print("result: $val");
-        return val;
-      } else {
-        print("unsuccessful");
-        Map val = jsonDecode(response.body);
-        print("error: $val");
-        if (val.toString().contains("Auth Token is invalid")) {
-          String sessionID = StorageService.instance.sessionID!;
-          String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
-          if (result["success"]) {
-            String authToken = result["data"]["authToken"];
-            StorageService.instance.updateAuthToken(authToken);
-            return getTransactions(address);
-          }
-          return;
-        }
-        CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
-        return val;
-      }
-    } on SocketException {
-      return "No internet connection";
-    } on HttpException {
-      return "Couldn't find URL";
-    } on FormatException {
-      return "Bad response format";
-    } catch (e) {
-      return "Server response:${e.toString()}";
-    }
+    });
+    return [total, transactions];
   }
 
-  @override
-  importWallet() {
-    throw UnimplementedError();
-  }
-
-  Future sendTransaction(double amount, String recieveraddress) async {
+  Future sendTransaction(double amount, String receiverAddress) async {
     CryptoWallet wallet = getWallet();
     String address = wallet.address;
     ECPair keypairtemp = wallet.keyPair!;
     try {
+      print(amount);
+      amount = amount * satoshi;
+      print(amount);
       print("Start");
       final txb =
           new TransactionBuilder(network: isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
-      print("Unspent is=$unspent");
       print("got unspent");
       var availBal = await getBalance([address]);
       print(availBal);
@@ -146,9 +113,9 @@ class Bitcoin implements Currency {
       var estimated = (180 * unspent.list!.length + noOutput * 34 + 10) * 10;
       print("estiated amount=$estimated");
       if (amount == availBal) {
-        txb.addOutput(recieveraddress, (amount.toInt() - estimated));
+        txb.addOutput(receiverAddress, (amount.toInt() - estimated));
       } else {
-        txb.addOutput(recieveraddress, (amount.toInt()));
+        txb.addOutput(receiverAddress, (amount.toInt()));
       }
       if ((unspent.amount! - amount) != 0 && amount != availBal) {
         txb.addOutput(
@@ -162,50 +129,28 @@ class Bitcoin implements Currency {
       } catch (e) {
         print(e);
       }
-
       var hexbuild = txb.build().toHex();
       print("hexbuild: $hexbuild");
-      // Map format = {
-      //   "network": "TESTNET",
-      //   "currency": "BTC",
+      try {
+        var response = await http.post(
+            Uri.parse("https://blockstream.info/testnet/api/tx"),
+            body: hexbuild);
+        print(jsonDecode(response.body));
+        return response;
+      } catch (e) {
+        print(e);
+      }
+      // Map body = {
+      //   "network": network,
+      //   "currency": coinData.unit,
       //   "fromAddress": address,
-      //   "toAddress": recieveraddress,
+      //   "toAddress": receiverAddress,
       //   "amount": amount,
       //   "signedRawTransaction": hexbuild
       // };
-      // var formatbody = json.encode(format);
-      // var response = await http.post(
-      //     Uri.parse("http://13.235.53.197:3000/transaction/send"),
-      //     headers: {
-      //       'Authorization': 'Bearer ' + StorageService.instance.authToken!
-      //       'Content-Type': 'application/json'
-      //     },
-      //     body: formatbody);
-      // if (response.statusCode == 200) {
-      //   print("success");
-      //   Map val = jsonDecode(response.body);
-      //   print("result: $val");
-      //   return val;
-      // } else {
-      //   print("unsuccessful");
-      //   Map val = jsonDecode(response.body);
-      //   print("error: $val");
-      //   if (val.toString().contains("Auth Token is invalid")) {
-      //     String sessionID = StorageService.instance.sessionID!;
-      //     String deviceID = StorageService.instance.deviceID!;
-      //     var result = await APIServices()
-      //         .getAuthToken(sessionId: sessionID, deviceId: deviceID);
-      //     if (result["success"]) {
-      //       String authToken = result["data"]["authToken"];
-      //       StorageService.instance.updateAuthToken(authToken);
-      //       return sendTransaction(
-      //           amount, keypairtemp, address, recieveraddress);
-      //     }
-      //     return;
-      //   }
-      //   CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
-      //   return val;
-      // }
+      // var response = await APIServices().sendTransaction(body);
+      // print(response.body);
+      // return response;
     } on SocketException {
       return "No internet connection";
     } on HttpException {
@@ -222,7 +167,7 @@ class Bitcoin implements Currency {
       print("start");
       var response = await http.get(
         Uri.parse(
-            "$ipAddress$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
+            "$ipAddress\address/$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
         headers: {
           'Authorization': 'Bearer ' + StorageService.instance.authToken!
         },
@@ -238,7 +183,8 @@ class Bitcoin implements Currency {
             try {
               BTCglobalList sxn = BTCglobalList(
                   amount: val.data!.list![i].value!.toDouble(),
-                  list: val.data!.list! as List<ListElement>);
+                  list: [val.data!.list![i]]);
+              // sxn.list!.forEach((element) => print(element.toJson()));
               return sxn;
             } catch (e) {
               print(e);
@@ -254,9 +200,11 @@ class Bitcoin implements Currency {
             return txn;
           }
         }
+
         return txn;
       } else {
-        print("unsuccessful");
+        print("unsuccessful yo");
+        print("error: ${response.body}");
         Map val = jsonDecode(response.body);
         print("error: $val");
         if (val.toString().contains("Auth Token is invalid")) {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/new_user/login.dart';
+import 'package:wallet/widgets/common.dart';
 
 class ChangePassword extends StatefulWidget {
   final bool resetPassword;
@@ -31,30 +32,55 @@ class _ChangePasswordState extends State<ChangePassword> {
       setState(() {
         submitting = true;
       });
-      String authToken = StorageService.instance.authToken!;
-      var response = await APIServices().resetPassword(
-        email: emailController.text,
-        authToken: authToken,
-        newPassword: passwordController.text,
-        currentPassword: currentPassController.text,
-      );
-      setState(() {
-        submitting = false;
-      });
-      if (response["success"]) {
-        await Get.dialog(
-          AlertDialog(
-            title: Text("Success"),
-            content: Text("Password Successfully Changed!"),
-            actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text("Okay"),
-              ),
-            ],
-          ),
+      if (!widget.resetPassword) {
+        var response = await APIServices().userPasswordUpdate(
+          newPassword: passwordController.text,
+          currentPassword: currentPassController.text,
         );
-        Get.back();
+        setState(() {
+          submitting = false;
+        });
+        print(response);
+        if (response["success"]) {
+          await Get.dialog(
+            AlertDialog(
+              title: Text("Success"),
+              content: Text("Password Successfully Changed!"),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text("Okay"),
+                ),
+              ],
+            ),
+          );
+          Get.back();
+        }
+      } else {
+        print(StorageService.instance.authToken);
+        var response = await APIServices().resetPassword(
+          newPassword: passwordController.text,
+          authToken: StorageService.instance.authToken!,
+        );
+        setState(() {
+          submitting = false;
+        });
+        print(response);
+        if (response["success"]) {
+          await Get.dialog(
+            AlertDialog(
+              title: Text("Success"),
+              content: Text(
+                  "Password Successfully Changed!, Please Login to continue."),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.offAll(() => LoginPage()),
+                  child: Text("Okay"),
+                ),
+              ],
+            ),
+          );
+        }
       }
     }
   }
@@ -73,8 +99,17 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     List<Widget> passwordFields = [
       SizedBox(
-        height: widget.resetPassword ? 0 : 16,
+        height: widget.resetPassword ? 0 : 0,
       ),
+      widget.resetPassword
+          ? Container()
+          : Align(
+              alignment: Alignment.centerLeft, child: Text("Current Password")),
+      widget.resetPassword
+          ? Container()
+          : SizedBox(
+              height: 8,
+            ),
       widget.resetPassword
           ? Container()
           : TextFormField(
@@ -83,8 +118,9 @@ class _ChangePasswordState extends State<ChangePassword> {
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: "Current Password",
-                border: OutlineInputBorder(),
+                hintText: "Current Password",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
                 suffixIcon: IconButton(
                   icon:
                       Icon(obscurity ? Icons.visibility_off : Icons.visibility),
@@ -98,6 +134,10 @@ class _ChangePasswordState extends State<ChangePassword> {
       SizedBox(
         height: 16,
       ),
+      Align(alignment: Alignment.centerLeft, child: Text("New Password")),
+      SizedBox(
+        height: 8,
+      ),
       TextFormField(
         controller: passwordController,
         focusNode: passwordFocus,
@@ -105,8 +145,9 @@ class _ChangePasswordState extends State<ChangePassword> {
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          labelText: "New Password",
-          border: OutlineInputBorder(),
+          hintText: "New Password",
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
           suffixIcon: widget.resetPassword
               ? IconButton(
                   icon:
@@ -125,14 +166,20 @@ class _ChangePasswordState extends State<ChangePassword> {
       SizedBox(
         height: 16,
       ),
+      Align(
+          alignment: Alignment.centerLeft, child: Text("Confirm New Password")),
+      SizedBox(
+        height: 8,
+      ),
       TextFormField(
         focusNode: confirmPasswordFocus,
         obscureText: obscurity,
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          labelText: "Confirm New Password",
-          border: OutlineInputBorder(),
+          hintText: "Confirm New Password",
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
         validator: (val) => val == passwordController.text
             ? null
@@ -140,6 +187,13 @@ class _ChangePasswordState extends State<ChangePassword> {
       ),
     ];
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Change Password"),
+        centerTitle: true,
+        leading: widget.resetPassword
+            ? Container()
+            : CommonWidgets.backButton(context),
+      ),
       body: Form(
         key: formKey,
         child: SafeArea(
@@ -156,16 +210,16 @@ class _ChangePasswordState extends State<ChangePassword> {
                 //     style: context.textTheme.caption!.copyWith(color: appColor),
                 //   ),
                 // ),
-                SizedBox(
-                  height: 16,
-                ),
-                Text(
-                  "Change Password",
-                  style: context.textTheme.headline4,
-                ),
-                SizedBox(
-                  height: 32,
-                ),
+                // SizedBox(
+                //   height: 16,
+                // ),
+                // Text(
+                //   "Change Password",
+                //   style: context.textTheme.headline4,
+                // ),
+                // SizedBox(
+                //   height: 32,
+                // ),
                 // Text(
                 //   "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
                 //   style: context.textTheme.caption!.copyWith(fontSize: 24),
@@ -191,7 +245,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           onPressed: () {
                             _changePassword();
                           },
-                          child: Text("Change Password"),
+                          child: Text("Save Changes"),
                           style: MyButtonStyles.onboardStyle,
                         ),
                       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/new_user/create_wallet/verify_recovery.dart';
 import 'package:wallet/pages/qr_creation.dart';
@@ -66,20 +67,17 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
   @override
   void initState() {
     super.initState();
-
-    words = List.generate(
-      12,
-      (index) {
-        String word = "word${index + 1}";
-        // words.add(word);
-        return word;
-      },
-    );
+    words = services.generateMnemonic().split(' ');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Create Wallet"),
+        centerTitle: true,
+        leading: CommonWidgets.backButton(context),
+      ),
       body: SafeArea(
         child: Container(
           padding: EdgeInsets.all(16.0),

@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/models.dart';
 
 class CommonWidgets {
   CommonWidgets._();
@@ -18,6 +20,25 @@ class CommonWidgets {
       animationDuration: Duration(milliseconds: 200),
       // snackPosition: SnackPosition.TOP,
     ));
+  }
+
+  static waitDialog({String text = "Accessing Wallet"}) {
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [CircularProgressIndicator.adaptive(), Text(text)],
+          ),
+        ),
+      ),
+      // barrierDismissible: false,
+    );
+  }
+
+  static bottomSheet(Widget bottomsheet) {
+    Get.bottomSheet(bottomsheet);
   }
 
   static backButton(BuildContext context) => IconButton(
@@ -53,5 +74,29 @@ class CommonWidgets {
           ],
         ),
         child: child,
+      );
+
+  static Widget profileItem(
+    BuildContext context, {
+    required String key,
+    required String value,
+    Function()? onPressed,
+  }) =>
+      Row(
+        // crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            key,
+            style: context.textTheme.caption!.copyWith(fontSize: 16),
+          ),
+          Text(
+            value,
+            style: context.textTheme.caption!
+                .copyWith(fontSize: 20, color: appColor),
+          ),
+          onPressed == null
+              ? Container()
+              : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
+        ],
       );
 }

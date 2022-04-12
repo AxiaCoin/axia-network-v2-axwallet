@@ -103,9 +103,7 @@ class MorePage extends StatelessWidget {
                   title: Text("${item.coinData.name} (${item.coinData.unit})"),
                   leading: FlutterLogo(),
                   onTap: () {
-                    pushNewScreen(context,
-                        screen: CoinPage(
-                            currency: item, balance: balanceInfo[item]!));
+                    pushNewScreen(context, screen: CoinPage(currency: item));
                   },
                 );
               }),

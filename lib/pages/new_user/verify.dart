@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/pages/settings/profile/change_password.dart';
 import 'package:wallet/widgets/common.dart';
 
 class VerificationPage extends StatefulWidget {
@@ -54,14 +55,27 @@ class _VerificationPageState extends State<VerificationPage> {
         setState(() {
           submitting = false;
         });
-        // CommonWidgets.snackBar("Incorrect code entered");
+        CommonWidgets.snackBar("Incorrect code entered");
       }
     } else {
-      // var response = await APIServices().resetPassword();
-
-      setState(() {
-        submitting = false;
-      });
+      var response = await APIServices().verifyforgotPasswordOtp(
+          phoneNumber: widget.phoneNumber != null
+              ? widget.phoneNumber!.parseNumber()
+              : null,
+          phoneCode: widget.phoneNumber != null
+              ? widget.phoneNumber!.dialCode!.substring(1)
+              : null,
+          otp: code);
+      if (response["success"]) {
+        StorageService.instance.updateAuthToken(response["data"]["authToken"]);
+        CommonWidgets.snackBar("OTP Verified successfully", duration: 3);
+        Get.off(() => ChangePassword(resetPassword: true));
+      } else {
+        setState(() {
+          submitting = false;
+        });
+        CommonWidgets.snackBar("Incorrect code entered");
+      }
     }
   }
 
