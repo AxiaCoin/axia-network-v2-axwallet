@@ -145,11 +145,12 @@ class Bitcoin implements Currency {
       //   "currency": coinData.unit,
       //   "fromAddress": address,
       //   "toAddress": receiverAddress,
-      //   "amount": amount / satoshi,
+      //   "amount": amount,
       //   "signedRawTransaction": hexbuild
       // };
       // var response = await APIServices().sendTransaction(body);
-
+      // print(response.body);
+      // return response;
     } on SocketException {
       return "No internet connection";
     } on HttpException {

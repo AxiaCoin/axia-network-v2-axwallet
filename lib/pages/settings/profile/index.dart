@@ -203,6 +203,19 @@ class ProfilePageState extends State<ProfilePage> {
                         style: MyButtonStyles.onboardStyle,
                       ),
                     ),
+                    // SizedBox(
+                    //   height: 16,
+                    // ),
+                    // SizedBox(
+                    //   width: Get.width,
+                    //   child: TextButton(
+                    //     onPressed: () {
+                    //       services.generateAXIAMnemonic();
+                    //     },
+                    //     child: Text("Testing"),
+                    //     style: MyButtonStyles.onboardStyle,
+                    //   ),
+                    // ),
                     // kDebugMode
                     //     ? SizedBox(
                     //         height: 16,
