@@ -39,10 +39,6 @@ class Bitcoin implements Currency {
     var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
     ECPair keyPair = ECPair.fromWIF(wallet.wif.toString());
     keyPair.network = isTestNet ? testnet : bitcoin;
-    // print("Bitcoin Address:${wallet.address}");
-    // print(wallet.privKey);
-    // print(wallet.pubKey);
-    // print(keyPair);
     return CryptoWallet(
       address: wallet.address!,
       privKey: wallet.privKey!,
@@ -52,22 +48,12 @@ class Bitcoin implements Currency {
   }
 
   @override
-  getBalance(List<String> address) async {
-    // var response = await http.get(
-    //   Uri.parse(
-    //       "$ipAddress/address/balance?network=$network&addresses=$address&currency=${coinData.unit}"),
-    //   headers: {
-    //     'Authorization': 'Bearer ' + StorageService.instance.authToken!
-    //   },
-    // );
-    // print(response.body);
-    var amount = await APIServices()
-        .getBalance(["mvSjCZRpBc2YzDjFUJdtvNa8AZshqXUiz6"], coinData.unit);
-    // print(amount["data"]);
+  getBalance(List address) async {
+    var amount =
+        await APIServices().getBalance([getWallet().address], coinData.unit);
     var data = amount["data"];
     var bal = data[0];
     var b = bal["confirmed"];
-    // print(b);
     return b / satoshi;
   }
 
@@ -89,7 +75,7 @@ class Bitcoin implements Currency {
         TransactionModel(
           from: e["inputs"][0]["address"],
           to: e["outputs"][0]["address"],
-          amount: (e["inputs"][0]["value"]).toDouble() / satoshi,
+          amount: (e["outputs"][0]["value"]).toDouble() / satoshi,
           time: DateTime.fromMillisecondsSinceEpoch(e["time"] * 1000),
           hash: e["txid"],
           fee: e["fee"] / satoshi,
@@ -104,12 +90,13 @@ class Bitcoin implements Currency {
     String address = wallet.address;
     ECPair keypairtemp = wallet.keyPair!;
     try {
+      print(amount);
       amount = amount * satoshi;
+      print(amount);
       print("Start");
       final txb =
           new TransactionBuilder(network: isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
-      print("Unspent is=$unspent");
       print("got unspent");
       var availBal = await getBalance([address]);
       print(availBal);
@@ -142,20 +129,27 @@ class Bitcoin implements Currency {
       } catch (e) {
         print(e);
       }
-
       var hexbuild = txb.build().toHex();
       print("hexbuild: $hexbuild");
-      Map body = {
-        "network": network,
-        "currency": coinData.unit,
-        "fromAddress": address,
-        "toAddress": receiverAddress,
-        "amount": amount / satoshi,
-        "signedRawTransaction": hexbuild
-      };
-      var response = await APIServices().sendTransaction(body);
-      print(response);
-      return response;
+      try {
+        var response = await http.post(
+            Uri.parse("https://blockstream.info/testnet/api/tx"),
+            body: hexbuild);
+        print(jsonDecode(response.body));
+        return response;
+      } catch (e) {
+        print(e);
+      }
+      // Map body = {
+      //   "network": network,
+      //   "currency": coinData.unit,
+      //   "fromAddress": address,
+      //   "toAddress": receiverAddress,
+      //   "amount": amount / satoshi,
+      //   "signedRawTransaction": hexbuild
+      // };
+      // var response = await APIServices().sendTransaction(body);
+
     } on SocketException {
       return "No internet connection";
     } on HttpException {
@@ -188,7 +182,8 @@ class Bitcoin implements Currency {
             try {
               BTCglobalList sxn = BTCglobalList(
                   amount: val.data!.list![i].value!.toDouble(),
-                  list: val.data!.list! as List<ListElement>);
+                  list: [val.data!.list![i]]);
+              // sxn.list!.forEach((element) => print(element.toJson()));
               return sxn;
             } catch (e) {
               print(e);
@@ -204,6 +199,7 @@ class Bitcoin implements Currency {
             return txn;
           }
         }
+
         return txn;
       } else {
         print("unsuccessful yo");
