@@ -34,7 +34,7 @@ class _SendPageState extends State<SendPage> {
     String? address;
     String? amount;
     if (result.contains(":")) {
-      var data = result.split(":").last.split("?amount=");
+      var data = result.split("/").last.split("?amount=");
       address = data.first;
       amount = data.last;
       recipientController.text = address;
@@ -256,6 +256,7 @@ class _SendPageState extends State<SendPage> {
                             ),
                             validator: (val) => val != null &&
                                     val.isNotEmpty &&
+                                    val != "." &&
                                     double.parse(val) <
                                         balanceData.data![currency]!
                                 ? null

@@ -29,7 +29,7 @@ class _CoinPageState extends State<CoinPage> {
   bool isRefreshing = false;
   int total = 0;
   int offset = 0;
-  List<TransactionModel> transactions = [];
+  List<TransactionItem> transactions = [];
   final BalanceData balanceData = Get.find();
   final ScrollController scrollController = ScrollController();
 
@@ -37,17 +37,17 @@ class _CoinPageState extends State<CoinPage> {
     print("fetching");
     if (isLoading || isRefreshing) {
       // await 1.delay();
-      var data = await currency.getTransactions(
+      TransactionListModel data = await currency.getTransactions(
         offset: isRefreshing ? 0 : offset,
         limit: 10,
       );
       if (isRefreshing) {
         offset = 0;
-        transactions = data[1];
+        transactions = data.transactionList;
       } else {
-        transactions.addAll(data[1]);
+        transactions.addAll(data.transactionList);
       }
-      total = data[0];
+      total = data.total;
       setState(() {
         isLoading = false;
         isRefreshing = false;
@@ -330,7 +330,7 @@ class _CoinPageState extends State<CoinPage> {
                           return Center(
                               child: CircularProgressIndicator.adaptive());
                         }
-                        TransactionModel item = transactions[index];
+                        TransactionItem item = transactions[index];
                         bool isReceived = item.to.toLowerCase() ==
                             currency.getWallet().address.toLowerCase();
                         return ListTile(
@@ -340,8 +340,12 @@ class _CoinPageState extends State<CoinPage> {
                               DateFormat.yMMMd().format(item.time.toLocal()) +
                                   " at " +
                                   DateFormat.jm().format(item.time.toLocal())),
-                          trailing: Text(FormatText.roundOff(item.amount) +
-                              " ${currency.coinData.unit}"),
+                          trailing: Text(
+                            FormatText.roundOff(item.amount) +
+                                " ${currency.coinData.unit}",
+                            style: TextStyle(
+                                color: isReceived ? tickerGreen : tickerRed),
+                          ),
                           leading: SvgPicture.asset(
                             "assets/icons/${isReceived ? "receive" : "send"}_dash.svg",
                             color: appColor,

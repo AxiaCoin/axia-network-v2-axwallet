@@ -99,6 +99,7 @@ class CoinData {
   String name;
   String unit;
   int coinType;
+  int smallestUnit;
   String prefix;
   double rate;
   String change;
@@ -107,6 +108,7 @@ class CoinData {
     required this.name,
     required this.unit,
     required this.coinType,
+    required this.smallestUnit,
     required this.prefix,
     this.rate = 1,
     this.change = "",
@@ -119,6 +121,7 @@ class CoinData {
       unit: "XCN$i",
       prefix: "",
       coinType: 1,
+      smallestUnit: 1000,
       rate: 123.45,
       change: "1.2",
       selected: false,
@@ -135,7 +138,7 @@ class CryptoWallet {
     required this.address,
     required this.privKey,
     required this.pubKey,
-    required this.keyPair,
+    this.keyPair,
   });
 
   factory CryptoWallet.dummyWallet() {
@@ -146,6 +149,27 @@ class CryptoWallet {
       keyPair: null,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'address': address,
+      'privKey': privKey,
+      'pubKey': pubKey,
+    };
+  }
+
+  factory CryptoWallet.fromMap(Map<String, dynamic> map) {
+    return CryptoWallet(
+      address: map['address'] ?? '',
+      privKey: map['privKey'] ?? '',
+      pubKey: map['pubKey'] ?? '',
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory CryptoWallet.fromJson(String source) =>
+      CryptoWallet.fromMap(json.decode(source));
 }
 
 enum SearchMode { customize, send, receive, buy, swap }
@@ -166,19 +190,37 @@ class DAppsTile {
 //   RecoveryPhrase(this.index, this.word, {this.selected = true});
 // }
 
-class TransactionModel {
+class TransactionItem {
   String from;
   String to;
   double amount;
   DateTime time;
   String hash;
   double fee;
-  TransactionModel({
+  TransactionItem({
     required this.from,
     required this.to,
     required this.amount,
     required this.time,
     required this.hash,
     required this.fee,
+  });
+}
+
+class TransactionListModel {
+  int total;
+  List<TransactionItem> transactionList;
+  TransactionListModel({
+    required this.total,
+    required this.transactionList,
+  });
+}
+
+class TransactionRequestParams {
+  final int offset;
+  final int limit;
+  TransactionRequestParams({
+    required this.offset,
+    required this.limit,
   });
 }

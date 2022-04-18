@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:wallet/Crypto_Models/unspent_model.dart';
 import 'package:wallet/code/constants.dart';
@@ -26,6 +27,7 @@ class Bitcoin implements Currency {
     name: "Bitcoin",
     unit: "BTC",
     prefix: "",
+    smallestUnit: pow(10, 8).toInt(), //100000000 satoshi
     coinType: isTestNet ? 1 : 0,
     rate: 1.23,
     change: "1",
@@ -48,17 +50,18 @@ class Bitcoin implements Currency {
   }
 
   @override
-  getBalance(List address) async {
+  Future<double> getBalance(List address) async {
     var amount =
         await APIServices().getBalance([getWallet().address], coinData.unit);
     var data = amount["data"];
     var bal = data[0];
     var b = bal["confirmed"];
-    return b / satoshi;
+    return b / coinData.smallestUnit;
   }
 
   @override
-  getTransactions({required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -68,21 +71,21 @@ class Bitcoin implements Currency {
     // print(response);
     var data = response["data"]["list"];
     int total = response["data"]["total"];
-    List<TransactionModel> transactions = [];
+    List<TransactionItem> transactions = [];
     // print("data is $data");
     data.forEach((e) {
       transactions.add(
-        TransactionModel(
+        TransactionItem(
           from: e["inputs"][0]["address"],
           to: e["outputs"][0]["address"],
-          amount: (e["outputs"][0]["value"]).toDouble() / satoshi,
+          amount: (e["outputs"][0]["value"]).toDouble() / coinData.smallestUnit,
           time: DateTime.fromMillisecondsSinceEpoch(e["time"] * 1000),
           hash: e["txid"],
-          fee: e["fee"] / satoshi,
+          fee: e["fee"] / coinData.smallestUnit,
         ),
       );
     });
-    return [total, transactions];
+    return TransactionListModel(total: total, transactionList: transactions);
   }
 
   Future sendTransaction(double amount, String receiverAddress) async {
@@ -91,7 +94,7 @@ class Bitcoin implements Currency {
     ECPair keypairtemp = wallet.keyPair!;
     try {
       print(amount);
-      amount = amount * satoshi;
+      amount = amount * coinData.smallestUnit;
       print(amount);
       print("Start");
       final txb =

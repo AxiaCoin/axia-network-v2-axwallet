@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/currencies/ethereum.dart';
 
@@ -74,11 +75,12 @@ bool isTestNet = true;
 List<Currency> currencyList = [
   Bitcoin(),
   Ethereum(),
+  AXIACoin(),
 ];
 
 String encKey = "keyForEncryptingMnemonic";
 String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";
 const ipAddress = "http://13.235.53.197:3000/";
 String network = isTestNet ? "TESTNET" : "MAINNET";
-int satoshi = 100000000;
-int wei = 1000000000000000000;
+// int satoshi = 100000000;
+// int wei = 1000000000000000000;
