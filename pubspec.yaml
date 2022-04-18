@@ -50,12 +50,18 @@ dependencies:
   encrypt: ^5.0.1
   hex: ^0.2.0
   flutter_svg: ^1.0.3
-  # axiawallet_sdk:
-  #   git: https://github.com/ashishbeck/sdk
+  substrate_sdk:
+    git: 
+      url: https://github.com/ashishbeck-zeeve/substrate_sdk.git
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+dependency_overrides:
+  substrate_sdk:
+    path: ../substrate_sdk/
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

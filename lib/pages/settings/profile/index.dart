@@ -45,7 +45,9 @@ class ProfilePageState extends State<ProfilePage> {
     var response =
         await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
     if (response["success"]) {
-      StorageService.instance.clearTokens();
+      StorageService.instance
+        ..clearTokens()
+        ..init();
       Get.offAll(() => LoginPage());
     }
   }

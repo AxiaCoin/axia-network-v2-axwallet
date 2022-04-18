@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
 import 'package:wallet/code/constants.dart';
@@ -14,6 +16,7 @@ class Ethereum implements Currency {
     name: "Ethereum",
     unit: "ETH",
     prefix: "0x",
+    smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
     coinType: 60,
     rate: 1,
     change: "1",
@@ -76,7 +79,7 @@ class Ethereum implements Currency {
   }
 
   @override
-  getBalance(List address) async {
+  Future<double> getBalance(List address) async {
     // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     // var client = Web3Client(
     //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
@@ -91,7 +94,8 @@ class Ethereum implements Currency {
   }
 
   @override
-  getTransactions({required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -100,29 +104,33 @@ class Ethereum implements Currency {
     );
     var data = response["data"]["list"];
     int total = response["data"]["total"];
-    List<TransactionModel> transactions = [];
+    List<TransactionItem> transactions = [];
     // print("data is $data");
     data.forEach((e) {
       transactions.add(
-        TransactionModel(
+        TransactionItem(
           from: e["from"],
           to: e["to"],
-          amount: double.parse(e["value"]) / wei,
+          amount: double.parse(e["value"]) / coinData.smallestUnit,
           time: DateTime.fromMillisecondsSinceEpoch(
               int.parse(e["timeStamp"]) * 1000),
           hash: e["hash"],
-          fee: double.parse(e["gasUsed"]) * double.parse(e["gasPrice"]) / wei,
+          fee: double.parse(e["gasUsed"]) *
+              double.parse(e["gasPrice"]) /
+              coinData.smallestUnit,
         ),
       );
     });
     // print(response);
-    return [total, transactions];
+    return TransactionListModel(total: total, transactionList: transactions);
   }
 
   @override
-  sendTransaction(double amount, String receiverAddress) async {
+  Future sendTransaction(double amount, String receiverAddress) async {
+    amount = amount * coinData.smallestUnit;
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     print("address is ${ethWallet.address.hexEip55}");
+    print("amount is $amount");
     var client = Web3Client(
         "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
         Client());
@@ -133,7 +141,7 @@ class Ethereum implements Currency {
         to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
         maxGas: 100000,
-        value: EtherAmount.fromUnitAndValue(EtherUnit.szabo, BigInt.one),
+        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, amount.toInt()),
       ),
       fetchChainIdFromNetworkId: true,
       chainId: null,

@@ -11,7 +11,7 @@ import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class TransactionsPage extends StatelessWidget {
-  final TransactionModel transaction;
+  final TransactionItem transaction;
   final CoinData coinData;
   final bool isReceived;
   const TransactionsPage({

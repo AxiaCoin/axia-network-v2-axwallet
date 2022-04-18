@@ -5,9 +5,10 @@ abstract class Currency {
 
   CryptoWallet getWallet() => CryptoWallet.dummyWallet();
 
-  getBalance(List<String> address) => null;
+  Future<double> getBalance(List<String> address);
 
-  sendTransaction(double amount, String receiveraddress) async => null;
+  Future sendTransaction(double amount, String receiveraddress);
 
-  getTransactions({required int offset, required int limit}) => null;
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit});
 }

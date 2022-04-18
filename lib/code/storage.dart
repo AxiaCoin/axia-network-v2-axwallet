@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/models.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._();
@@ -18,6 +20,7 @@ class StorageService {
   // Map<String, double> balances = {};
   // Map<String, String> currencies = {};
   List<String>? defaultWallets;
+  String? substrateWallets;
 
   init() {
     // box.remove("authToken");
@@ -33,6 +36,10 @@ class StorageService {
       getInitialWallets();
     } else {
       defaultWallets = wallets.map((e) => e.toString()).toList();
+    }
+    substrateWallets = box.read("substrateWallets");
+    if (substrateWallets == null) {
+      generateSubstrateWallets();
     }
   }
 
@@ -51,6 +58,17 @@ class StorageService {
         .where((e) => e.coinData.selected)
         .map((e) => e.coinData.unit)
         .toList();
+  }
+
+  generateSubstrateWallets() {
+    List<String> substrateNetworks = ["AXC", "DOT"];
+    Map<String, String> wallets = {};
+    substrateNetworks.forEach(
+        (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
+    var stringified = jsonEncode(wallets);
+    // var decoded = jsonDecode(stringified);
+    substrateWallets = stringified;
+    box.write("substrateWallets", stringified);
   }
 
   updateAuthToken(String value) {
@@ -87,6 +105,18 @@ class StorageService {
     box.write("defaultWallets", defaultWallets);
   }
 
+  CryptoWallet getSubstrateWallet(String unit) {
+    Map subWallet = jsonDecode(substrateWallets!);
+    return CryptoWallet.fromJson(subWallet[unit]!);
+  }
+
+  updateSubstrateWallets(String unit, CryptoWallet wallet) {
+    Map<String, dynamic> subWallet = jsonDecode(substrateWallets!);
+    subWallet[unit] = wallet.toJson();
+    substrateWallets = jsonEncode(subWallet);
+    box.write("substrateWallets", substrateWallets);
+  }
+
   clearTokens() {
     authToken = null;
     sessionID = null;
@@ -95,6 +125,7 @@ class StorageService {
     box.remove("mnemonic");
     box.remove("pin");
     box.remove("defaultWallets");
+    box.remove("substrateWallets");
     box.remove("useBiometric");
   }
 

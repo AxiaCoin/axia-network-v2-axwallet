@@ -1,17 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
-// import 'package:axiawallet_sdk/api/api.dart';
-// import 'package:axiawallet_sdk/api/apiAccount.dart';
-// import 'package:axiawallet_sdk/api/apiKeyring.dart';
-// import 'package:axiawallet_sdk/axiawallet_sdk.dart';
-// import 'package:axiawallet_sdk/service/account.dart';
-// import 'package:axiawallet_sdk/service/index.dart';
-// import 'package:axiawallet_sdk/storage/keyring.dart';
 import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
+import 'package:substrate_sdk/substrate_sdk.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -33,8 +27,12 @@ Services services = Services();
 class Services {
   HDWallet? hdWallet;
 
-  // WalletSDK walletSDK = WalletSDK();
-  // var _keyring = Keyring();
+  SubstrateSDK substrateSDK = SubstrateSDK();
+
+  initSubstrateSDK() async {
+    if (substrateSDK.api == null) await substrateSDK.init();
+  }
+
   // generateAXIAMnemonic() async {
   //   await _keyring.init([0]);
   //   if (walletSDK.api == null) await walletSDK.init(_keyring);
@@ -43,6 +41,13 @@ class Services {
   //   AXIAWalletApi apiRoot = AXIAWalletApi(subService);
   //   // var data = ApiAccount(apiRoot, service).apiRoot.keyring.generateMnemonic();
   //   var data = await walletSDK.api.keyring.generateMnemonic();
+  //   print(data);
+  // }
+
+  // sendAXtransaction() async {
+  //   print("sending transaction");
+  //   var data = await walletSDK.api!.basic.signTransaction();
+  //   print("wallet app");
   //   print(data);
   // }
 
@@ -62,9 +67,9 @@ class Services {
     receivePort.close();
     hdWallet = new HDWallet.fromSeed(seed);
     print("wallet created");
-    // currencyList.forEach(
-    //   (e) => e.getWallet(),
-    // );
+    currencyList.forEach(
+      (e) => e.getWallet(),
+    );
   }
 
   updateBalances() async {
