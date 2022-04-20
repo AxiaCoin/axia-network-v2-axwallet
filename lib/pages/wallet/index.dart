@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -7,7 +6,6 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
-import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
@@ -223,14 +221,14 @@ class _WalletPageState extends State<WalletPage> {
 
     return Scaffold(
       appBar: appBar(),
-      // floatingActionButton: kDebugMode
-      //     ? FloatingActionButton(
-      //         onPressed: () {
-      //           currencyList.last.getWallet();
-      //         },
-      //         child: Icon(Icons.favorite),
-      //       )
-      //     : Container(),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     var val = currencyList.last.getWallet();
+      //     print(val.toJson());
+      //     print(val.address);
+      //   },
+      //   child: Icon(Icons.favorite),
+      // ),
       drawer: SideBar(
         totalBalance: totalBalance,
       ),

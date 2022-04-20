@@ -5,8 +5,6 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/dapps/index.dart';
-import 'package:wallet/pages/dex/index.dart';
-import 'package:wallet/pages/settings/index.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
 

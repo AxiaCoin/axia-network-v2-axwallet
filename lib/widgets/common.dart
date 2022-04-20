@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/models.dart';
 
 class CommonWidgets {
   CommonWidgets._();

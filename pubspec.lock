@@ -750,7 +750,7 @@ packages:
     source: hosted
     version: "1.1.0"
   substrate_sdk:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       path: "../substrate_sdk"
       relative: true

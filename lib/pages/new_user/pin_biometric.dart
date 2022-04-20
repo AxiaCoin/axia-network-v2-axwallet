@@ -4,12 +4,10 @@ import 'package:get/get.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/home.dart';
-import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/widgets/common.dart';
 
 class PinBiometricPage extends StatefulWidget {
