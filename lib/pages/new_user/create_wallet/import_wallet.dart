@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/common.dart';
@@ -159,13 +157,18 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   }
 
   void onsubmit() {
-    if (isValid) {
-      // StorageService.instance.storeMnemonic(phraseController.text);
-      // services.initWallet(phraseController.text);
-      Get.offAll(() => PinBiometricPage(
-            mnemonic: phraseController.text,
-          ));
-    } else
-      CommonWidgets.snackBar("Error while importing");
+    if (services.validateMnemonic(phraseController.text)) {
+      if (isValid) {
+        // StorageService.instance.storeMnemonic(phraseController.text);
+        // services.initWallet(phraseController.text);
+        Get.offAll(() => PinBiometricPage(
+              mnemonic: phraseController.text,
+            ));
+      } else
+        CommonWidgets.snackBar("Please check the mnemonic keys");
+    } else {
+      CommonWidgets.snackBar("Invalid Mnemonic Keys");
+      return;
+    }
   }
 }

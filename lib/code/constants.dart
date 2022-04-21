@@ -4,6 +4,7 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/currencies/ethereum.dart';
+import 'package:wallet/currencies/polkadot.dart';
 
 MaterialColor appColor = MaterialColor(0xff178FE1, {
   50: Color(0xFFE3F2FD),
@@ -76,6 +77,7 @@ List<Currency> currencyList = [
   Bitcoin(),
   Ethereum(),
   AXIACoin(),
+  Polkadot(),
 ];
 
 String encKey = "keyForEncryptingMnemonic";
