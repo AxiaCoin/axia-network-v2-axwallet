@@ -73,6 +73,7 @@ class MyButtonStyles {
 }
 
 bool isTestNet = true;
+List<String> substrateNetworks = ["AXC", "DOT"];
 List<Currency> currencyList = [
   Bitcoin(),
   Ethereum(),

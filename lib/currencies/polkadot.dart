@@ -14,7 +14,8 @@ class Polkadot implements Currency {
     name: "Polkadot",
     unit: "DOT",
     prefix: "",
-    smallestUnit: pow(10, 10).toInt(), //10000000000 pico (i guess)
+    smallestUnit: pow(10, 16).toInt(), // plank
+    existential: 1,
     coinType: 1,
     rate: 1.23,
     change: "1",
@@ -26,19 +27,16 @@ class Polkadot implements Currency {
     SubstrateApi substrateApi = services.substrateSDK.api!;
     if (oldAddress !=
         StorageService.instance.getSubstrateWallet(coinData.unit).address) {
-      try {
-        substrateApi.basic
-            .getWallet(mnemonic: StorageService.instance.readMnemonic()!)
-            .then((value) {
-          print("get wallet is ");
-          print(value);
-          var data = CryptoWallet.fromMap(value);
-          StorageService.instance.updateSubstrateWallets(coinData.unit, data);
-          oldAddress = value["address"];
-        });
-      } catch (e) {
-        print("error:$e");
-      }
+      substrateApi.basic
+          .getWallet(mnemonic: StorageService.instance.readMnemonic()!)
+          .then((value) {
+        print("get wallet is ");
+        print(value);
+        var data = CryptoWallet.fromMap(value);
+        StorageService.instance.updateSubstrateWallets(coinData.unit, data);
+        services.updateBalances();
+        oldAddress = value["address"];
+      });
     }
     // print(
     //     "dot: ${StorageService.instance.getSubstrateWallet(coinData.unit).address}");
@@ -46,9 +44,9 @@ class Polkadot implements Currency {
   }
 
   @override
-  Future<double> getBalance(List<String> address) async {
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
+  Future<double> getBalance({String? address}) async {
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     var balance = amount["data"].first["confirmed"];
     return balance.toDouble();
     // return 1.23;
@@ -86,6 +84,10 @@ class Polkadot implements Currency {
 
   @override
   Future sendTransaction(double amount, String receiveraddress) async {
+    double destBalance = await getBalance(address: receiveraddress);
+    if (amount + destBalance < coinData.existential) {
+      throw ("Recepient balance too low. Send at least ${coinData.existential - destBalance} ${coinData.unit}");
+    }
     amount = amount * coinData.smallestUnit;
     SubstrateApi substrateApi = services.substrateSDK.api!;
     bool submit = false;

@@ -78,14 +78,14 @@ class Ethereum implements Currency {
   }
 
   @override
-  Future<double> getBalance(List address) async {
+  Future<double> getBalance({String? address}) async {
     // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     // var client = Web3Client(
     //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
     //     Client());
     // return await client.getBalance(ethWallet.address);
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     double balance = amount["data"].first["confirmed"];
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");

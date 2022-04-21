@@ -51,9 +51,9 @@ class Bitcoin implements Currency {
   }
 
   @override
-  Future<double> getBalance(List address) async {
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
+  Future<double> getBalance({String? address}) async {
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     var bal = amount["data"].first["confirmed"];
     return bal / coinData.smallestUnit;
   }
@@ -100,7 +100,7 @@ class Bitcoin implements Currency {
           new TransactionBuilder(network: isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
       print("got unspent");
-      var availBal = await getBalance([address]);
+      var availBal = await getBalance();
       print(availBal);
       txb.setVersion(1);
       for (var i = 0; i < unspent.list!.length; i++) {

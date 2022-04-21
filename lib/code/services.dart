@@ -85,7 +85,7 @@ class Services {
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     currencyList.forEach((e) async {
-      double balance = (await e.getBalance(["address"])).toDouble();
+      double balance = (await e.getBalance()).toDouble();
       balanceCont.updateBalance(e, balance);
     });
     await Future.delayed(Duration(seconds: 10));

@@ -229,9 +229,15 @@ class _CoinPageState extends State<CoinPage> {
                           child: HomeWidgets.quickAction(
                               icon: "assets/icons/send.svg",
                               text: "Send",
-                              onPressed: () => Get.to(() => SendPage(
-                                    currency: currency,
-                                  )),
+                              onPressed: () async {
+                                bool? success = await Get.to(() => SendPage(
+                                      currency: currency,
+                                    ));
+                                if (success ?? false) {
+                                  isRefreshing = true;
+                                  refreshData();
+                                }
+                              },
                               whiteBG: true),
                         ),
                         Expanded(

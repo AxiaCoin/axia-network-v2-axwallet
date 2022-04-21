@@ -61,7 +61,6 @@ class StorageService {
   }
 
   generateSubstrateWallets() {
-    List<String> substrateNetworks = ["AXC", "DOT"];
     Map<String, String> wallets = {};
     substrateNetworks.forEach(
         (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));

@@ -15,6 +15,7 @@ class AXIACoin implements Currency {
     unit: "AXC",
     prefix: "",
     smallestUnit: pow(10, 12).toInt(), //10000000000 pico (i guess)
+    existential: 0.01,
     coinType: 1,
     rate: 1.23,
     change: "1",
@@ -33,6 +34,7 @@ class AXIACoin implements Currency {
         print(value);
         var data = CryptoWallet.fromMap(value);
         StorageService.instance.updateSubstrateWallets(coinData.unit, data);
+        services.updateBalances();
         oldAddress = value["address"];
       });
     }
@@ -42,9 +44,9 @@ class AXIACoin implements Currency {
   }
 
   @override
-  Future<double> getBalance(List<String> address) async {
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
+  Future<double> getBalance({String? address}) async {
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     var balance = amount["data"].first["confirmed"];
     return balance.toDouble() / coinData.smallestUnit;
     // return 1.23;
@@ -82,6 +84,10 @@ class AXIACoin implements Currency {
 
   @override
   Future sendTransaction(double amount, String receiveraddress) async {
+    double destBalance = await getBalance(address: receiveraddress);
+    if (amount + destBalance < coinData.existential) {
+      throw ("Recepient balance too low. Send at least ${coinData.existential - destBalance} ${coinData.unit}");
+    }
     amount = (amount * coinData.smallestUnit) / 100;
     SubstrateApi substrateApi = services.substrateSDK.api!;
     bool submit = false;

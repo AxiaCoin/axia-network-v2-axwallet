@@ -50,6 +50,7 @@ dependencies:
   encrypt: ^5.0.1
   hex: ^0.2.0
   flutter_svg: ^1.0.3
+  rename: ^2.0.1
   # substrate_sdk:
   #   git: 
   #     url: https://github.com/ashishbeck-zeeve/substrate_sdk.git

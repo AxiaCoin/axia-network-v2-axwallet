@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
+import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/qr_scan.dart';
@@ -55,7 +56,7 @@ class _SendPageState extends State<SendPage> {
               recipientController.text.trim());
           // print(response);
           Get.back();
-          Get.back();
+          Get.back(result: true);
         } catch (e) {
           Get.back();
           print(e);
@@ -291,6 +292,11 @@ class _SendPageState extends State<SendPage> {
                       OnboardWidgets.neverShare(
                           text:
                               "Make sure that you are sending to the correct address otherwise you may lose your funds"),
+                      substrateNetworks.contains(currency.coinData.unit)
+                          ? OnboardWidgets.neverShare(
+                              text:
+                                  "Ensure the recipient has an existential deposit of at least ${currency.coinData.existential} ${currency.coinData.unit} for a successful transaction")
+                          : Container(),
                       // SizedBox(
                       //   height: 16,
                       // ),
