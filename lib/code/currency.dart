@@ -5,7 +5,7 @@ abstract class Currency {
 
   CryptoWallet getWallet() => CryptoWallet.dummyWallet();
 
-  Future<double> getBalance(List<String> address);
+  Future<double> getBalance({String? address});
 
   Future sendTransaction(double amount, String receiveraddress);
 

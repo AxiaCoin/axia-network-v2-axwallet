@@ -6,16 +6,16 @@ import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 
-class AXIACoin implements Currency {
+class Polkadot implements Currency {
   String oldAddress = "abcdf";
 
   @override
   CoinData coinData = CoinData(
-    name: "AXIA Coin",
-    unit: "AXC",
+    name: "Polkadot",
+    unit: "DOT",
     prefix: "",
-    smallestUnit: pow(10, 12).toInt(), //10000000000 pico (i guess)
-    existential: 0.01,
+    smallestUnit: pow(10, 16).toInt(), // plank
+    existential: 1,
     coinType: 1,
     rate: 1.23,
     change: "1",
@@ -39,7 +39,7 @@ class AXIACoin implements Currency {
       });
     }
     // print(
-    //     "axia: ${StorageService.instance.getSubstrateWallet(coinData.unit).address}");
+    //     "dot: ${StorageService.instance.getSubstrateWallet(coinData.unit).address}");
     return StorageService.instance.getSubstrateWallet(coinData.unit);
   }
 
@@ -48,7 +48,7 @@ class AXIACoin implements Currency {
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
     var balance = amount["data"].first["confirmed"];
-    return balance.toDouble() / coinData.smallestUnit;
+    return balance.toDouble();
     // return 1.23;
   }
 
@@ -71,7 +71,7 @@ class AXIACoin implements Currency {
         TransactionItem(
           from: e["fromAddress"],
           to: e["toAddress"],
-          amount: ((double.parse(e["amount"])) / coinData.smallestUnit) * 100,
+          amount: ((double.parse(e["amount"])) / coinData.smallestUnit),
           time: DateTime.parse(e["createdAt"]),
           hash: e["txnHash"],
           // fee: e["fee"] / coinData.smallestUnit,
@@ -88,7 +88,7 @@ class AXIACoin implements Currency {
     if (amount + destBalance < coinData.existential) {
       throw ("Recepient balance too low. Send at least ${coinData.existential - destBalance} ${coinData.unit}");
     }
-    amount = (amount * coinData.smallestUnit) / 100;
+    amount = amount * coinData.smallestUnit;
     SubstrateApi substrateApi = services.substrateSDK.api!;
     bool submit = false;
     var res = await substrateApi.basic.signTransaction(

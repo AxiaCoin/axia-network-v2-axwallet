@@ -100,6 +100,7 @@ class CoinData {
   String unit;
   int coinType;
   int smallestUnit;
+  double existential;
   String prefix;
   double rate;
   String change;
@@ -109,6 +110,7 @@ class CoinData {
     required this.unit,
     required this.coinType,
     required this.smallestUnit,
+    this.existential = 1,
     required this.prefix,
     this.rate = 1,
     this.change = "",
@@ -122,6 +124,7 @@ class CoinData {
       prefix: "",
       coinType: 1,
       smallestUnit: 1000,
+      existential: 1,
       rate: 123.45,
       change: "1.2",
       selected: false,

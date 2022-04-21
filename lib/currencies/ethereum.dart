@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
 import 'package:wallet/code/constants.dart';
@@ -7,7 +6,6 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
 import 'package:coinslib/coinslib.dart' as coinslib;
 import 'package:wallet/code/services.dart';
-import 'package:wallet/widgets/common.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Ethereum implements Currency {
@@ -71,6 +69,7 @@ class Ethereum implements Currency {
     // print(coinData.privKey);
     // print(coinData.pubKey);
     // print(ethWallet.address.hexEip55);
+    // print("eth: ${ethWallet.address.hexEip55}");
     return CryptoWallet(
         address: ethWallet.address.hexEip55,
         privKey: "${coinData.prefix}${wallet.privKey}",
@@ -79,14 +78,14 @@ class Ethereum implements Currency {
   }
 
   @override
-  Future<double> getBalance(List address) async {
+  Future<double> getBalance({String? address}) async {
     // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     // var client = Web3Client(
     //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
     //     Client());
     // return await client.getBalance(ethWallet.address);
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     double balance = amount["data"].first["confirmed"];
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");

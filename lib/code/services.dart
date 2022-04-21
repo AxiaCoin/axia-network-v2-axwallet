@@ -55,6 +55,16 @@ class Services {
     return bip39.generateMnemonic();
   }
 
+  validateMnemonic(String mnemonic) {
+    try {
+      return bip39.validateMnemonic(mnemonic);
+    } catch (e) {
+      print(e);
+      CommonWidgets.snackBar(e.toString());
+      return false;
+    }
+  }
+
   Future<void> initWallet(String mnemonic) async {
     void toSeed(IsolateParams isolateParams) {
       var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
@@ -75,7 +85,7 @@ class Services {
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     currencyList.forEach((e) async {
-      double balance = (await e.getBalance(["address"])).toDouble();
+      double balance = (await e.getBalance()).toDouble();
       balanceCont.updateBalance(e, balance);
     });
     await Future.delayed(Duration(seconds: 10));
@@ -135,13 +145,13 @@ class APIServices {
         return val;
       }
     } on SocketException {
-      return "No internet connection";
+      return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
-      return "Couldn't find URL";
+      return CommonWidgets.snackBar("Couldn't find URL");
     } on FormatException {
-      return "Bad response format";
+      return CommonWidgets.snackBar("Bad response format");
     } catch (e) {
-      return "Server response:${e.toString()}";
+      return CommonWidgets.snackBar("Server response:${e.toString()}");
     }
   }
 
@@ -180,13 +190,13 @@ class APIServices {
         return val;
       }
     } on SocketException {
-      return "No internet connection";
+      return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
-      return "Couldn't find URL";
+      return CommonWidgets.snackBar("Couldn't find URL");
     } on FormatException {
-      return "Bad response format";
+      return CommonWidgets.snackBar("Bad response format");
     } catch (e) {
-      return "Server response:${e.toString()}";
+      return CommonWidgets.snackBar("Server response:${e.toString()}");
     }
   }
 
@@ -226,13 +236,13 @@ class APIServices {
         return val;
       }
     } on SocketException {
-      return "No internet connection";
+      return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
-      return "Couldn't find URL";
+      return CommonWidgets.snackBar("Couldn't find URL");
     } on FormatException {
-      return "Bad response format";
+      return CommonWidgets.snackBar("Bad response format");
     } catch (e) {
-      return "Server response:${e.toString()}";
+      return CommonWidgets.snackBar("Server response:${e.toString()}");
     }
   }
 
@@ -270,13 +280,13 @@ class APIServices {
         return val;
       }
     } on SocketException {
-      return "No internet connection";
+      return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
-      return "Couldn't find URL";
+      return CommonWidgets.snackBar("Couldn't find URL");
     } on FormatException {
-      return "Bad response format";
+      return CommonWidgets.snackBar("Bad response format");
     } catch (e) {
-      return "Server response:${e.toString()}";
+      return CommonWidgets.snackBar("Server response:${e.toString()}");
     }
   }
 
@@ -420,6 +430,13 @@ class APIServices {
     // 'address/$address/transactions?network=$network&currency=${coinData.unit}&offset=0&limit=10&sort=asc'
     return getBaseAPI(
       "address/$address/transactions?network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
+    );
+  }
+
+  getPlatformTransactions(String address, String unit,
+      {int offset = 0, int limit = 10, bool ascending = false}) async {
+    return getBaseAPI(
+      "transaction/list/wallet?address=$address&network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
     );
   }
 

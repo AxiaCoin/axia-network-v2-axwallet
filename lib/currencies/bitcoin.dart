@@ -41,6 +41,7 @@ class Bitcoin implements Currency {
     var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
     ECPair keyPair = ECPair.fromWIF(wallet.wif.toString());
     keyPair.network = isTestNet ? testnet : bitcoin;
+    // print("btc: ${wallet.address}");
     return CryptoWallet(
       address: wallet.address!,
       privKey: wallet.privKey!,
@@ -50,13 +51,11 @@ class Bitcoin implements Currency {
   }
 
   @override
-  Future<double> getBalance(List address) async {
-    var amount =
-        await APIServices().getBalance([getWallet().address], coinData.unit);
-    var data = amount["data"];
-    var bal = data[0];
-    var b = bal["confirmed"];
-    return b / coinData.smallestUnit;
+  Future<double> getBalance({String? address}) async {
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
+    var bal = amount["data"].first["confirmed"];
+    return bal / coinData.smallestUnit;
   }
 
   @override
@@ -101,7 +100,7 @@ class Bitcoin implements Currency {
           new TransactionBuilder(network: isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
       print("got unspent");
-      var availBal = await getBalance([address]);
+      var availBal = await getBalance();
       print(availBal);
       txb.setVersion(1);
       for (var i = 0; i < unspent.list!.length; i++) {
@@ -134,26 +133,25 @@ class Bitcoin implements Currency {
       }
       var hexbuild = txb.build().toHex();
       print("hexbuild: $hexbuild");
-      try {
-        var response = await http.post(
-            Uri.parse("https://blockstream.info/testnet/api/tx"),
-            body: hexbuild);
-        print(jsonDecode(response.body));
-        return response;
-      } catch (e) {
-        print(e);
-      }
-      // Map body = {
-      //   "network": network,
-      //   "currency": coinData.unit,
-      //   "fromAddress": address,
-      //   "toAddress": receiverAddress,
-      //   "amount": amount,
-      //   "signedRawTransaction": hexbuild
-      // };
-      // var response = await APIServices().sendTransaction(body);
-      // print(response.body);
-      // return response;
+      // try {
+      //   var response = await http.post(
+      //       Uri.parse("https://blockstream.info/testnet/api/tx"),
+      //       body: hexbuild);
+      //   print(jsonDecode(response.body));
+      //   return response;
+      // } catch (e) {
+      //   print(e);
+      // }
+      Map body = {
+        "network": network,
+        "currency": coinData.unit,
+        "fromAddress": address,
+        "toAddress": receiverAddress,
+        "amount": amount,
+        "signedRawTransaction": hexbuild
+      };
+      var response = await APIServices().sendTransaction(body);
+      print(response.body);
     } on SocketException {
       return "No internet connection";
     } on HttpException {

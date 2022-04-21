@@ -96,7 +96,7 @@ class _ReceivePageState extends State<ReceivePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       QrImage(
-                        data: wallet.address,
+                        data: qrData,
                       ),
                       SizedBox(
                         height: 16,

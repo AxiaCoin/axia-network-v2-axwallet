@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
-import 'package:wallet/code/services.dart';
-import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/utils.dart';
-import 'package:wallet/pages/home.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
