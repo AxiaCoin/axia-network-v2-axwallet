@@ -16,7 +16,7 @@ class AXIACoin implements Currency {
     prefix: "",
     smallestUnit: pow(10, 12).toInt(), //10000000000 pico (i guess)
     existential: 0.01,
-    coinType: 1,
+    coinType: isTestNet ? 1 : 1,
     rate: 1.23,
     change: "1",
     selected: true,

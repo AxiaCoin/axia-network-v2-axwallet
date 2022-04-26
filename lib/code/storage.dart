@@ -29,6 +29,8 @@ class StorageService {
     deviceID = box.read("deviceID");
     pin = box.read("pin");
     useBiometric = box.read("useBiometric") ?? true;
+    print("isTestnet:$isTestNet");
+    isTestNet = box.read("networkType") ?? true;
     if (deviceID == null) getDeviceID();
 
     List<dynamic>? wallets = box.read("defaultWallets");
@@ -95,6 +97,12 @@ class StorageService {
     box.write("useBiometric", value);
   }
 
+  updateNetworkType(bool value) {
+    isTestNet = value;
+    print("isTestnet:$isTestNet");
+    box.write("networkType", value);
+  }
+
   updateDefaultWallets(String wallet, {required isSelected}) {
     if (isSelected && !defaultWallets!.contains(wallet)) {
       defaultWallets!.add(wallet);
@@ -126,6 +134,13 @@ class StorageService {
     box.remove("defaultWallets");
     box.remove("substrateWallets");
     box.remove("useBiometric");
+    box.remove("networkType");
+  }
+
+  networkclearTokens() {
+    box.remove("defaultWallets");
+    box.remove("substrateWallets");
+    box.remove("networkType");
   }
 
   // initBalances() {

@@ -15,7 +15,7 @@ class Ethereum implements Currency {
     unit: "ETH",
     prefix: "0x",
     smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
-    coinType: 60,
+    coinType: isTestNet ? 1 : 60,
     rate: 1,
     change: "1",
     selected: true,
@@ -86,7 +86,7 @@ class Ethereum implements Currency {
     // return await client.getBalance(ethWallet.address);
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
-    double balance = amount["data"].first["confirmed"];
+    double balance = amount["data"].first["confirmed"].toDouble();
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");
     return balance;
@@ -103,20 +103,20 @@ class Ethereum implements Currency {
     );
     var data = response["data"]["list"];
     int total = response["data"]["total"];
+    print(total);
     List<TransactionItem> transactions = [];
-    // print("data is $data");
+    print("data is $data");
+
     data.forEach((e) {
+      print(double.parse(e["recipients"][0]["amount"]) / coinData.smallestUnit);
       transactions.add(
         TransactionItem(
-          from: e["from"],
-          to: e["to"],
-          amount: double.parse(e["value"]) / coinData.smallestUnit,
-          time: DateTime.fromMillisecondsSinceEpoch(
-              int.parse(e["timeStamp"]) * 1000),
-          hash: e["hash"],
-          fee: double.parse(e["gasUsed"]) *
-              double.parse(e["gasPrice"]) /
-              coinData.smallestUnit,
+          from: e["senders"][0]["address"],
+          to: e["recipients"][0]["address"],
+          amount: double.parse(e["recipients"][0]["amount"]),
+          time: DateTime.fromMillisecondsSinceEpoch(e["timestamp"] * 1000),
+          hash: e["transactionHash"],
+          fee: double.parse(e["fee"]["amount"]),
         ),
       );
     });
@@ -131,7 +131,7 @@ class Ethereum implements Currency {
     print("address is ${ethWallet.address.hexEip55}");
     print("amount is $amount");
     var client = Web3Client(
-        "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+        "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
         Client());
     var gasPrice = await client.getGasPrice();
     var signedData = await client.signTransaction(
