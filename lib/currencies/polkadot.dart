@@ -16,7 +16,7 @@ class Polkadot implements Currency {
     prefix: "",
     smallestUnit: pow(10, 16).toInt(), // plank
     existential: 1,
-    coinType: 1,
+    coinType: isTestNet ? 1 : 354,
     rate: 1.23,
     change: "1",
     selected: true,

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
+import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
 import 'package:substrate_sdk/substrate_sdk.dart';
@@ -68,7 +69,12 @@ class Services {
   Future<void> initWallet(String mnemonic) async {
     void toSeed(IsolateParams isolateParams) {
       var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
-      isolateParams.sendPort.send(seed);
+      print("a");
+      var b = HexEncoder().convert(seed);
+      print("aaa");
+      var c = HexDecoder().convert(b);
+      print("bbbb");
+      isolateParams.sendPort.send(c);
     }
 
     var receivePort = ReceivePort();
@@ -228,7 +234,7 @@ class APIServices {
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
-            return getBaseAPI(url);
+            return authBaseAPI(url, body);
           }
           return;
         }
