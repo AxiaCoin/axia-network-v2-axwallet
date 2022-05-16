@@ -34,7 +34,8 @@ class _LoginPageState extends State<LoginPage> {
   bool obscurity = true;
   bool submitting = false;
   PhoneNumber phoneNumber = PhoneNumber(
-    isoCode: Platform.localeName.split('_').last,
+    isoCode:
+        StorageService.instance.isoCode ?? Platform.localeName.split('_').last,
     phoneNumber: kDebugMode ? "+919879879871" : null,
   );
 
@@ -100,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
           initialValue: phoneNumber,
           onInputChanged: (PhoneNumber number) {
             phoneNumber = number;
+            StorageService.instance.updateISOCode(number.isoCode);
             print(number.phoneNumber);
           },
           onInputValidated: (bool value) {

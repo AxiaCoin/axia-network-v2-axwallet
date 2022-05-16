@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:wallet/Crypto_Models/unspent_model.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:coinslib/coinslib.dart';
 import 'package:wallet/code/services.dart';
@@ -28,7 +30,7 @@ class Bitcoin implements Currency {
     unit: "BTC",
     prefix: "",
     smallestUnit: pow(10, 8).toInt(), //100000000 satoshi
-    coinType: isTestNet ? 1 : 0,
+    coinType: StorageService.instance.isTestNet ? 1 : 0,
     rate: 1.23,
     change: "1",
     selected: true,
@@ -36,11 +38,12 @@ class Bitcoin implements Currency {
 
   @override
   CryptoWallet getWallet() {
-    HDWallet hdWallet = services.hdWallet!;
-    hdWallet.network = isTestNet ? testnet : bitcoin;
-    var wallet = hdWallet.derivePath("m/44'/${coinData.coinType}'/0'/0/0");
+    WalletData walletData = Get.find();
+    HDWallet hdWallet = walletData.hdWallet!.value;
+    hdWallet.network = StorageService.instance.isTestNet ? testnet : bitcoin;
+    var wallet = hdWallet.derivePath("m/44'/${StorageService.instance.isTestNet ? 1 : 0}'/0'/0/0");
     ECPair keyPair = ECPair.fromWIF(wallet.wif.toString());
-    keyPair.network = isTestNet ? testnet : bitcoin;
+    keyPair.network = StorageService.instance.isTestNet ? testnet : bitcoin;
     // print("btc: ${wallet.address}");
     return CryptoWallet(
       address: wallet.address!,
@@ -52,15 +55,13 @@ class Bitcoin implements Currency {
 
   @override
   Future<double> getBalance({String? address}) async {
-    var amount = await APIServices()
-        .getBalance([address ?? getWallet().address], coinData.unit);
+    var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
     var bal = amount["data"].first["confirmed"];
     return bal / coinData.smallestUnit;
   }
 
   @override
-  Future<TransactionListModel> getTransactions(
-      {required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -96,8 +97,7 @@ class Bitcoin implements Currency {
       amount = amount * coinData.smallestUnit;
       print(amount);
       print("Start");
-      final txb =
-          new TransactionBuilder(network: isTestNet ? testnet : bitcoin);
+      final txb = new TransactionBuilder(network: StorageService.instance.isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
       print("got unspent");
       var availBal = await getBalance();
@@ -120,8 +120,7 @@ class Bitcoin implements Currency {
         txb.addOutput(receiverAddress, (amount.toInt()));
       }
       if ((unspent.amount! - amount) != 0 && amount != availBal) {
-        txb.addOutput(
-            address, ((unspent.amount! - amount)).toInt() - estimated);
+        txb.addOutput(address, ((unspent.amount! - amount)).toInt() - estimated);
       }
       print("something");
       try {
@@ -167,11 +166,8 @@ class Bitcoin implements Currency {
     try {
       print("start");
       var response = await http.get(
-        Uri.parse(
-            "$ipAddress\address/$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!
-        },
+        Uri.parse("$ipAddress\address/$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
+        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!},
       );
       if (response.statusCode == 200) {
         print("success");
@@ -182,9 +178,8 @@ class Bitcoin implements Currency {
         for (var i = 0; i < val.data!.list!.length; i++) {
           if (val.data!.list![i].value! > amount) {
             try {
-              BTCglobalList sxn = BTCglobalList(
-                  amount: val.data!.list![i].value!.toDouble(),
-                  list: [val.data!.list![i]]);
+              BTCglobalList sxn =
+                  BTCglobalList(amount: val.data!.list![i].value!.toDouble(), list: [val.data!.list![i]]);
               // sxn.list!.forEach((element) => print(element.toJson()));
               return sxn;
             } catch (e) {
@@ -196,8 +191,7 @@ class Bitcoin implements Currency {
           }
           if (txn.amount! > amount) {
             return txn;
-          } else if ((txn.amount == amount) &&
-              (val.data!.list!.length - 1 == i)) {
+          } else if ((txn.amount == amount) && (val.data!.list!.length - 1 == i)) {
             return txn;
           }
         }
@@ -211,8 +205,7 @@ class Bitcoin implements Currency {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);

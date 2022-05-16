@@ -14,6 +14,7 @@ import 'package:wallet/pages/search.dart';
 import 'package:wallet/pages/wallet/finance.dart';
 import 'package:wallet/pages/wallet/tokens.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/network_switcher.dart';
 import 'package:wallet/widgets/sidebar.dart';
 
 class WalletPage extends StatefulWidget {
@@ -78,9 +79,7 @@ class _WalletPageState extends State<WalletPage> {
               Radius.circular(20),
             ),
             gradient: LinearGradient(
-                colors: [appColor[600]!, appColor],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight),
+                colors: [appColor[600]!, appColor], begin: Alignment.centerLeft, end: Alignment.centerRight),
           ),
           child: Container(
               padding: EdgeInsets.only(
@@ -119,10 +118,7 @@ class _WalletPageState extends State<WalletPage> {
                   Obx(
                     () => Text(
                       "\$${balanceData.totalBalance.toStringAsFixed(2)}",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500),
+                      style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -155,8 +151,7 @@ class _WalletPageState extends State<WalletPage> {
                           onPressed: () {
                             pushNewScreen(
                               context,
-                              screen:
-                                  SearchPage(searchMode: SearchMode.receive),
+                              screen: SearchPage(searchMode: SearchMode.receive),
                             );
                           }),
                       SizedBox(
@@ -190,29 +185,6 @@ class _WalletPageState extends State<WalletPage> {
     }
 
     AppBar appBar() => AppBar(
-          // actions: [
-          //   slidingIndex == 0
-          //       ? IconButton(
-          //           icon: Icon(Icons.tune_outlined),
-          //           onPressed: () {
-          //             pushNewScreen(context,
-          //                 screen: SearchPage(
-          //                   searchMode: SearchMode.customize,
-          //                 )).then(
-          //               (value) {
-          //                 tokensKey.currentState?.setState(() {});
-          //               },
-          //             );
-          //           },
-          //         )
-          //       : Container()
-          // ],
-          // leading: slidingIndex == 0
-          //     ? IconButton(
-          //         icon: Icon(Icons.notifications_none),
-          //         onPressed: () => Get.to(() => NotificationsPage()),
-          //       )
-          //     : Container(),
           elevation: 0,
           title: Text("My AXIA Wallet"),
           centerTitle: true,
@@ -229,9 +201,7 @@ class _WalletPageState extends State<WalletPage> {
       //   },
       //   child: Icon(Icons.favorite),
       // ),
-      drawer: SideBar(
-        totalBalance: totalBalance,
-      ),
+      drawer: SideBar(),
       body: RefreshIndicator(
         onRefresh: () async {
           isRefreshing = true;
@@ -254,7 +224,6 @@ class _WalletPageState extends State<WalletPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      print(StorageService.instance.readMnemonic());
                       pushNewScreen(context,
                           screen: SearchPage(
                             searchMode: SearchMode.customize,
@@ -309,16 +278,12 @@ class _WalletPageState extends State<WalletPage> {
                   }
                   return Obx(
                     () => HomeWidgets.coinTile(
-                      balance:
-                          FormatText.roundOff((balanceData.data![currency])!) +
-                              " $unit",
+                      balance: FormatText.roundOff((balanceData.data![currency])!) + " $unit",
                       name: name,
                       rate: rate,
                       ticker: ticker,
                       unit: unit,
-                      value: "\$" +
-                          (item.rate * balanceData.data![currency]!)
-                              .toStringAsFixed(2),
+                      value: "\$" + (item.rate * balanceData.data![currency]!).toStringAsFixed(2),
                       onTap: () => pushNewScreen(
                         context,
                         screen: CoinPage(

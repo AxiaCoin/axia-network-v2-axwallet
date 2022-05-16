@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/currencies/ethereum.dart';
@@ -41,8 +42,7 @@ ThemeData lightTheme = ThemeData(
 );
 ThemeData darkTheme = lightTheme.copyWith(
   brightness: Brightness.dark,
-  bottomNavigationBarTheme:
-      BottomNavigationBarThemeData(backgroundColor: Colors.black38),
+  bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.black38),
 );
 
 class MyButtonStyles {
@@ -66,22 +66,20 @@ class MyButtonStyles {
         ),
         backgroundColor: enabled ? appColor : Colors.grey[100],
         primary: enabled ? Colors.white : Colors.black12,
-        splashFactory:
-            enabled ? InkRipple.splashFactory : NoSplash.splashFactory,
+        splashFactory: enabled ? InkRipple.splashFactory : NoSplash.splashFactory,
       );
 }
 
-bool isTestNet = true;
+// bool isTestNet = true;
 List<String> substrateNetworks = ["AXC"];
 List<Currency> currencyList = [
   Bitcoin(),
   Ethereum(),
-  AXIACoin(),
 ];
 
 String encKey = "keyForEncryptingMnemonic";
 String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";
 const ipAddress = "http://13.235.53.197:3000/";
-String network = isTestNet ? "TESTNET" : "MAINNET";
+String network = StorageService.instance.isTestNet ? "TESTNET" : "MAINNET";
 // int satoshi = 100000000;
 // int wei = 1000000000000000000;

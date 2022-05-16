@@ -18,6 +18,8 @@ initServices() async {
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
   await GetStorage.init();
   StorageService.instance.init();
+  var mnemonics = StorageService.instance.readMnemonicSeed();
+  print('mnemonics are $mnemonics');
   services.initSubstrateSDK();
   // StorageService.instance.clearTokens();
   // earn opinion sketch humble turn unaware keep defy what clay tip tribe
@@ -42,7 +44,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         home: StorageService.instance.authToken == null
             ? LoginPage()
-            : StorageService.instance.readMnemonic() == null
+            : StorageService.instance.readCurrentMnemonic() == null
                 ? OnboardPage()
                 : DeviceAuthPage(),
       ),

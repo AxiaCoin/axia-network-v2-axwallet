@@ -33,7 +33,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.wallet"
+        applicationId "com.axia.wallet"
         minSdkVersion 20
         targetSdkVersion 30
         multiDexEnabled true

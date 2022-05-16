@@ -1,7 +1,9 @@
+import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 
 class TokenData extends GetxController {
@@ -45,6 +47,14 @@ class BalanceData extends GetxController {
         totalBalance.value += value * key.coinData.rate;
     });
   }
+}
+
+class WalletData extends GetxController {
+  Rx<HDWallet>? hdWallet;
+
+  updateWallet(String seed) => hdWallet = Rx(services.hdWallets.entries
+      .firstWhere((element) => element.key == seed)
+      .value);
 }
 
 class SettingsState extends GetxController {

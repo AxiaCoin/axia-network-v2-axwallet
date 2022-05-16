@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 import 'package:coinslib/coinslib.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
@@ -23,10 +26,17 @@ class IsolateParams {
   );
 }
 
+String toSeed(String mnemonic) {
+  return HexEncoder().convert(bip39.mnemonicToSeed(mnemonic));
+}
+
 Services services = Services();
 
 class Services {
   HDWallet? hdWallet;
+  WalletData walletData = Get.put(WalletData());
+  Map<String, HDWallet> hdWallets = {};
+  Timer? timer;
 
   SubstrateSDK substrateSDK = SubstrateSDK();
 
@@ -88,14 +98,53 @@ class Services {
     );
   }
 
+  Future<void> createMCWallet(String mnemonic) async {
+    StorageService.instance.storeCurrentMnemonic(mnemonic);
+    String seed = await compute(toSeed, mnemonic);
+    var seedData = HexDecoder().convert(seed) as Uint8List;
+    HDWallet wallet = HDWallet.fromSeed(seedData);
+    StorageService.instance.storeMnemonicSeed(mnemonic, seed);
+    hdWallets[mnemonic] = wallet;
+    initMCWallet(mnemonic);
+  }
+
+  void initMCWallet(
+    String? mnemonic,
+  ) {
+    var mnemonicSeeds = StorageService.instance.readMnemonicSeed();
+    if (mnemonicSeeds == null || mnemonicSeeds.isEmpty) return;
+    mnemonicSeeds.forEach((key, value) {
+      var seedData = HexDecoder().convert(value) as Uint8List;
+      hdWallets[key] = new HDWallet.fromSeed(seedData);
+    });
+    print(hdWallets);
+    print(mnemonic);
+    if (mnemonic != null) {
+      walletData.updateWallet(mnemonic);
+      print("wallet created");
+      currencyList.forEach(
+        (e) => e.getWallet(),
+      );
+    }
+  }
+
   updateBalances() async {
     BalanceData balanceCont = Get.find();
-    currencyList.forEach((e) async {
-      double balance = (await e.getBalance()).toDouble();
-      balanceCont.updateBalance(e, balance);
+    void update() async {
+      await Future.wait(currencyList.map((e) async {
+        double balance = (await e.getBalance()).toDouble();
+        balanceCont.updateBalance(e, balance);
+      }));
+    }
+
+    if (timer != null) {
+      timer!.cancel();
+      print("timer cancelled");
+    }
+    update();
+    timer = Timer.periodic(Duration(seconds: 10), (t) {
+      update();
     });
-    await Future.delayed(Duration(seconds: 10));
-    updateBalances();
   }
 
   Future<bool> canCheckBiometrics() async {
@@ -122,8 +171,7 @@ class APIServices {
   noAuthbaseAPI(String url, Map body) async {
     try {
       var response = await http.post(Uri.parse(ipAddress + url),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(body));
+          headers: {'Content-Type': 'application/json'}, body: jsonEncode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -137,8 +185,7 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -165,10 +212,7 @@ class APIServices {
     try {
       var response = await http.get(
         Uri.parse(ipAddress + url),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
-          'Content-Type': 'application/json'
-        },
+        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!, 'Content-Type': 'application/json'},
       );
       // print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
@@ -183,8 +227,7 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -210,10 +253,7 @@ class APIServices {
     try {
       var response = await http.post(
         Uri.parse(ipAddress + url),
-        headers: {
-          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
-          'Content-Type': 'application/json'
-        },
+        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!, 'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
       print("response code:${response.statusCode}");
@@ -229,8 +269,7 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -273,8 +312,7 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices()
-              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -347,10 +385,8 @@ class APIServices {
     );
   }
 
-  userVerify(
-      {String? phoneNumber, String? phoneCode, required String otp}) async {
-    return noAuthbaseAPI("user/verify",
-        {"phoneNumber": phoneNumber, "phoneCode": phoneCode, "otp": otp});
+  userVerify({String? phoneNumber, String? phoneCode, required String otp}) async {
+    return noAuthbaseAPI("user/verify", {"phoneNumber": phoneNumber, "phoneCode": phoneCode, "otp": otp});
   }
 
   sendVerifyOTP({String? phoneNumber, String? phoneCode}) async {
@@ -360,19 +396,14 @@ class APIServices {
     );
   }
 
-  forgotPasswordOtp(
-      {String? email, String? phoneNumber, String? phoneCode}) async {
+  forgotPasswordOtp({String? email, String? phoneNumber, String? phoneCode}) async {
     return noAuthbaseAPI(
       "user/send-forget-pass-otp",
       {"email": email, "phoneNumber": phoneNumber, "phoneCode": phoneCode},
     );
   }
 
-  verifyforgotPasswordOtp(
-      {String? email,
-      required String otp,
-      String? phoneNumber,
-      String? phoneCode}) {
+  verifyforgotPasswordOtp({String? email, required String otp, String? phoneNumber, String? phoneCode}) {
     return noAuthbaseAPI(
       "user/verify-forget-pass-otp",
       {
@@ -384,15 +415,10 @@ class APIServices {
     );
   }
 
-  resetPassword(
-      {required String newPassword, required String authToken}) async {
+  resetPassword({required String newPassword, required String authToken}) async {
     return noAuthbaseAPI(
       "user/reset-password",
-      {
-        "newPassword": newPassword,
-        "confirmPassword": newPassword,
-        "authToken": authToken
-      },
+      {"newPassword": newPassword, "confirmPassword": newPassword, "authToken": authToken},
     );
   }
 
@@ -427,20 +453,18 @@ class APIServices {
   //CRYPTO APIs
   //-----------
   getBalance(List<String> address, String unit) async {
-    return getBaseAPI(
-        "address/balance?network=$network&addresses=${address.join(',')}&currency=$unit");
+    print(network);
+    return getBaseAPI("address/balance?network=$network&addresses=${address.join(',')}&currency=$unit");
   }
 
-  getTransactions(String address, String unit,
-      {int offset = 0, int limit = 10, bool ascending = false}) async {
+  getTransactions(String address, String unit, {int offset = 0, int limit = 10, bool ascending = false}) async {
     // 'address/$address/transactions?network=$network&currency=${coinData.unit}&offset=0&limit=10&sort=asc'
     return getBaseAPI(
       "address/$address/transactions?network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
     );
   }
 
-  getPlatformTransactions(String address, String unit,
-      {int offset = 0, int limit = 10, bool ascending = false}) async {
+  getPlatformTransactions(String address, String unit, {int offset = 0, int limit = 10, bool ascending = false}) async {
     return getBaseAPI(
       "transaction/list/wallet?address=$address&network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
     );

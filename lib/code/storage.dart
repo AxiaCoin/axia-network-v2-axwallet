@@ -11,23 +11,30 @@ class StorageService {
   static final StorageService instance = StorageService._();
   StorageService._();
   final box = GetStorage();
+  var iv = IV.fromLength(16);
+  var encrypter = Encrypter(AES(Key.fromUtf8(encKey)));
 
   String? authToken;
   String? sessionID;
   String? deviceID;
   String? pin;
   bool? useBiometric;
+  bool isTestNet = false;
   // Map<String, double> balances = {};
   // Map<String, String> currencies = {};
   List<String>? defaultWallets;
   String? substrateWallets;
+  String? isoCode;
 
   init() {
     // box.remove("authToken");
+    // box.erase();
     authToken = box.read("authToken");
     sessionID = box.read("sessionID");
     deviceID = box.read("deviceID");
-    pin = box.read("pin");
+    pin = readPIN();
+    isoCode = box.read("isoCode");
+    isTestNet = box.read("isTestNet") ?? false;
     useBiometric = box.read("useBiometric") ?? true;
     print("isTestnet:$isTestNet");
     isTestNet = box.read("networkType") ?? true;
@@ -56,16 +63,12 @@ class StorageService {
   }
 
   getInitialWallets() {
-    defaultWallets = currencyList
-        .where((e) => e.coinData.selected)
-        .map((e) => e.coinData.unit)
-        .toList();
+    defaultWallets = currencyList.where((e) => e.coinData.selected).map((e) => e.coinData.unit).toList();
   }
 
   generateSubstrateWallets() {
     Map<String, String> wallets = {};
-    substrateNetworks.forEach(
-        (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
+    substrateNetworks.forEach((e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
     var stringified = jsonEncode(wallets);
     // var decoded = jsonDecode(stringified);
     substrateWallets = stringified;
@@ -88,8 +91,21 @@ class StorageService {
   }
 
   updatePIN(String value) {
+    var encrypted = encrypter.encrypt(value, iv: iv);
     pin = value;
-    box.write("pin", value);
+    box.write("pin", encrypted.base16);
+  }
+
+  String? readPIN() {
+    String? pin = box.read("pin");
+    if (pin == null) return null;
+    var decrypted = encrypter.decrypt16(pin, iv: iv);
+    return decrypted;
+  }
+
+  updateISOCode(String? value) {
+    isoCode = value;
+    box.write("isoCode", value);
   }
 
   updateBiometricPreference(bool value) {
@@ -100,7 +116,7 @@ class StorageService {
   updateNetworkType(bool value) {
     isTestNet = value;
     print("isTestnet:$isTestNet");
-    box.write("networkType", value);
+    box.write("isTestNet", value);
   }
 
   updateDefaultWallets(String wallet, {required isSelected}) {
@@ -134,13 +150,13 @@ class StorageService {
     box.remove("defaultWallets");
     box.remove("substrateWallets");
     box.remove("useBiometric");
-    box.remove("networkType");
+    box.remove("isTestNet");
   }
 
   networkclearTokens() {
-    box.remove("defaultWallets");
-    box.remove("substrateWallets");
-    box.remove("networkType");
+    // box.remove("defaultWallets");
+    // box.remove("substrateWallets");
+    box.remove("isTestNet");
   }
 
   // initBalances() {
@@ -154,21 +170,46 @@ class StorageService {
   //   data.forEach((key, value) {});
   // }
 
-  storeMnemonic(String mnemonic) {
-    var iv = IV.fromLength(16);
-    var key = Key.fromUtf8(encKey);
-    var encrypter = Encrypter(AES(key));
+  storeCurrentMnemonic(String mnemonic) {
     var encrypted = encrypter.encrypt(mnemonic, iv: iv);
     box.write("mnemonic", encrypted.base16);
   }
 
-  String? readMnemonic() {
+  String? readCurrentMnemonic() {
     String? mnemonic = box.read("mnemonic");
     if (mnemonic == null) return null;
-    var iv = IV.fromLength(16);
-    var key = Key.fromUtf8(encKey);
-    var encrypter = Encrypter(AES(key));
     var decrypted = encrypter.decrypt16(mnemonic, iv: iv);
     return decrypted;
+  }
+
+  storeMnemonicSeed(String mnemonic, String seed) {
+    var encryptedSeed = encrypter.encrypt(seed, iv: iv);
+    var encryptedMnemonic = encrypter.encrypt(mnemonic, iv: iv);
+    var data = box.read("seeds");
+    if (data == null) {
+      data = {encryptedMnemonic.base16: encryptedSeed.base16};
+    } else {
+      data[encryptedMnemonic.base16] = encryptedSeed.base16;
+    }
+    box.write("seeds", data);
+    print("written seeds are $data");
+  }
+
+  dynamic readMnemonicSeed({String? mnemonic}) {
+    var seeds = box.read("seeds");
+    if (seeds == null) return null;
+    print("read seeds are $seeds");
+    if (mnemonic == null) {
+      var data = {};
+      seeds.forEach((key, value) {
+        var decryptedSeed = encrypter.decrypt16(value, iv: iv);
+        var decryptedMnemonic = encrypter.decrypt16(key, iv: iv);
+        data[decryptedMnemonic] = decryptedSeed;
+      });
+      print("processed seeds are $data");
+      return data;
+    }
+    print("processed seed is ${encrypter.decrypt16(seeds[mnemonic], iv: iv)}");
+    return encrypter.decrypt16(seeds[mnemonic], iv: iv);
   }
 }

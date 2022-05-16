@@ -29,9 +29,8 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
     setState(() {});
     if (canCheckBiometrics && StorageService.instance.useBiometric!) {
       bool success = await localAuth.authenticate(
-          localizedReason: isSettingUp
-              ? "Please authenticate to continue to wallet"
-              : "Please authenticate this Transaction",
+          localizedReason:
+              isSettingUp ? "Please authenticate to continue to wallet" : "Please authenticate this Transaction",
           biometricOnly: false);
       if (success) {
         successful();
@@ -59,9 +58,9 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
 
   successful() async {
     if (isSettingUp) {
-      String mnemonic = StorageService.instance.readMnemonic()!;
+      String mnemonic = StorageService.instance.readCurrentMnemonic()!;
       CommonWidgets.waitDialog();
-      await services.initWallet(mnemonic);
+      services.initMCWallet(mnemonic);
       Get.offAll(() => HomePage());
     } else {
       Get.back(result: true);
@@ -79,7 +78,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   @override
   void initState() {
     super.initState();
-    mnemonic = StorageService.instance.readMnemonic();
+    mnemonic = StorageService.instance.readCurrentMnemonic();
     initAuthentication();
   }
 
@@ -145,16 +144,12 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                   canCheckBiometrics
                       ? GestureDetector(
                           onTap: (() {
-                            StorageService.instance
-                                .updateBiometricPreference(true);
+                            StorageService.instance.updateBiometricPreference(true);
                             initAuthentication();
                           }),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Use Biometrics"),
-                              Icon(Icons.fingerprint)
-                            ],
+                            children: [Text("Use Biometrics"), Icon(Icons.fingerprint)],
                           ),
                         )
                       : Container()

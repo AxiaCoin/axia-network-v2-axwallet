@@ -16,7 +16,7 @@ class Polkadot implements Currency {
     prefix: "",
     smallestUnit: pow(10, 16).toInt(), // plank
     existential: 1,
-    coinType: isTestNet ? 1 : 354,
+    coinType: StorageService.instance.isTestNet ? 1 : 354,
     rate: 1.23,
     change: "1",
     selected: true,
@@ -25,11 +25,8 @@ class Polkadot implements Currency {
   @override
   CryptoWallet getWallet() {
     SubstrateApi substrateApi = services.substrateSDK.api!;
-    if (oldAddress !=
-        StorageService.instance.getSubstrateWallet(coinData.unit).address) {
-      substrateApi.basic
-          .getWallet(mnemonic: StorageService.instance.readMnemonic()!)
-          .then((value) {
+    if (oldAddress != StorageService.instance.getSubstrateWallet(coinData.unit).address) {
+      substrateApi.basic.getWallet(mnemonic: StorageService.instance.readCurrentMnemonic()!).then((value) {
         print("get wallet is ");
         print(value);
         var data = CryptoWallet.fromMap(value);
@@ -45,16 +42,14 @@ class Polkadot implements Currency {
 
   @override
   Future<double> getBalance({String? address}) async {
-    var amount = await APIServices()
-        .getBalance([address ?? getWallet().address], coinData.unit);
+    var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
     var balance = amount["data"].first["confirmed"];
     return balance.toDouble();
     // return 1.23;
   }
 
   @override
-  Future<TransactionListModel> getTransactions(
-      {required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
     var response = await APIServices().getPlatformTransactions(
       getWallet().address,
       coinData.unit,
@@ -92,7 +87,7 @@ class Polkadot implements Currency {
     SubstrateApi substrateApi = services.substrateSDK.api!;
     bool submit = false;
     var res = await substrateApi.basic.signTransaction(
-      mnemonic: StorageService.instance.readMnemonic()!,
+      mnemonic: StorageService.instance.readCurrentMnemonic()!,
       dest: receiveraddress,
       amount: amount,
       submit: submit,

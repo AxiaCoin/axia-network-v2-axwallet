@@ -5,20 +5,18 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/search.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/network_switcher.dart';
 
 class SideBar extends StatelessWidget {
-  final double totalBalance;
-  const SideBar({
-    Key? key,
-    required this.totalBalance,
-  }) : super(key: key);
+  const SideBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Map<Currency, double> balanceInfo = {};
+    final BalanceData balanceData = Get.find();
     double height = Get.height;
     double width = Get.width;
     List<String> cat = [
@@ -36,34 +34,45 @@ class SideBar extends StatelessWidget {
     Widget dash() => Container(
           height: height * 0.25,
           padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
+          child: Stack(
             children: [
-              Text(
-                "My AXIA Wallet",
-                style: TextStyle(color: Colors.white, fontSize: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "My AXIA Wallet",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  Spacer(),
+                  Icon(
+                    Icons.account_circle,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                  Text(
+                    "Wallet 1",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Obx(
+                    () => Text(
+                      "\$${balanceData.totalBalance.toStringAsFixed(2)}",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Spacer(),
-              Icon(
-                Icons.account_circle,
-                color: Colors.white,
-                size: 48,
-              ),
-              Text(
-                "Wallet 1",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
-              Text(
-                "\$${totalBalance.toStringAsFixed(2)}",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: NetworkSwitcher(onChanged: (inTestNet) {}),
+              )
             ],
           ),
         );

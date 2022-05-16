@@ -34,29 +34,30 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   void toggleBiometrics(bool value) async {
-    bool success = await localAuth.authenticate(
-        localizedReason: "Please authenticate to toggle", biometricOnly: true);
+    bool success = await localAuth.authenticate(localizedReason: "Please authenticate to toggle", biometricOnly: true);
     if (success) StorageService.instance.updateBiometricPreference(value);
     setState(() {});
   }
 
   void toggleNetworkType(bool value) async {
     print("restart");
-    StorageService.instance.networkclearTokens();
-    setState(() {
-      StorageService.instance.updateNetworkType(value);
-    });
+    // StorageService.instance.networkclearTokens();
+    // setState(() {
+    StorageService.instance.updateNetworkType(value);
+    network = value ? "TESTNET" : "MAINNET";
+    // });
     print("center");
-    CommonWidgets.waitDialog(text: "Network Switching");
-    Future.delayed(Duration(seconds: 3), () => Restart.restartApp());
+    // CommonWidgets.waitDialog(text: "Network Switching");
+    // Future.delayed(Duration(seconds: 3), () => Restart.restartApp());
+    services.updateBalances();
+    setState(() {});
     print("end");
   }
 
   logOut() async {
     String sessionID = StorageService.instance.sessionID!;
     String deviceID = StorageService.instance.deviceID!;
-    var response =
-        await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
+    var response = await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
     if (response["success"]) {
       StorageService.instance
         ..clearTokens()
@@ -132,9 +133,7 @@ class ProfilePageState extends State<ProfilePage> {
                                 ))!
                             .then((value) {
                           if (value != null && value) {
-                            Services()
-                                .loadUser(loadController: false)
-                                .then((value) => setState(() {}));
+                            Services().loadUser(loadController: false).then((value) => setState(() {}));
                           }
                         });
                       },
@@ -151,8 +150,7 @@ class ProfilePageState extends State<ProfilePage> {
                         : CommonWidgets.profileItem(
                             context,
                             key: "Phone number: ",
-                            value:
-                                "+${userModel.phoneCode}${userModel.phoneNumber}",
+                            value: "+${userModel.phoneCode}${userModel.phoneNumber}",
                           ),
                     // SizedBox(
                     //   height: 8,
@@ -198,7 +196,7 @@ class ProfilePageState extends State<ProfilePage> {
                     SizedBox(
                       width: Get.width * 0.9,
                       child: SwitchListTile.adaptive(
-                        value: isTestNet,
+                        value: StorageService.instance.isTestNet,
                         onChanged: toggleNetworkType,
                         title: Text("Is Testnet"),
                       ),

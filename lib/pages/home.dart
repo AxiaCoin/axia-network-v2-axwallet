@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final TokenData list = Get.put(TokenData());
   final BalanceData balanceCont = Get.put(BalanceData());
   SettingsState settingsState = Get.put(SettingsState());
+  WalletData walletData = Get.put(WalletData());
 
   int pageIndex = 0;
 
