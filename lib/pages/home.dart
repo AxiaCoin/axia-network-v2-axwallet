@@ -25,18 +25,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   int pageIndex = 0;
 
-  List<Widget> pages = [WalletPage(), DAppsPage(), ProfilePage()];
+  List<Widget> pages = [WalletPage(), ProfilePage()];
   List<PersistentBottomNavBarItem> bottomNavBarItems = [
     PersistentBottomNavBarItem(
         icon: Icon(Icons.shield),
         title: "Wallet",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
-    PersistentBottomNavBarItem(
-        icon: Icon(Icons.apps),
-        title: "DApps",
-        activeColorPrimary: appColor,
-        inactiveColorPrimary: Colors.grey),
+    // PersistentBottomNavBarItem(
+    //     icon: Icon(Icons.apps),
+    //     title: "DApps",
+    //     activeColorPrimary: appColor,
+    //     inactiveColorPrimary: Colors.grey),
     // PersistentBottomNavBarItem(
     //     icon: Icon(Icons.swap_horiz),
     //     title: "DEX",
