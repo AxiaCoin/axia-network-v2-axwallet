@@ -24,7 +24,8 @@ class _ChangePasswordState extends State<ChangePassword> {
   TextEditingController passwordController = TextEditingController();
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
-  bool obscurity = true;
+  bool obscurity1 = true;
+  bool obscurity2 = true;
   bool submitting = false;
 
   _changePassword() async {
@@ -114,7 +115,7 @@ class _ChangePasswordState extends State<ChangePassword> {
           ? Container()
           : TextFormField(
               controller: currentPassController,
-              obscureText: obscurity,
+              obscureText: obscurity1,
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
@@ -122,9 +123,9 @@ class _ChangePasswordState extends State<ChangePassword> {
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(15))),
                 suffixIcon: IconButton(
-                  icon:
-                      Icon(obscurity ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => obscurity = !obscurity),
+                  icon: Icon(
+                      obscurity1 ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => obscurity1 = !obscurity1),
                 ),
               ),
               // validator: (val) => val == passwordController.text
@@ -141,24 +142,23 @@ class _ChangePasswordState extends State<ChangePassword> {
       TextFormField(
         controller: passwordController,
         focusNode: passwordFocus,
-        obscureText: obscurity,
+        obscureText: obscurity2,
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           hintText: "New Password",
           border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(15))),
-          suffixIcon: widget.resetPassword
-              ? IconButton(
-                  icon:
-                      Icon(obscurity ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => obscurity = !obscurity),
-                )
-              : null,
+          suffixIcon: IconButton(
+            icon: Icon(obscurity2 ? Icons.visibility_off : Icons.visibility),
+            onPressed: () => setState(() => obscurity2 = !obscurity2),
+          ),
         ),
         validator: (val) => passwordController.text.length < 8
             ? "The password should be 8 characters long"
-            : null,
+            : passwordController.text == currentPassController.text
+                ? "New password cannot be same as old password"
+                : null,
         onFieldSubmitted: (val) {
           confirmPasswordFocus.requestFocus();
         },
@@ -173,7 +173,7 @@ class _ChangePasswordState extends State<ChangePassword> {
       ),
       TextFormField(
         focusNode: confirmPasswordFocus,
-        obscureText: obscurity,
+        obscureText: true,
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(

@@ -35,7 +35,6 @@ dependencies:
   intl_phone_number_input: ^0.7.0+2
   device_info_plus: ^3.2.2
   get_storage: any
-  restart_app: ^1.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -51,6 +50,7 @@ dependencies:
   hex: ^0.2.0
   flutter_svg: ^1.0.3
   rename: ^2.0.1
+  url_launcher: ^6.1.2
   # substrate_sdk:
   #   git: 
   #     url: https://github.com/ashishbeck-zeeve/substrate_sdk.git

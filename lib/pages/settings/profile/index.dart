@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -37,21 +36,6 @@ class ProfilePageState extends State<ProfilePage> {
     bool success = await localAuth.authenticate(localizedReason: "Please authenticate to toggle", biometricOnly: true);
     if (success) StorageService.instance.updateBiometricPreference(value);
     setState(() {});
-  }
-
-  void toggleNetworkType(bool value) async {
-    print("restart");
-    // StorageService.instance.networkclearTokens();
-    // setState(() {
-    StorageService.instance.updateNetworkType(value);
-    network = value ? "TESTNET" : "MAINNET";
-    // });
-    print("center");
-    // CommonWidgets.waitDialog(text: "Network Switching");
-    // Future.delayed(Duration(seconds: 3), () => Restart.restartApp());
-    services.updateBalances();
-    setState(() {});
-    print("end");
   }
 
   logOut() async {
@@ -193,14 +177,6 @@ class ProfilePageState extends State<ProfilePage> {
                             ),
                           )
                         : Container(),
-                    SizedBox(
-                      width: Get.width * 0.9,
-                      child: SwitchListTile.adaptive(
-                        value: StorageService.instance.isTestNet,
-                        onChanged: toggleNetworkType,
-                        title: Text("Is Testnet"),
-                      ),
-                    ),
                     SizedBox(
                       width: Get.width,
                       child: TextButton(

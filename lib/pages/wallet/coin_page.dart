@@ -7,7 +7,6 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
-import 'package:wallet/pages/buy.dart';
 import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/send.dart';
 import 'package:wallet/widgets/common.dart';
@@ -217,14 +216,14 @@ class _CoinPageState extends State<CoinPage> {
                                   Get.to(() => ReceivePage(currency: currency)),
                               whiteBG: true),
                         ),
-                        Expanded(
-                          child: HomeWidgets.quickAction(
-                              icon: "assets/icons/buy.svg",
-                              text: "Buy",
-                              onPressed: () => Get.to(() =>
-                                  BuyPage(currency: currency, minimum: 50)),
-                              whiteBG: true),
-                        ),
+                        // Expanded(
+                        //   child: HomeWidgets.quickAction(
+                        //       icon: "assets/icons/buy.svg",
+                        //       text: "Buy",
+                        //       onPressed: () => Get.to(() =>
+                        //           BuyPage(currency: currency, minimum: 50)),
+                        //       whiteBG: true),
+                        // ),
                         Expanded(
                           child: HomeWidgets.quickAction(
                               icon: "assets/icons/send.svg",
@@ -240,13 +239,13 @@ class _CoinPageState extends State<CoinPage> {
                               },
                               whiteBG: true),
                         ),
-                        Expanded(
-                          child: HomeWidgets.quickAction(
-                              icon: "assets/icons/swap.svg",
-                              text: "Swap",
-                              onPressed: () {},
-                              whiteBG: true),
-                        ),
+                        // Expanded(
+                        //   child: HomeWidgets.quickAction(
+                        //       icon: "assets/icons/swap.svg",
+                        //       text: "Swap",
+                        //       onPressed: () {},
+                        //       whiteBG: true),
+                        // ),
                       ],
                     ),
                     SizedBox(
