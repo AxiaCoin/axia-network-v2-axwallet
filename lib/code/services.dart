@@ -14,6 +14,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
 
@@ -35,7 +36,7 @@ Services services = Services();
 class Services {
   HDWallet? hdWallet;
   WalletData walletData = Get.put(WalletData());
-  Map<String, HDWallet> hdWallets = {};
+  Map<String, HDWalletInfo> hdWallets = {};
   Timer? timer;
 
   SubstrateSDK substrateSDK = SubstrateSDK();
@@ -98,29 +99,29 @@ class Services {
     );
   }
 
-  Future<void> createMCWallet(String mnemonic) async {
-    StorageService.instance.storeCurrentMnemonic(mnemonic);
+  Future<void> createMCWallet(String mnemonic, String name) async {
     String seed = await compute(toSeed, mnemonic);
     var seedData = HexDecoder().convert(seed) as Uint8List;
     HDWallet wallet = HDWallet.fromSeed(seedData);
-    StorageService.instance.storeMnemonicSeed(mnemonic, seed);
-    hdWallets[mnemonic] = wallet;
-    initMCWallet(mnemonic);
+    HDWalletInfo walletInfo = HDWalletInfo(seed: seed, name: name, mnemonic: mnemonic, hdWallet: wallet);
+    StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
+    hdWallets[wallet.pubKey!] = walletInfo;
+    StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
+    initMCWallet(wallet.pubKey!);
   }
 
   void initMCWallet(
-    String? mnemonic,
+    String? pubKey,
   ) {
     var mnemonicSeeds = StorageService.instance.readMnemonicSeed();
     if (mnemonicSeeds == null || mnemonicSeeds.isEmpty) return;
     mnemonicSeeds.forEach((key, value) {
-      var seedData = HexDecoder().convert(value) as Uint8List;
-      hdWallets[key] = new HDWallet.fromSeed(seedData);
+      var seedData = HexDecoder().convert(value.seed) as Uint8List;
+      value.hdWallet = HDWallet.fromSeed(seedData);
+      hdWallets[key] = value;
     });
-    print(hdWallets);
-    print(mnemonic);
-    if (mnemonic != null) {
-      walletData.updateWallet(mnemonic);
+    if (pubKey != null) {
+      walletData.updateWallet(pubKey);
       print("wallet created");
       currencyList.forEach(
         (e) => e.getWallet(),
@@ -145,6 +146,23 @@ class Services {
     timer = Timer.periodic(Duration(seconds: 10), (t) {
       update();
     });
+  }
+
+  pseudoLogout() {
+    timer!.cancel();
+  }
+
+  logOut() async {
+    String sessionID = StorageService.instance.sessionID!;
+    String deviceID = StorageService.instance.deviceID!;
+    var response = await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
+    if (response["success"]) {
+      timer!.cancel();
+      StorageService.instance
+        ..clearTokens()
+        ..init();
+      Get.offAll(() => LoginPage());
+    }
   }
 
   Future<bool> canCheckBiometrics() async {
@@ -453,7 +471,6 @@ class APIServices {
   //CRYPTO APIs
   //-----------
   getBalance(List<String> address, String unit) async {
-    print(network);
     return getBaseAPI("address/balance?network=$network&addresses=${address.join(',')}&currency=$unit");
   }
 

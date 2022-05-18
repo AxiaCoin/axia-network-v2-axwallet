@@ -58,9 +58,9 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
 
   successful() async {
     if (isSettingUp) {
-      String mnemonic = StorageService.instance.readCurrentMnemonic()!;
+      String pubKey = StorageService.instance.readCurrentPubKey()!;
       CommonWidgets.waitDialog();
-      services.initMCWallet(mnemonic);
+      services.initMCWallet(pubKey);
       Get.offAll(() => HomePage());
     } else {
       Get.back(result: true);
@@ -78,7 +78,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   @override
   void initState() {
     super.initState();
-    mnemonic = StorageService.instance.readCurrentMnemonic();
+    mnemonic = StorageService.instance.readCurrentPubKey();
     initAuthentication();
   }
 

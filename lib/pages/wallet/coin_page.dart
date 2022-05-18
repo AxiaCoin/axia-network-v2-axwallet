@@ -67,8 +67,7 @@ class _CoinPageState extends State<CoinPage> {
     currency = widget.currency;
     scrollController.addListener(
       () {
-        if (scrollController.offset >
-                scrollController.position.maxScrollExtent - 50 &&
+        if (scrollController.offset > scrollController.position.maxScrollExtent - 50 &&
             transactions.isNotEmpty &&
             transactions.length < total &&
             !isLoading &&
@@ -108,7 +107,7 @@ class _CoinPageState extends State<CoinPage> {
             //       "BUY",
             //       style: TextStyle(color: Colors.white),
             //     )),
-            IconButton(onPressed: () {}, icon: Icon(Icons.search))
+            // IconButton(onPressed: () {}, icon: Icon(Icons.search))
           ],
         );
 
@@ -121,8 +120,7 @@ class _CoinPageState extends State<CoinPage> {
             // HomeWidgets.coinPageHeaderText("COIN"),
             // Spacer(),
             HomeWidgets.coinPageHeaderText("\$${currency.coinData.rate} "),
-            HomeWidgets.coinPageHeaderText("${currency.coinData.change}",
-                isTicker: true)
+            HomeWidgets.coinPageHeaderText("${currency.coinData.change}", isTicker: true)
           ],
         ),
       );
@@ -147,26 +145,22 @@ class _CoinPageState extends State<CoinPage> {
                     SizedBox(
                         width: Get.width * 0.15,
                         height: Get.width * 0.15,
-                        child: Image.asset(
-                            "assets/currencies/${currency.coinData.unit}.png")),
+                        child: Image.asset("assets/currencies/${currency.coinData.unit}.png")),
                     SizedBox(
                       height: 8,
                     ),
                     Text(
                       currency.coinData.name,
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
                     ),
                     header(),
                     SizedBox(
                       height: height * 0.02,
                     ),
                     Text(
-                      FormatText.roundOff((balanceData.data![currency])!,
-                              maxDecimals: 8) +
+                      FormatText.roundOff((balanceData.data![currency])!, maxDecimals: 8) +
                           " ${currency.coinData.unit}",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                     ),
                     Text(
                       "Portfolio Worth: \$${(balanceData.data![currency]! * currency.coinData.rate).toStringAsFixed(2)}",
@@ -212,8 +206,7 @@ class _CoinPageState extends State<CoinPage> {
                           child: HomeWidgets.quickAction(
                               icon: "assets/icons/deposit.svg",
                               text: "Deposit",
-                              onPressed: () =>
-                                  Get.to(() => ReceivePage(currency: currency)),
+                              onPressed: () => Get.to(() => ReceivePage(currency: currency)),
                               whiteBG: true),
                         ),
                         // Expanded(
@@ -303,8 +296,7 @@ class _CoinPageState extends State<CoinPage> {
               children: [
                 dash(),
                 Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(
                       Radius.circular(16),
@@ -329,27 +321,20 @@ class _CoinPageState extends State<CoinPage> {
                             ),
                           );
                         } else if (transactions.isEmpty) return emptyList();
-                        if (index == transactions.length &&
-                            transactions.isNotEmpty &&
-                            total != transactions.length) {
-                          return Center(
-                              child: CircularProgressIndicator.adaptive());
+                        if (index == transactions.length && transactions.isNotEmpty && total != transactions.length) {
+                          return Center(child: CircularProgressIndicator.adaptive());
                         }
                         TransactionItem item = transactions[index];
-                        bool isReceived = item.to.toLowerCase() ==
-                            currency.getWallet().address.toLowerCase();
+                        bool isReceived = item.to.toLowerCase() == currency.getWallet().address.toLowerCase();
                         return ListTile(
                           title: Text(
                               "${isReceived ? "Received from" : "Sent to"}: ${FormatText.address(isReceived ? item.from : item.to)}"),
-                          subtitle: Text(
-                              DateFormat.yMMMd().format(item.time.toLocal()) +
-                                  " at " +
-                                  DateFormat.jm().format(item.time.toLocal())),
+                          subtitle: Text(DateFormat.yMMMd().format(item.time.toLocal()) +
+                              " at " +
+                              DateFormat.jm().format(item.time.toLocal())),
                           trailing: Text(
-                            FormatText.roundOff(item.amount) +
-                                " ${currency.coinData.unit}",
-                            style: TextStyle(
-                                color: isReceived ? tickerGreen : tickerRed),
+                            FormatText.roundOff(item.amount) + " ${currency.coinData.unit}",
+                            style: TextStyle(color: isReceived ? tickerGreen : tickerRed),
                           ),
                           leading: SvgPicture.asset(
                             "assets/icons/${isReceived ? "receive" : "send"}_dash.svg",

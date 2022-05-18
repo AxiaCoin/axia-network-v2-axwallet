@@ -20,7 +20,7 @@ initServices() async {
   StorageService.instance.init();
   var mnemonics = StorageService.instance.readMnemonicSeed();
   print('mnemonics are $mnemonics');
-  services.initSubstrateSDK();
+  // services.initSubstrateSDK();
   // StorageService.instance.clearTokens();
   // earn opinion sketch humble turn unaware keep defy what clay tip tribe
   // bone erase document label member evolve sense absent smoke dumb foster daring
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         home: StorageService.instance.authToken == null
             ? LoginPage()
-            : StorageService.instance.readCurrentMnemonic() == null
+            : StorageService.instance.readCurrentPubKey() == null
                 ? OnboardPage()
                 : DeviceAuthPage(),
       ),

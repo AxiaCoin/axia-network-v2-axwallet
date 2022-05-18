@@ -17,8 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   PageController pageController = PageController();
-  PersistentTabController _controller =
-      PersistentTabController(initialIndex: 0);
+  PersistentTabController _controller = PersistentTabController(initialIndex: 0);
   final TokenData list = Get.put(TokenData());
   final BalanceData balanceCont = Get.put(BalanceData());
   SettingsState settingsState = Get.put(SettingsState());
@@ -29,10 +28,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Widget> pages = [WalletPage(), ProfilePage()];
   List<PersistentBottomNavBarItem> bottomNavBarItems = [
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.shield),
-        title: "Wallet",
-        activeColorPrimary: appColor,
-        inactiveColorPrimary: Colors.grey),
+        icon: Icon(Icons.shield), title: "Wallet", activeColorPrimary: appColor, inactiveColorPrimary: Colors.grey),
     // PersistentBottomNavBarItem(
     //     icon: Icon(Icons.apps),
     //     title: "DApps",
@@ -58,13 +54,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     Services().loadUser();
-    Services().updateBalances();
+    services.updateBalances();
   }
 
   @override
   Widget build(BuildContext context) {
     Color darkNavBar = darkTheme.bottomNavigationBarTheme.backgroundColor!;
-    Color lightNavBar = Colors.white;
+    Color lightNavBar = Color(0xFFF4F5F6);
 
     return Obx(
       () => PersistentTabView(
@@ -73,9 +69,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         screens: pages,
         items: bottomNavBarItems,
         confineInSafeArea: true,
-        backgroundColor: settingsState.darkMode.value
-            ? darkNavBar
-            : lightNavBar, // Default is Colors.white.
+        backgroundColor: settingsState.darkMode.value ? darkNavBar : lightNavBar, // Default is Colors.white.
         handleAndroidBackButtonPress: true, // Default is true.
         resizeToAvoidBottomInset:
             true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
@@ -84,8 +78,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
         decoration: NavBarDecoration(
           borderRadius: BorderRadius.circular(10.0),
-          colorBehindNavBar:
-              settingsState.darkMode.value ? darkNavBar : lightNavBar,
+          colorBehindNavBar: settingsState.darkMode.value ? darkNavBar : lightNavBar,
         ),
         popAllScreensOnTapOfSelectedTab: true,
         popActionScreens: PopActionScreensType.all,
@@ -100,8 +93,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           curve: Curves.ease,
           duration: Duration(milliseconds: 200),
         ),
-        navBarStyle:
-            NavBarStyle.style8, // Choose the nav bar style with this property.
+        navBarStyle: NavBarStyle.style8, // Choose the nav bar style with this property.
       ),
     );
     // return Scaffold(

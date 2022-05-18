@@ -23,10 +23,16 @@ class SideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final BalanceData balanceData = Get.find();
+    final WalletData walletData = Get.find();
+    User user = Get.find();
+    UserModel userModel = user.userModel.value;
+    String firstName = userModel.firstName;
+    String lastName = userModel.lastName ?? "";
+    String userName = "$firstName $lastName";
     double height = Get.height;
     double width = Get.width;
     List<String> cat = [
-      "Browser",
+      // "Browser",
       // "Wallet",
       // "Activity",
       // "DApps",
@@ -57,7 +63,7 @@ class SideBar extends StatelessWidget {
                     size: 48,
                   ),
                   Text(
-                    "Wallet 1",
+                    userName,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -134,74 +140,69 @@ class SideBar extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [appColor[600]!, Colors.white],
-                stops: [0.3, 0])),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            dash(),
-            buttons(),
-            Spacer(),
-            ListTile(
-              onTap: () => Get.to(() => WebViewPage(url: "https://www.google.com/")),
-              title: Text(
-                cat[0],
-                style: TextStyle(color: appColor[800], fontSize: 16),
+                stops: [0.33, 0])),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              dash(),
+              buttons(),
+              Divider(),
+              Spacer(),
+              // ListTile(
+              //   onTap: () => Get.to(() => WebViewPage(url: "https://www.google.com/")),
+              //   title: Text(
+              //     cat[0],
+              //     style: TextStyle(color: appColor[800], fontSize: 16),
+              //   ),
+              // ),
+              Divider(),
+              ListTile(
+                onTap: () => support(),
+                title: Text(
+                  cat[0],
+                  style: TextStyle(color: appColor[800], fontSize: 16),
+                ),
               ),
-            ),
-            ListTile(
-              onTap: () => support(),
-              title: Text(
-                cat[1],
-                style: TextStyle(color: appColor[800], fontSize: 16),
+              Divider(),
+              ListTile(
+                onTap: () => services.logOut(),
+                title: Text(
+                  cat[1],
+                  style: TextStyle(color: appColor[800], fontSize: 16),
+                ),
               ),
-            ),
-            ListTile(
-              onTap: () => logOut(),
-              title: Text(
-                cat[2],
-                style: TextStyle(color: appColor[800], fontSize: 16),
-              ),
-            ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: ListView.separated(
-            //     separatorBuilder: ((context, index) {
-            //       return Divider();
-            //     }),
-            //     shrinkWrap: true,
-            //     primary: false,
-            //     itemCount: cat.length,
-            //     itemBuilder: ((context, index) {
-            //       return Padding(
-            //         padding: const EdgeInsets.all(8.0),
-            //         child: Text(
-            //           cat[index],
-            //           style: TextStyle(color: appColor[800], fontSize: 16),
-            //         ),
-            //       );
-            //     }),
-            //   ),
-            // ),
-          ],
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: ListView.separated(
+              //     separatorBuilder: ((context, index) {
+              //       return Divider();
+              //     }),
+              //     shrinkWrap: true,
+              //     primary: false,
+              //     itemCount: cat.length,
+              //     itemBuilder: ((context, index) {
+              //       return Padding(
+              //         padding: const EdgeInsets.all(8.0),
+              //         child: Text(
+              //           cat[index],
+              //           style: TextStyle(color: appColor[800], fontSize: 16),
+              //         ),
+              //       );
+              //     }),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  logOut() async {
-    String sessionID = StorageService.instance.sessionID!;
-    String deviceID = StorageService.instance.deviceID!;
-    var response = await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
-    if (response["success"]) {
-      StorageService.instance
-        ..clearTokens()
-        ..init();
-      Get.offAll(() => LoginPage());
-    }
-  }
-
   support() async {
-    Uri url = Uri.parse("https://www.axia.global/");
-    (await canLaunchUrl(url)) ? await launchUrl(url) : CommonWidgets.snackBar("Cannot open the support link");
+    Uri url = Uri.parse("https://axia.global/");
+    (await canLaunchUrl(url))
+        ? await launchUrl(url, mode: LaunchMode.externalApplication)
+        : CommonWidgets.snackBar("Cannot open the support link");
   }
 }

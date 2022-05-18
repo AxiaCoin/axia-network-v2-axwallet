@@ -26,7 +26,7 @@ class Polkadot implements Currency {
   CryptoWallet getWallet() {
     SubstrateApi substrateApi = services.substrateSDK.api!;
     if (oldAddress != StorageService.instance.getSubstrateWallet(coinData.unit).address) {
-      substrateApi.basic.getWallet(mnemonic: StorageService.instance.readCurrentMnemonic()!).then((value) {
+      substrateApi.basic.getWallet(mnemonic: StorageService.instance.readCurrentPubKey()!).then((value) {
         print("get wallet is ");
         print(value);
         var data = CryptoWallet.fromMap(value);
@@ -87,7 +87,7 @@ class Polkadot implements Currency {
     SubstrateApi substrateApi = services.substrateSDK.api!;
     bool submit = false;
     var res = await substrateApi.basic.signTransaction(
-      mnemonic: StorageService.instance.readCurrentMnemonic()!,
+      mnemonic: StorageService.instance.readCurrentPubKey()!,
       dest: receiveraddress,
       amount: amount,
       submit: submit,

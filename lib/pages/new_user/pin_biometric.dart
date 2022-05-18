@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
@@ -12,9 +13,11 @@ import 'package:wallet/widgets/common.dart';
 
 class PinBiometricPage extends StatefulWidget {
   final String mnemonic;
+  final String name;
   const PinBiometricPage({
     Key? key,
     required this.mnemonic,
+    required this.name,
   }) : super(key: key);
 
   @override
@@ -60,7 +63,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
     StorageService.instance.updateBiometricPreference(useBiometric);
     StorageService.instance.updatePIN(controller.text);
     CommonWidgets.waitDialog();
-    await services.createMCWallet(widget.mnemonic);
+    await services.createMCWallet(widget.mnemonic, widget.name);
     Get.offAll(() => HomePage());
   }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,7 +17,7 @@ class ImportWalletPage extends StatefulWidget {
 }
 
 class _ImportWalletPageState extends State<ImportWalletPage> {
-  var nameController = new TextEditingController(text: "Wallet 1");
+  var nameController = new TextEditingController(text: kDebugMode ? "Wallet 1" : "");
   var phraseController = new TextEditingController();
   var isValid = false;
 
@@ -69,23 +70,18 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                     ),
                     TextFormField(
                       controller: nameController,
-                      validator: (val) => val == ""
-                          ? "Please enter a name for the wallet"
-                          : null,
+                      validator: (val) => val == "" ? "Please enter a name for the wallet" : null,
                       autovalidateMode: AutovalidateMode.always,
                       decoration: InputDecoration(
                         hintText: "Name",
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
                       ),
                       onChanged: (val) => setState(() {}),
                     ),
                     SizedBox(
                       height: 16,
                     ),
-                    Align(
-                        alignment: Alignment.centerLeft, child: Text("Phrase")),
+                    Align(alignment: Alignment.centerLeft, child: Text("Phrase")),
                     SizedBox(
                       height: 8,
                     ),
@@ -94,9 +90,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       decoration: InputDecoration(
                         hintText: "Phrase",
                         alignLabelWithHint: true,
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
                       ),
                       onChanged: (val) => setState(() {}),
                       minLines: 4,
@@ -107,8 +101,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       child: TextButton(
                         child: Text("Paste"),
                         onPressed: () async {
-                          ClipboardData? data =
-                              await Clipboard.getData('text/plain');
+                          ClipboardData? data = await Clipboard.getData('text/plain');
                           setState(
                             () {
                               phraseController.text = data!.text!;
@@ -117,8 +110,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         },
                       ),
                     ),
-                    OnboardWidgets.subtitle(
-                        "Typically 12 (sometimes 24) words separated by single spaces"),
+                    OnboardWidgets.subtitle("Typically 12 (sometimes 24) words separated by single spaces"),
                     // Spacer(),
                   ],
                 ),
@@ -163,6 +155,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         // services.initWallet(phraseController.text);
         Get.offAll(() => PinBiometricPage(
               mnemonic: phraseController.text,
+              name: nameController.text.trim(),
             ));
       } else
         CommonWidgets.snackBar("Please check the mnemonic keys");

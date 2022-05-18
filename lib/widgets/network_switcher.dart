@@ -17,17 +17,17 @@ class NetworkSwitcher extends StatefulWidget {
 
 class _NetworkSwitcherState extends State<NetworkSwitcher> {
   void toggleNetworkType(bool value) async {
-    print("restart");
+    // print("restart");
     // StorageService.instance.networkclearTokens();
     // setState(() {
     StorageService.instance.updateNetworkType(value);
     network = value ? "TESTNET" : "MAINNET";
     // });
-    print("center");
+    // print("center");
     // CommonWidgets.waitDialog(text: "Network Switching");
     // Future.delayed(Duration(seconds: 3), () => Restart.restartApp());
     services.updateBalances();
-    print("end");
+    // print("end");
     widget.onChanged(value);
     setState(() {});
   }

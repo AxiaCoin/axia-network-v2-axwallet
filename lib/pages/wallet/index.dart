@@ -34,6 +34,7 @@ class _WalletPageState extends State<WalletPage> {
   Map<Currency, double> balanceInfo = {};
   final TokenData list = Get.find();
   final BalanceData balanceData = Get.find();
+  final WalletData walletData = Get.find();
 
   Future refreshData() async {
     if (isLoading || isRefreshing) {
@@ -107,10 +108,12 @@ class _WalletPageState extends State<WalletPage> {
                   SizedBox(
                     height: height * 0.04,
                   ),
-                  Text(
-                    "WALLET 1",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                    textAlign: TextAlign.center,
+                  Obx(
+                    () => Text(
+                      walletData.name.value,
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   SizedBox(
                     height: 4,
@@ -129,21 +132,21 @@ class _WalletPageState extends State<WalletPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text.rich(
-                        TextSpan(
-                          text: "More",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          children: [
-                            WidgetSpan(
-                              child: Icon(
-                                Icons.keyboard_arrow_right,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                      // Text.rich(
+                      //   TextSpan(
+                      //     text: "More",
+                      //     style: TextStyle(color: Colors.white, fontSize: 12),
+                      //     children: [
+                      //       WidgetSpan(
+                      //         child: Icon(
+                      //           Icons.keyboard_arrow_right,
+                      //           color: Colors.white,
+                      //           size: 14,
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
                       Spacer(),
                       HomeWidgets.quickAction(
                           icon: "assets/icons/receive_dash.svg",

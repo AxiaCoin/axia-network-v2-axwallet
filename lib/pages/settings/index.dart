@@ -39,8 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text("Profile"),
               // subtitle: Text("Wallet 1"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.account_circle), color: appColor),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.account_circle), color: appColor),
               onTap: () {
                 pushNewScreen(context, screen: ProfilePage());
               },
@@ -49,9 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text("Wallets"),
               subtitle: Text("Wallet 1"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.account_balance_wallet),
-                  color: Colors.green),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.account_balance_wallet), color: Colors.green),
               onTap: () {
                 pushNewScreen(context, screen: ManageWalletsPage());
               },
@@ -63,8 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      HomeWidgets.settingsTileIcon(
-                          icon: Icon(Icons.dark_mode), color: Colors.black),
+                      HomeWidgets.settingsTileIcon(icon: Icon(Icons.dark_mode), color: Colors.black),
                       SizedBox(
                         width: 16,
                       ),
@@ -80,8 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("Security"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.lock), color: Colors.grey),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.lock), color: Colors.grey),
               onTap: () {
                 pushNewScreen(context, screen: SecurityPage());
               },
@@ -89,8 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("Push Notifications"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.doorbell), color: Colors.red),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.doorbell), color: Colors.red),
               onTap: () {
                 pushNewScreen(context, screen: PushNotificationsPage());
               },
@@ -98,9 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("Preferences"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.settings_applications),
-                  color: Colors.lightGreen),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.settings_applications), color: Colors.lightGreen),
               onTap: () {
                 pushNewScreen(context, screen: PreferencesPage());
               },
@@ -108,8 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("Price Alerts"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.attach_money), color: Colors.pink),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.attach_money), color: Colors.pink),
               onTap: () {
                 pushNewScreen(context, screen: PriceAlertsPage());
               },
@@ -117,8 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("WalletConnect"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.ac_unit), color: Colors.blue),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.ac_unit), color: Colors.blue),
             ),
             Divider(),
             Padding(
@@ -131,14 +121,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text("Help Center"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.help), color: Colors.orange),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.help), color: Colors.orange),
             ),
             ListTile(
               title: Text("Feedback"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.email), color: Colors.blueGrey),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.email), color: Colors.blueGrey),
               onTap: () {
                 pushNewScreen(context, screen: FeedbackPage());
               },
@@ -147,25 +135,16 @@ class _SettingsPageState extends State<SettingsPage> {
               // dense: true,
               title: Text("About"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.favorite), color: Colors.redAccent),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.favorite), color: Colors.redAccent),
             ),
             Divider(),
             ListTile(
               title: Text("Logout"),
               // subtitle: Text("Wallet 1"),
               trailing: Icon(Icons.navigate_next),
-              leading: HomeWidgets.settingsTileIcon(
-                  icon: Icon(Icons.logout), color: Colors.grey),
+              leading: HomeWidgets.settingsTileIcon(icon: Icon(Icons.logout), color: Colors.grey),
               onTap: () async {
-                String sessionID = StorageService.instance.sessionID!;
-                String deviceID = StorageService.instance.deviceID!;
-                var response = await APIServices()
-                    .logOut(sessionId: sessionID, deviceId: deviceID);
-                if (response["success"]) {
-                  StorageService.instance.clearTokens();
-                  Get.offAll(() => LoginPage());
-                }
+                services.logOut();
               },
             ),
             SizedBox(

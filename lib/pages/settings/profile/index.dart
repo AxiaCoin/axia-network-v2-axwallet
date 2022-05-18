@@ -38,18 +38,6 @@ class ProfilePageState extends State<ProfilePage> {
     setState(() {});
   }
 
-  logOut() async {
-    String sessionID = StorageService.instance.sessionID!;
-    String deviceID = StorageService.instance.deviceID!;
-    var response = await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
-    if (response["success"]) {
-      StorageService.instance
-        ..clearTokens()
-        ..init();
-      Get.offAll(() => LoginPage());
-    }
-  }
-
   // getProfile() async {
   //   var response = await APIServices().getProfile();
   //   if (response["success"]) {
@@ -194,7 +182,7 @@ class ProfilePageState extends State<ProfilePage> {
                       width: Get.width,
                       child: TextButton(
                         onPressed: () {
-                          logOut();
+                          services.logOut();
                         },
                         child: Text("Logout"),
                         style: MyButtonStyles.onboardStyle,

@@ -91,8 +91,7 @@ class UserModel {
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source));
+  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source));
 }
 
 class CoinData {
@@ -130,6 +129,39 @@ class CoinData {
       selected: false,
     );
   }
+}
+
+class HDWalletInfo {
+  String seed;
+  String name;
+  String mnemonic;
+  HDWallet? hdWallet;
+  HDWalletInfo({
+    required this.seed,
+    required this.name,
+    required this.mnemonic,
+    this.hdWallet,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'seed': seed,
+      'name': name,
+      'mnemonic': mnemonic,
+    };
+  }
+
+  factory HDWalletInfo.fromMap(Map<String, dynamic> map) {
+    return HDWalletInfo(
+      seed: map['seed'] ?? '',
+      name: map['name'] ?? '',
+      mnemonic: map['mnemonic'] ?? '',
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory HDWalletInfo.fromJson(String source) => HDWalletInfo.fromMap(json.decode(source));
 }
 
 class CryptoWallet {
@@ -171,8 +203,7 @@ class CryptoWallet {
 
   String toJson() => json.encode(toMap());
 
-  factory CryptoWallet.fromJson(String source) =>
-      CryptoWallet.fromMap(json.decode(source));
+  factory CryptoWallet.fromJson(String source) => CryptoWallet.fromMap(json.decode(source));
 }
 
 enum SearchMode { customize, send, receive, buy, swap }
