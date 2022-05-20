@@ -103,7 +103,8 @@ class Services {
     String seed = await compute(toSeed, mnemonic);
     var seedData = HexDecoder().convert(seed) as Uint8List;
     HDWallet wallet = HDWallet.fromSeed(seedData);
-    HDWalletInfo walletInfo = HDWalletInfo(seed: seed, name: name, mnemonic: mnemonic, hdWallet: wallet);
+    HDWalletInfo walletInfo = HDWalletInfo(
+        seed: seed, name: name, mnemonic: mnemonic, hdWallet: wallet);
     StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
     hdWallets[wallet.pubKey!] = walletInfo;
     StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
@@ -148,14 +149,11 @@ class Services {
     });
   }
 
-  pseudoLogout() {
-    timer!.cancel();
-  }
-
   logOut() async {
     String sessionID = StorageService.instance.sessionID!;
     String deviceID = StorageService.instance.deviceID!;
-    var response = await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
+    var response =
+        await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
     if (response["success"]) {
       timer!.cancel();
       StorageService.instance
@@ -189,7 +187,8 @@ class APIServices {
   noAuthbaseAPI(String url, Map body) async {
     try {
       var response = await http.post(Uri.parse(ipAddress + url),
-          headers: {'Content-Type': 'application/json'}, body: jsonEncode(body));
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body));
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
@@ -203,7 +202,8 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -230,7 +230,10 @@ class APIServices {
     try {
       var response = await http.get(
         Uri.parse(ipAddress + url),
-        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!, 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
+          'Content-Type': 'application/json'
+        },
       );
       // print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
@@ -245,7 +248,8 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -271,7 +275,10 @@ class APIServices {
     try {
       var response = await http.post(
         Uri.parse(ipAddress + url),
-        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!, 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer ' + StorageService.instance.authToken!,
+          'Content-Type': 'application/json'
+        },
         body: jsonEncode(body),
       );
       print("response code:${response.statusCode}");
@@ -287,7 +294,8 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -330,7 +338,8 @@ class APIServices {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);
@@ -403,8 +412,10 @@ class APIServices {
     );
   }
 
-  userVerify({String? phoneNumber, String? phoneCode, required String otp}) async {
-    return noAuthbaseAPI("user/verify", {"phoneNumber": phoneNumber, "phoneCode": phoneCode, "otp": otp});
+  userVerify(
+      {String? phoneNumber, String? phoneCode, required String otp}) async {
+    return noAuthbaseAPI("user/verify",
+        {"phoneNumber": phoneNumber, "phoneCode": phoneCode, "otp": otp});
   }
 
   sendVerifyOTP({String? phoneNumber, String? phoneCode}) async {
@@ -414,14 +425,19 @@ class APIServices {
     );
   }
 
-  forgotPasswordOtp({String? email, String? phoneNumber, String? phoneCode}) async {
+  forgotPasswordOtp(
+      {String? email, String? phoneNumber, String? phoneCode}) async {
     return noAuthbaseAPI(
       "user/send-forget-pass-otp",
       {"email": email, "phoneNumber": phoneNumber, "phoneCode": phoneCode},
     );
   }
 
-  verifyforgotPasswordOtp({String? email, required String otp, String? phoneNumber, String? phoneCode}) {
+  verifyforgotPasswordOtp(
+      {String? email,
+      required String otp,
+      String? phoneNumber,
+      String? phoneCode}) {
     return noAuthbaseAPI(
       "user/verify-forget-pass-otp",
       {
@@ -433,10 +449,15 @@ class APIServices {
     );
   }
 
-  resetPassword({required String newPassword, required String authToken}) async {
+  resetPassword(
+      {required String newPassword, required String authToken}) async {
     return noAuthbaseAPI(
       "user/reset-password",
-      {"newPassword": newPassword, "confirmPassword": newPassword, "authToken": authToken},
+      {
+        "newPassword": newPassword,
+        "confirmPassword": newPassword,
+        "authToken": authToken
+      },
     );
   }
 
@@ -471,17 +492,20 @@ class APIServices {
   //CRYPTO APIs
   //-----------
   getBalance(List<String> address, String unit) async {
-    return getBaseAPI("address/balance?network=$network&addresses=${address.join(',')}&currency=$unit");
+    return getBaseAPI(
+        "address/balance?network=$network&addresses=${address.join(',')}&currency=$unit");
   }
 
-  getTransactions(String address, String unit, {int offset = 0, int limit = 10, bool ascending = false}) async {
+  getTransactions(String address, String unit,
+      {int offset = 0, int limit = 10, bool ascending = false}) async {
     // 'address/$address/transactions?network=$network&currency=${coinData.unit}&offset=0&limit=10&sort=asc'
     return getBaseAPI(
       "address/$address/transactions?network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
     );
   }
 
-  getPlatformTransactions(String address, String unit, {int offset = 0, int limit = 10, bool ascending = false}) async {
+  getPlatformTransactions(String address, String unit,
+      {int offset = 0, int limit = 10, bool ascending = false}) async {
     return getBaseAPI(
       "transaction/list/wallet?address=$address&network=$network&currency=$unit&offset=$offset&limit=$limit&sort=${ascending ? "asc" : "desc"}",
     );
