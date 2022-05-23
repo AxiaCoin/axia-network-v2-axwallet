@@ -19,7 +19,7 @@ class StorageService {
   String? deviceID;
   String? pin;
   bool? useBiometric;
-  bool isTestNet = false;
+  bool isTestNet = true;
   // Map<String, double> balances = {};
   // Map<String, String> currencies = {};
   List<String>? defaultWallets;
@@ -34,7 +34,8 @@ class StorageService {
     deviceID = box.read("deviceID");
     pin = readPIN();
     isoCode = box.read("isoCode");
-    isTestNet = box.read("isTestNet") ?? false;
+    isTestNet = true;
+    //box.read("isTestNet") ?? true;
     print("isTestnet:$isTestNet");
     useBiometric = box.read("useBiometric") ?? true;
     if (deviceID == null) getDeviceID();

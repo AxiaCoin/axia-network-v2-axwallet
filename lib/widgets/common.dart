@@ -13,7 +13,7 @@ class CommonWidgets {
       message: "${copyMode ? "Copied: " : ""}$text",
       backgroundColor: Colors.black.withOpacity(0.7),
       maxWidth: Get.width * 0.85,
-      margin: EdgeInsets.only(bottom: Get.height * 0.15),
+      margin: EdgeInsets.only(bottom: 16),
       borderRadius: 10,
       duration: Duration(seconds: duration),
       animationDuration: Duration(milliseconds: 200),
@@ -24,7 +24,7 @@ class CommonWidgets {
   static waitDialog({String text = "Accessing Wallet"}) {
     Get.dialog(
       WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: AlertDialog(
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -90,12 +90,9 @@ class CommonWidgets {
           ),
           Text(
             value,
-            style: context.textTheme.caption!
-                .copyWith(fontSize: 20, color: appColor),
+            style: context.textTheme.caption!.copyWith(fontSize: 20, color: appColor),
           ),
-          onPressed == null
-              ? Container()
-              : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
+          onPressed == null ? Container() : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
         ],
       );
 }

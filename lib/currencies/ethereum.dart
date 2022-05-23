@@ -28,7 +28,7 @@ class Ethereum implements Currency {
   CryptoWallet getWallet() {
     WalletData walletData = Get.find();
     coinslib.HDWallet hdWallet = walletData.hdWallet!.value;
-    var wallet = hdWallet.derivePath("m/44'/${StorageService.instance.isTestNet ? 1 : 60}'/0'/0/0");
+    var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
     var ethWallet = EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
     // var client = Web3Client(
     //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",

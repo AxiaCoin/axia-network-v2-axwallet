@@ -80,11 +80,11 @@ class SideBar extends StatelessWidget {
                   ),
                 ],
               ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: NetworkSwitcher(onChanged: (inTestNet) {}),
-              )
+              // Positioned(
+              //   right: 0,
+              //   bottom: 0,
+              //   child: NetworkSwitcher(onChanged: (inTestNet) {}),
+              // )
             ],
           ),
         );

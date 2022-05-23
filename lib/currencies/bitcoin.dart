@@ -41,7 +41,7 @@ class Bitcoin implements Currency {
     WalletData walletData = Get.find();
     HDWallet hdWallet = walletData.hdWallet!.value;
     hdWallet.network = StorageService.instance.isTestNet ? testnet : bitcoin;
-    var wallet = hdWallet.derivePath("m/44'/${StorageService.instance.isTestNet ? 1 : 0}'/0'/0/0");
+    var wallet = hdWallet.derivePath("m/44'/${0}'/0'/0/0");
     ECPair keyPair = ECPair.fromWIF(wallet.wif.toString());
     keyPair.network = StorageService.instance.isTestNet ? testnet : bitcoin;
     // print("btc: ${wallet.address}");
