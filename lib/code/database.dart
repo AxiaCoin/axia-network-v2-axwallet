@@ -43,7 +43,8 @@ class BalanceData extends GetxController {
     getData()[currency] = value;
     totalBalance.value = 0;
     data!.forEach((key, value) {
-      if (key.coinData.selected) totalBalance.value += value * key.coinData.rate;
+      if (key.coinData.selected)
+        totalBalance.value += value * key.coinData.rate;
     });
   }
 }
@@ -53,7 +54,9 @@ class WalletData extends GetxController {
   Rx<String> name = Rx("");
 
   updateWallet(String pubKey) {
-    HDWalletInfo walletInfo = services.hdWallets.entries.firstWhere((element) => element.key == pubKey).value;
+    HDWalletInfo walletInfo = services.hdWallets.entries
+        .firstWhere((element) => element.key == pubKey)
+        .value;
     hdWallet = Rx(walletInfo.hdWallet!);
     name = Rx(walletInfo.name);
   }

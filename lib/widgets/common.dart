@@ -36,8 +36,8 @@ class CommonWidgets {
     );
   }
 
-  static bottomSheet(Widget bottomsheet) {
-    Get.bottomSheet(bottomsheet);
+  static bottomSheet(Widget bottomsheet) async {
+    await Get.bottomSheet(bottomsheet);
   }
 
   static backButton(BuildContext context) => IconButton(

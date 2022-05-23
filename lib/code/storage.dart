@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._();
@@ -63,12 +66,16 @@ class StorageService {
   }
 
   getInitialWallets() {
-    defaultWallets = currencyList.where((e) => e.coinData.selected).map((e) => e.coinData.unit).toList();
+    defaultWallets = currencyList
+        .where((e) => e.coinData.selected)
+        .map((e) => e.coinData.unit)
+        .toList();
   }
 
   generateSubstrateWallets() {
     Map<String, String> wallets = {};
-    substrateNetworks.forEach((e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
+    substrateNetworks.forEach(
+        (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
     var stringified = jsonEncode(wallets);
     // var decoded = jsonDecode(stringified);
     substrateWallets = stringified;
@@ -140,6 +147,19 @@ class StorageService {
     box.write("substrateWallets", substrateWallets);
   }
 
+  updateWalletName(String newname) {
+    WalletData walletData = Get.find();
+    String pubKey = readCurrentPubKey()!;
+    var hdWalletInfo = readMnemonicSeed();
+    hdWalletInfo[pubKey].name = newname;
+    HDWalletInfo walletInfo =
+        HDWalletInfo.fromJson(hdWalletInfo[pubKey].toJson());
+    storeMnemonicSeed(pubKey, walletInfo);
+    services.hdWallets[pubKey]!.name = newname;
+    walletData.updateWallet(pubKey);
+    print("Wallet name updated");
+  }
+
   clearTokens() {
     authToken = null;
     sessionID = null;
@@ -152,23 +172,6 @@ class StorageService {
     box.remove("useBiometric");
     box.remove("isTestNet");
   }
-
-  networkclearTokens() {
-    // box.remove("defaultWallets");
-    // box.remove("substrateWallets");
-    box.remove("isTestNet");
-  }
-
-  // initBalances() {
-  //   currencyList.forEach((element) {
-  //     balances[element.coinData.unit] = 0;
-  //   });
-  //   box.write("balances", balances);
-  // }
-
-  // updateCurrencies(Map<String, String> data) {
-  //   data.forEach((key, value) {});
-  // }
 
   storeCurrentPubKey(String pubKey) {
     var encrypted = encrypter.encrypt(pubKey, iv: iv);
