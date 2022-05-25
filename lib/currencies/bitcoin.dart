@@ -31,7 +31,7 @@ class Bitcoin implements Currency {
     prefix: "",
     smallestUnit: pow(10, 8).toInt(), //100000000 satoshi
     coinType: StorageService.instance.isTestNet ? 1 : 0,
-    rate: 1.23,
+    rate: 29220.60,
     change: "1",
     selected: true,
   );

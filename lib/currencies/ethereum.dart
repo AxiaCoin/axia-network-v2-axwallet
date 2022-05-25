@@ -10,8 +10,11 @@ import 'package:coinslib/coinslib.dart' as coinslib;
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:web3dart/web3dart.dart';
+import 'dart:developer' as dev;
 
 class Ethereum implements Currency {
+  final rpcURLTest = "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
+
   @override
   CoinData coinData = CoinData(
     name: "Ethereum",
@@ -19,7 +22,7 @@ class Ethereum implements Currency {
     prefix: "0x",
     smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
     coinType: StorageService.instance.isTestNet ? 1 : 60,
-    rate: 1,
+    rate: 1963.71,
     change: "1",
     selected: true,
   );
@@ -31,7 +34,7 @@ class Ethereum implements Currency {
     var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
     var ethWallet = EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
     // var client = Web3Client(
-    //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+    //     rpcURLTest,
     //     Client());
     // client.getGasPrice().then((value) => print(value.getInWei));
     // var signedData = await client.signTransaction(
@@ -84,7 +87,7 @@ class Ethereum implements Currency {
   Future<double> getBalance({String? address}) async {
     // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     // var client = Web3Client(
-    //     "https://rinkeby.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605",
+    //     rpcURLTest,
     //     Client());
     // return await client.getBalance(ethWallet.address);
     var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
@@ -106,18 +109,18 @@ class Ethereum implements Currency {
     int total = response["data"]["total"];
     print(total);
     List<TransactionItem> transactions = [];
-    print("data is $data");
+    dev.log("data is $data");
 
     data.forEach((e) {
-      print(double.parse(e["recipients"][0]["amount"]) / coinData.smallestUnit);
+      // print(double.parse(e["recipients"][0]["amount"]) / coinData.smallestUnit);
       transactions.add(
         TransactionItem(
-          from: e["senders"][0]["address"],
-          to: e["recipients"][0]["address"],
-          amount: double.parse(e["recipients"][0]["amount"]),
-          time: DateTime.fromMillisecondsSinceEpoch(e["timestamp"] * 1000),
-          hash: e["transactionHash"],
-          fee: double.parse(e["fee"]["amount"]),
+          from: e["from"],
+          to: e["to"],
+          amount: e["value"] / coinData.smallestUnit,
+          time: DateTime.parse(e["blockTime"]),
+          hash: e["txid"],
+          fee: e["fee"] / coinData.smallestUnit,
         ),
       );
     });
@@ -131,7 +134,7 @@ class Ethereum implements Currency {
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     print("address is ${ethWallet.address.hexEip55}");
     print("amount is $amount");
-    var client = Web3Client("https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605", Client());
+    var client = Web3Client(rpcURLTest, Client());
     var gasPrice = await client.getGasPrice();
     var signedData = await client.signTransaction(
       ethWallet,

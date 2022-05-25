@@ -12,6 +12,9 @@ import 'package:wallet/code/storage.dart';
 import 'package:web3dart/web3dart.dart';
 
 class AXIACoin implements Currency {
+  final rpcURLTest = "https://rpc.archive.canary.axiacoin.network";
+  final rpcURLMain = "https://rpc.archive.canary.axiacoin.network";
+
   @override
   CoinData coinData = CoinData(
     name: "AXIA Coin",
@@ -19,7 +22,7 @@ class AXIACoin implements Currency {
     prefix: "0x",
     smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
     coinType: StorageService.instance.isTestNet ? 1 : 60,
-    rate: 1,
+    rate: 13.43,
     change: "1",
     selected: true,
   );
@@ -30,7 +33,7 @@ class AXIACoin implements Currency {
     coinslib.HDWallet hdWallet = walletData.hdWallet!.value;
     var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
     var ethWallet = EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
-    // var client = Web3Client("https://rpc.canary.axiacoin.network", Client());
+    // var client = Web3Client(rpcURL, Client());
     // client.getGasPrice().then((value) => print("gasprice ${value.getInWei}"));
     // client.getBalance(ethWallet.address).then((value) => print("axc bal is ${value.getInWei}"));
     // var signedData = await client.signTransaction(
@@ -82,12 +85,12 @@ class AXIACoin implements Currency {
   @override
   Future<double> getBalance({String? address}) async {
     // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
-    // var client = Web3Client("https://rpc.canary.axiacoin.network", Client());
+    // var client = Web3Client(rpcURLTest, Client());
     // var bal = (await client.getBalance(ethWallet.address)).getInEther.toDouble();
     // print(bal);
     // return bal;
     var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
-    print(amount);
+    // print(amount);
     double balance = amount["data"].first["confirmed"].toDouble() / coinData.smallestUnit;
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");
@@ -96,7 +99,7 @@ class AXIACoin implements Currency {
 
   @override
   Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
-    var response = await APIServices().getPlatformTransactions(
+    var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
       offset: offset,
@@ -111,11 +114,11 @@ class AXIACoin implements Currency {
     data.forEach((e) {
       transactions.add(
         TransactionItem(
-          from: e["fromAddress"],
-          to: e["toAddress"],
-          amount: double.parse(e["amount"]) / coinData.smallestUnit,
-          time: DateTime.parse(e["createdAt"]),
-          hash: e["txnHash"],
+          from: e["from"],
+          to: e["to"],
+          amount: e["value"] / coinData.smallestUnit,
+          time: DateTime.parse(e["blockTime"]),
+          hash: e["txid"],
           fee: (e["fee"]) / coinData.smallestUnit,
         ),
       );
@@ -130,7 +133,7 @@ class AXIACoin implements Currency {
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     print("address is ${ethWallet.address.hexEip55}");
     print("amount is $amount");
-    var client = Web3Client("https://rpc.canary.axiacoin.network", Client());
+    var client = Web3Client(rpcURLTest, Client());
     var gasPrice = await client.getGasPrice();
     var signedData = await client.signTransaction(
       ethWallet,

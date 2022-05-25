@@ -43,19 +43,17 @@ class _SignupPageState extends State<SignupPage> {
     if (!widget.resetPassword) {
       var response = await APIServices().signUp(
         firstName: firstNameController.text,
-        lastName:
-            lastNameController.text == "" ? null : lastNameController.text,
+        lastName: lastNameController.text == "" ? null : lastNameController.text,
         email: mode == Mode.email ? emailController.text : null,
         phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-        phoneCode:
-            mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        phoneCode: mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
         password: passwordController.text,
       );
       if (response["success"]) {
         var result = await APIServices().sendVerifyOTP(
+          email: mode == Mode.email ? emailController.text : null,
           phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-          phoneCode:
-              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          phoneCode: mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
         );
         if (result["success"]) {
           Get.to(() => VerificationPage(
@@ -69,8 +67,7 @@ class _SignupPageState extends State<SignupPage> {
       var response = await APIServices().forgotPasswordOtp(
         email: mode == Mode.email ? emailController.text : null,
         phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-        phoneCode:
-            mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+        phoneCode: mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
       );
 
       if (response["success"]) {
@@ -102,8 +99,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     Widget phoneField() => InternationalPhoneNumberInput(
           initialValue: PhoneNumber(
-            isoCode: StorageService.instance.isoCode ??
-                Platform.localeName.split('_').last,
+            isoCode: StorageService.instance.isoCode ?? Platform.localeName.split('_').last,
           ),
           onInputChanged: (PhoneNumber number) {
             phoneNumber = number;
@@ -125,8 +121,7 @@ class _SignupPageState extends State<SignupPage> {
           // initialValue: number,
           textFieldController: phoneController,
           formatInput: false,
-          keyboardType:
-              TextInputType.numberWithOptions(signed: true, decimal: true),
+          keyboardType: TextInputType.numberWithOptions(signed: true, decimal: true),
           inputBorder: OutlineInputBorder(),
           onSaved: (PhoneNumber number) {
             print('On Saved: $number');
@@ -163,13 +158,11 @@ class _SignupPageState extends State<SignupPage> {
                   labelText: "Password",
                   border: OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(
-                        obscurity ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(obscurity ? Icons.visibility_off : Icons.visibility),
                     onPressed: () => setState(() => obscurity = !obscurity),
                   )),
-              validator: (val) => passwordController.text.length < 8
-                  ? "The password should be 8 characters long"
-                  : null,
+              validator: (val) =>
+                  passwordController.text.length < 8 ? "The password should be 8 characters long" : null,
               onFieldSubmitted: (val) {
                 confirmPasswordFocus.requestFocus();
               },
@@ -186,9 +179,7 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "Confirm Password",
                 border: OutlineInputBorder(),
               ),
-              validator: (val) => val == passwordController.text
-                  ? null
-                  : "The passwords do not match",
+              validator: (val) => val == passwordController.text ? null : "The passwords do not match",
             ),
             SizedBox(
               height: 16,
@@ -206,9 +197,7 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "First Name",
                 border: OutlineInputBorder(),
               ),
-              validator: (val) => val!.isNotEmpty
-                  ? null
-                  : "Please provide at least the first name",
+              validator: (val) => val!.isNotEmpty ? null : "Please provide at least the first name",
             ),
             SizedBox(
               height: 16,
@@ -263,8 +252,7 @@ class _SignupPageState extends State<SignupPage> {
                         // ),
                         Text(
                           "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
-                          style:
-                              context.textTheme.caption!.copyWith(fontSize: 24),
+                          style: context.textTheme.caption!.copyWith(fontSize: 24),
                         ),
                         SizedBox(
                           height: 16,
@@ -298,13 +286,10 @@ class _SignupPageState extends State<SignupPage> {
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => setState(() {
-                              mode =
-                                  mode == Mode.phone ? Mode.email : Mode.phone;
+                              mode = mode == Mode.phone ? Mode.email : Mode.phone;
                             }),
                             child: Text(
-                              mode == Mode.phone
-                                  ? "Use email insead"
-                                  : "Use phone number instead",
+                              mode == Mode.phone ? "Use email insead" : "Use phone number instead",
                               style: context.textTheme.caption!.copyWith(),
                             ),
                           ),

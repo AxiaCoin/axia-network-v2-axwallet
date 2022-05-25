@@ -172,6 +172,9 @@ class SideBar extends StatelessWidget {
                   style: TextStyle(color: appColor[800], fontSize: 16),
                 ),
               ),
+              SizedBox(
+                height: kBottomNavigationBarHeight * 0.25,
+              ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: ListView.separated(

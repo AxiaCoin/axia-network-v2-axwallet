@@ -103,11 +103,7 @@ class ProfilePageState extends State<ProfilePage> {
                                   firstName: firstName,
                                   lastName: lastName,
                                 ))!
-                            .then((value) {
-                          if (value != null && value) {
-                            Services().loadUser(loadController: false).then((value) => setState(() {}));
-                          }
-                        });
+                            .then((value) => setState(() {}));
                       },
                     ),
                     userModel.email == null

@@ -37,7 +37,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
     for (var i = 0; i < selectedList.length; i++) {
       if (selectedList[i] != widget.words[i]) invalidOrder = true;
     }
-    isValid = selectedList.length == widget.words.length && !invalidOrder && nameController.text.isNotEmpty;
+    isValid = selectedList.length == widget.words.length && !invalidOrder;
 
     Widget challengeWidget({required bool isSelected}) {
       List<String> items = isSelected ? selectedList : shuffledList;
@@ -159,7 +159,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                     //     Get.offAll(() => PinBiometricPage());
                     //   }
                     // },
-                    onPressed: onsubmit,
+                    onPressed: isValid ? onsubmit : null,
                     child: Text("DONE"),
                     style: MyButtonStyles.statefulStyle(isValid),
                   ),
@@ -173,7 +173,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
   }
 
   void onsubmit() {
-    if (isValid) {
+    if (isValid && nameController.text.isNotEmpty) {
       String mnemonic = FormatText.wordList(widget.words);
       print(mnemonic);
       // StorageService.instance.storeMnemonic(mnemonic);

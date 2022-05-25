@@ -232,9 +232,10 @@ class _SendPageState extends State<SendPage> {
                             validator: (val) => val != null &&
                                     val.isNotEmpty &&
                                     val != "." &&
+                                    double.parse(val) != 0 &&
                                     double.parse(val) < balanceData.data![currency]!
                                 ? null
-                                : "Amount should be lower than the balance (including fees)",
+                                : "Amount should be lower than the balance (including fees)\nand not zero",
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             onTap: () {
                               if (!numPadVisibility)

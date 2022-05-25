@@ -24,18 +24,15 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   Mode mode = Mode.phone;
-  TextEditingController emailController =
-      new TextEditingController(text: kDebugMode ? "test@test.com" : "");
-  TextEditingController passwordController =
-      new TextEditingController(text: kDebugMode ? "1111111q%" : "");
+  TextEditingController emailController = new TextEditingController(text: kDebugMode ? "test@test.com" : "");
+  TextEditingController passwordController = new TextEditingController(text: kDebugMode ? "1111111q%" : "");
   FocusNode emailFocus = FocusNode();
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
   bool obscurity = true;
   bool submitting = false;
   PhoneNumber phoneNumber = PhoneNumber(
-    isoCode:
-        StorageService.instance.isoCode ?? Platform.localeName.split('_').last,
+    isoCode: StorageService.instance.isoCode ?? Platform.localeName.split('_').last,
     phoneNumber: kDebugMode ? "+919879879871" : null,
   );
 
@@ -55,8 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       var response = await APIServices().signIn(
           email: mode == Mode.email ? emailController.text : null,
           phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-          phoneCode:
-              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          phoneCode: mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
           password: passwordController.text,
           deviceId: deviceId);
       if (response["success"]) {
@@ -66,9 +62,9 @@ class _LoginPageState extends State<LoginPage> {
         Get.off(() => OnboardPage());
       } else if (response.toString().contains("verify")) {
         var result = await APIServices().sendVerifyOTP(
+          email: mode == Mode.email ? emailController.text : null,
           phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
-          phoneCode:
-              mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
+          phoneCode: mode == Mode.phone ? phoneNumber.dialCode!.substring(1) : null,
         );
         if (result["success"]) {
           Get.to(() => VerificationPage(
@@ -117,8 +113,7 @@ class _LoginPageState extends State<LoginPage> {
           selectorTextStyle: TextStyle(color: Colors.black),
           // initialValue: number,
           formatInput: false,
-          keyboardType:
-              TextInputType.numberWithOptions(signed: true, decimal: true),
+          keyboardType: TextInputType.numberWithOptions(signed: true, decimal: true),
           inputBorder: OutlineInputBorder(),
           validator: (_) => null,
           onSaved: (PhoneNumber number) {
@@ -155,9 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                   animatedIcon: AnimatedIcons.menu_home,
                   children: [
                     SpeedDialChild(
-                        child: Icon(Icons.next_plan),
-                        label: "HomePage",
-                        onTap: () => Get.offAll(() => HomePage())),
+                        child: Icon(Icons.next_plan), label: "HomePage", onTap: () => Get.offAll(() => HomePage())),
                     // SpeedDialChild(
                     //     child: Icon(Icons.api),
                     //     label: "API Testing Page",
@@ -188,10 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                                height: Get.width * 0.2,
-                                width: Get.width * 0.2,
-                                child: FlutterLogo()),
+                            SizedBox(height: Get.width * 0.2, width: Get.width * 0.2, child: FlutterLogo()),
                             SizedBox(
                               height: 16,
                             ),
@@ -204,8 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                             // ),
                             Text(
                               "Welcome to your Wallet",
-                              style: context.textTheme.caption!
-                                  .copyWith(fontSize: 24),
+                              style: context.textTheme.caption!.copyWith(fontSize: 24),
                             ),
                             SizedBox(
                               height: 16,
@@ -219,27 +208,19 @@ class _LoginPageState extends State<LoginPage> {
                               focusNode: passwordFocus,
                               obscureText: obscurity,
                               keyboardType: TextInputType.visiblePassword,
-                              textInputAction: isPhoneMode
-                                  ? TextInputAction.done
-                                  : TextInputAction.next,
+                              textInputAction: isPhoneMode ? TextInputAction.done : TextInputAction.next,
                               decoration: InputDecoration(
                                   labelText: "Password",
                                   border: OutlineInputBorder(),
                                   suffixIcon: IconButton(
-                                    icon: Icon(obscurity
-                                        ? Icons.visibility_off
-                                        : Icons.visibility),
-                                    onPressed: () =>
-                                        setState(() => obscurity = !obscurity),
+                                    icon: Icon(obscurity ? Icons.visibility_off : Icons.visibility),
+                                    onPressed: () => setState(() => obscurity = !obscurity),
                                   )),
-                              validator: (val) => passwordController
-                                          .text.length <
-                                      8
+                              validator: (val) => passwordController.text.length < 8
                                   ? "The password should be 8 characters long"
                                   : null,
                               onFieldSubmitted: (val) {
-                                if (!isPhoneMode)
-                                  confirmPasswordFocus.requestFocus();
+                                if (!isPhoneMode) confirmPasswordFocus.requestFocus();
                               },
                             ),
                             SizedBox(
@@ -289,14 +270,10 @@ class _LoginPageState extends State<LoginPage> {
                               child: GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () => setState(() {
-                                  mode = mode == Mode.phone
-                                      ? Mode.email
-                                      : Mode.phone;
+                                  mode = mode == Mode.phone ? Mode.email : Mode.phone;
                                 }),
                                 child: Text(
-                                  mode == Mode.phone
-                                      ? "Use email insead"
-                                      : "Use phone number instead",
+                                  mode == Mode.phone ? "Use email insead" : "Use phone number instead",
                                   style: context.textTheme.caption!.copyWith(),
                                 ),
                               ),
@@ -306,8 +283,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             Text.rich(TextSpan(
                                 text: "Not yet registered? ",
-                                style: context.textTheme.caption!
-                                    .copyWith(color: Colors.black),
+                                style: context.textTheme.caption!.copyWith(color: Colors.black),
                                 children: [
                                   WidgetSpan(
                                       child: GestureDetector(
@@ -317,8 +293,7 @@ class _LoginPageState extends State<LoginPage> {
                                     onTap: () => Get.to(() => SignupPage()),
                                     child: Text(
                                       "Create Account",
-                                      style: context.textTheme.caption!
-                                          .copyWith(color: appColor),
+                                      style: context.textTheme.caption!.copyWith(color: appColor),
                                     ),
                                   ))
                                 ])),
@@ -327,8 +302,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             Text.rich(TextSpan(
                                 text: "Forgot Password? ",
-                                style: context.textTheme.caption!
-                                    .copyWith(color: Colors.black),
+                                style: context.textTheme.caption!.copyWith(color: Colors.black),
                                 children: [
                                   WidgetSpan(
                                       child: GestureDetector(
@@ -340,8 +314,7 @@ class _LoginPageState extends State<LoginPage> {
                                         )),
                                     child: Text(
                                       "Reset it",
-                                      style: context.textTheme.caption!
-                                          .copyWith(color: appColor),
+                                      style: context.textTheme.caption!.copyWith(color: appColor),
                                     ),
                                   ))
                                 ])),

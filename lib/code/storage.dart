@@ -66,16 +66,12 @@ class StorageService {
   }
 
   getInitialWallets() {
-    defaultWallets = currencyList
-        .where((e) => e.coinData.selected)
-        .map((e) => e.coinData.unit)
-        .toList();
+    defaultWallets = currencyList.where((e) => e.coinData.selected).map((e) => e.coinData.unit).toList();
   }
 
   generateSubstrateWallets() {
     Map<String, String> wallets = {};
-    substrateNetworks.forEach(
-        (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
+    substrateNetworks.forEach((e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
     var stringified = jsonEncode(wallets);
     // var decoded = jsonDecode(stringified);
     substrateWallets = stringified;
@@ -152,8 +148,7 @@ class StorageService {
     String pubKey = readCurrentPubKey()!;
     var hdWalletInfo = readMnemonicSeed();
     hdWalletInfo[pubKey].name = newname;
-    HDWalletInfo walletInfo =
-        HDWalletInfo.fromJson(hdWalletInfo[pubKey].toJson());
+    HDWalletInfo walletInfo = HDWalletInfo.fromJson(hdWalletInfo[pubKey].toJson());
     storeMnemonicSeed(pubKey, walletInfo);
     services.hdWallets[pubKey]!.name = newname;
     walletData.updateWallet(pubKey);
