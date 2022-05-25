@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
    <application
         android:label="AXwallet"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

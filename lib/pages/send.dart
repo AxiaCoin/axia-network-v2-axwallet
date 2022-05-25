@@ -54,8 +54,10 @@ class _SendPageState extends State<SendPage> {
               await currency.sendTransaction(double.parse(amountController.text), recipientController.text.trim());
           print(response);
           await Future.delayed(Duration(milliseconds: 200));
-          Get.back();
-          Get.back(result: true);
+          if (response != null && response["success"] == true) {
+            Get.back();
+            Get.back(result: true);
+          }
         } catch (e) {
           Get.back();
           print(e);

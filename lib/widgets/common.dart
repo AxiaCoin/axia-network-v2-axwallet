@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/code/constants.dart';
 
 class CommonWidgets {
@@ -38,6 +39,13 @@ class CommonWidgets {
 
   static bottomSheet(Widget bottomsheet) async {
     await Get.bottomSheet(bottomsheet);
+  }
+
+  static launch(String url) async {
+    Uri uri = Uri.parse(url);
+    (await canLaunchUrl(uri))
+        ? await launchUrl(uri, mode: LaunchMode.externalApplication)
+        : CommonWidgets.snackBar("Cannot open the support link");
   }
 
   static backButton(BuildContext context) => IconButton(

@@ -74,10 +74,22 @@ class Bitcoin implements Currency {
     List<TransactionItem> transactions = [];
     // print("data is $data");
     data.forEach((e) {
+      List inputs = e["inputs"];
+      List outputs = e["outputs"];
+      bool isInput = false;
+      inputs.forEach((element) {
+        if (element["address"].toString().toLowerCase() == getWallet().address.toLowerCase()) {
+          isInput = true;
+        }
+      });
+      String fromAddress = isInput ? getWallet().address : inputs.first["address"];
+      String toAddress = isInput ? outputs.first["address"] : getWallet().address;
       transactions.add(
         TransactionItem(
-          from: e["inputs"][0]["address"],
-          to: e["outputs"][0]["address"],
+          from: fromAddress,
+          fromTotal: inputs.length - 1,
+          to: toAddress,
+          toTotal: outputs.length - 1,
           amount: (e["outputs"][0]["value"]).toDouble() / coinData.smallestUnit,
           time: DateTime.fromMillisecondsSinceEpoch(e["time"] * 1000),
           hash: e["txid"],

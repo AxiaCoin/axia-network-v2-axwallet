@@ -226,14 +226,18 @@ class DAppsTile {
 
 class TransactionItem {
   String from;
+  int fromTotal;
   String to;
+  int toTotal;
   double amount;
   DateTime time;
   String hash;
   double fee;
   TransactionItem({
     required this.from,
+    this.fromTotal = 1,
     required this.to,
+    this.toTotal = 1,
     required this.amount,
     required this.time,
     required this.hash,

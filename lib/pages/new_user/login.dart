@@ -13,6 +13,7 @@ import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -151,10 +152,29 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SpeedDialChild(
                         child: Icon(Icons.next_plan), label: "HomePage", onTap: () => Get.offAll(() => HomePage())),
-                    // SpeedDialChild(
-                    //     child: Icon(Icons.api),
-                    //     label: "API Testing Page",
-                    //     onTap: () => Get.to(APITestpage()))
+                    SpeedDialChild(
+                        child: Icon(Icons.api),
+                        label: "Test WS",
+                        onTap: () {
+                          print("start");
+                          // IO.Socket socket = IO.io("http://13.235.53.197:3001/socket.io/?EIO=4&transport=polling");
+                          IO.Socket socket = IO.io(
+                              'http://13.235.53.197:3001',
+                              IO.OptionBuilder()
+                                  .setTransports(['polling'])
+                                  .disableAutoConnect() // disable auto-connection
+                                  .setExtraHeaders({'foo': 'bar'}) // optional
+                                  .build());
+                          socket.connect();
+                          socket.onConnect((_) {
+                            print('connect');
+                            socket.emit('msg', 'test');
+                          });
+                          socket.on('event', (data) => print(data));
+                          socket.onDisconnect((_) => print('disconnect'));
+                          socket.on('fromServer', (_) => print(_));
+                          print("end");
+                        })
                   ],
                 )
               : Container(),
