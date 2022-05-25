@@ -50,13 +50,19 @@ class _SendPageState extends State<SendPage> {
       if (data != null && data == true) {
         CommonWidgets.waitDialog(text: "Sending tokens");
         try {
-          var response =
-              await currency.sendTransaction(double.parse(amountController.text), recipientController.text.trim());
-          print(response);
+          print("Transaction started");
+          var response = await currency.sendTransaction(
+              double.parse(amountController.text),
+              recipientController.text.trim());
+          print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
           if (response != null && response["success"] == true) {
             Get.back();
             Get.back(result: true);
+          }
+          if (response["success"] == false) {
+            Get.back();
+            CommonWidgets.snackBar(response["errors"], duration: 5);
           }
         } catch (e) {
           Get.back();
@@ -64,7 +70,8 @@ class _SendPageState extends State<SendPage> {
           CommonWidgets.snackBar(e.toString(), duration: 5);
         }
       } else {
-        CommonWidgets.snackBar("Failed to authenticate transaction, try again", duration: 5);
+        CommonWidgets.snackBar("Failed to authenticate transaction, try again",
+            duration: 5);
       }
     }
   }
@@ -106,7 +113,8 @@ class _SendPageState extends State<SendPage> {
           children: [
             IconButton(
                 onPressed: () {
-                  Get.to(() => QRScanPage())!.then((value) => updateFields(value));
+                  Get.to(() => QRScanPage())!
+                      .then((value) => updateFields(value));
                 },
                 icon: SvgPicture.asset(
                   "assets/icons/qr.svg",
@@ -133,7 +141,8 @@ class _SendPageState extends State<SendPage> {
                 ? Container()
                 : TextButton(
                     onPressed: () {
-                      amountController.text = FormatText.roundOff((balanceData.data![currency])!);
+                      amountController.text =
+                          FormatText.roundOff((balanceData.data![currency])!);
                     },
                     child: Text("MAX"),
                   ),
@@ -172,12 +181,16 @@ class _SendPageState extends State<SendPage> {
           body: Column(
             children: [
               Container(
-                height: numPadVisibility ? (Get.height * 0.6 - 10) : Get.height - 90,
+                height: numPadVisibility
+                    ? (Get.height * 0.6 - 10)
+                    : Get.height - 90,
                 padding: EdgeInsets.only(top: 16, left: 16, right: 16),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Align(alignment: Alignment.centerLeft, child: Text("Recipient Address")),
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Recipient Address")),
                       SizedBox(
                         height: 8,
                       ),
@@ -191,11 +204,19 @@ class _SendPageState extends State<SendPage> {
                               amountFocus.requestFocus();
                             },
                             decoration: InputDecoration(
-                                hintText: FormatText.address(currency.getWallet().address, pad: 6),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                contentPadding: EdgeInsets.fromLTRB(18, 18, Get.width * 0.25, 18)),
-                            validator: (val) => val != null && val.isNotEmpty ? null : "Please enter an address",
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                                hintText: FormatText.address(
+                                    currency.getWallet().address,
+                                    pad: 6),
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15))),
+                                contentPadding: EdgeInsets.fromLTRB(
+                                    18, 18, Get.width * 0.25, 18)),
+                            validator: (val) => val != null && val.isNotEmpty
+                                ? null
+                                : "Please enter an address",
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             onTap: () {
                               if (numPadVisibility)
                                 setState(
@@ -213,7 +234,12 @@ class _SendPageState extends State<SendPage> {
                       ),
                       Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Amount " + "(" + (isCurrencyMode ? "USD" : currency.coinData.unit) + ")")),
+                          child: Text("Amount " +
+                              "(" +
+                              (isCurrencyMode
+                                  ? "USD"
+                                  : currency.coinData.unit) +
+                              ")")),
                       SizedBox(
                         height: 8,
                       ),
@@ -224,21 +250,28 @@ class _SendPageState extends State<SendPage> {
                             controller: amountController,
                             focusNode: amountFocus,
                             keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d*\.?\d*$'))
+                            ],
                             readOnly: true,
                             showCursor: true,
                             decoration: InputDecoration(
                               hintText: "0.1",
-                              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
                             ),
                             validator: (val) => val != null &&
                                     val.isNotEmpty &&
                                     val != "." &&
                                     double.parse(val) != 0 &&
-                                    double.parse(val) < balanceData.data![currency]!
+                                    double.parse(val) <
+                                        balanceData.data![currency]!
                                 ? null
                                 : "Amount should be lower than the balance (including fees)\nand not zero",
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             onTap: () {
                               if (!numPadVisibility)
                                 setState(

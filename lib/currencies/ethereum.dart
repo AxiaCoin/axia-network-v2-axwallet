@@ -9,11 +9,13 @@ import 'package:wallet/code/models.dart';
 import 'package:coinslib/coinslib.dart' as coinslib;
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:developer' as dev;
 
 class Ethereum implements Currency {
-  final rpcURLTest = "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
+  final rpcURLTest =
+      "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
 
   @override
   CoinData coinData = CoinData(
@@ -32,7 +34,8 @@ class Ethereum implements Currency {
     WalletData walletData = Get.find();
     coinslib.HDWallet hdWallet = walletData.hdWallet!.value;
     var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
-    var ethWallet = EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
+    var ethWallet =
+        EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
     // var client = Web3Client(
     //     rpcURLTest,
     //     Client());
@@ -90,7 +93,8 @@ class Ethereum implements Currency {
     //     rpcURLTest,
     //     Client());
     // return await client.getBalance(ethWallet.address);
-    var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     double balance = amount["data"].first["confirmed"].toDouble();
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");
@@ -98,7 +102,8 @@ class Ethereum implements Currency {
   }
 
   @override
-  Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -109,6 +114,8 @@ class Ethereum implements Currency {
     int total = response["data"]["total"];
     print(total);
     List<TransactionItem> transactions = [];
+    print("offset=$offset");
+    print("limit=$limit");
     dev.log("data is $data");
 
     data.forEach((e) {
@@ -157,8 +164,13 @@ class Ethereum implements Currency {
       "amount": amount,
       "signedRawTransaction": hex
     };
-    var response = await APIServices().sendTransaction(body);
-    print(response);
-    return response;
+    try {
+      var response = await APIServices().sendTransaction(body);
+      print(response);
+      return response;
+    } catch (e) {
+      print(e);
+      return CommonWidgets.snackBar(e.toString(), duration: 5);
+    }
   }
 }

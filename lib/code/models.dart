@@ -91,7 +91,8 @@ class UserModel {
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source));
+  factory UserModel.fromJson(String source) =>
+      UserModel.fromMap(json.decode(source));
 }
 
 class CoinData {
@@ -161,7 +162,8 @@ class HDWalletInfo {
 
   String toJson() => json.encode(toMap());
 
-  factory HDWalletInfo.fromJson(String source) => HDWalletInfo.fromMap(json.decode(source));
+  factory HDWalletInfo.fromJson(String source) =>
+      HDWalletInfo.fromMap(json.decode(source));
 }
 
 class CryptoWallet {
@@ -203,7 +205,8 @@ class CryptoWallet {
 
   String toJson() => json.encode(toMap());
 
-  factory CryptoWallet.fromJson(String source) => CryptoWallet.fromMap(json.decode(source));
+  factory CryptoWallet.fromJson(String source) =>
+      CryptoWallet.fromMap(json.decode(source));
 }
 
 enum SearchMode { customize, send, receive, buy, swap }
@@ -225,6 +228,7 @@ class DAppsTile {
 // }
 
 class TransactionItem {
+  bool? isInput;
   String from;
   int fromTotal;
   String to;
@@ -234,6 +238,7 @@ class TransactionItem {
   String hash;
   double fee;
   TransactionItem({
+    this.isInput,
     required this.from,
     this.fromTotal = 1,
     required this.to,

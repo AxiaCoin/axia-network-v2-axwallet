@@ -11,12 +11,12 @@ import 'package:wallet/widgets/onboard_widgets.dart';
 class TransactionsPage extends StatelessWidget {
   final TransactionItem transaction;
   final CoinData coinData;
-  final bool isReceived;
+  final bool isSent;
   const TransactionsPage({
     Key? key,
     required this.transaction,
     required this.coinData,
-    required this.isReceived,
+    required this.isSent,
   }) : super(key: key);
 
   copyAddress(String address) {
@@ -56,11 +56,13 @@ class TransactionsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OnboardWidgets.titleAlt("${FormatText.roundOff(transaction.amount)} ${coinData.unit}"),
+                OnboardWidgets.titleAlt(
+                    "${FormatText.roundOff(transaction.amount)} ${coinData.unit}"),
                 SizedBox(
                   height: 4,
                 ),
-                OnboardWidgets.subtitle("Fee: ${FormatText.roundOff(transaction.fee)} ${coinData.unit}"),
+                OnboardWidgets.subtitle(
+                    "Fee: ${FormatText.roundOff(transaction.fee)} ${coinData.unit}"),
               ],
             ),
           ),
@@ -79,8 +81,11 @@ class TransactionsPage extends StatelessWidget {
               size: 32,
             ),
             Text(
-              "  ${isReceived ? "Received" : "Sent"}",
-              style: TextStyle(color: tickerGreen, fontSize: 21, fontWeight: FontWeight.w500),
+              "  ${!isSent ? "Received" : "Sent"}",
+              style: TextStyle(
+                  color: tickerGreen,
+                  fontSize: 21,
+                  fontWeight: FontWeight.w500),
             ),
             Spacer(),
             Text(DateFormat.yMMMd().format(transaction.time.toLocal()) +
@@ -92,7 +97,8 @@ class TransactionsPage extends StatelessWidget {
     }
 
     Widget redirect(int total) => GestureDetector(
-        onTap: () => CommonWidgets.launch("https://www.blockchain.com/btc-testnet/tx/${transaction.hash}"),
+        onTap: () => CommonWidgets.launch(
+            "https://www.blockchain.com/btc-testnet/tx/${transaction.hash}"),
         child: Text(
           "+$total more",
           style: TextStyle(color: appColor),
@@ -115,7 +121,7 @@ class TransactionsPage extends StatelessWidget {
               ),
             ),
           ),
-          transaction.toTotal > 0 ? redirect(transaction.toTotal) : Container(),
+          transaction.toTotal > 1 ? redirect(transaction.toTotal) : Container(),
           ListTile(
             title: Text(
               "From",
@@ -129,7 +135,9 @@ class TransactionsPage extends StatelessWidget {
               ),
             ),
           ),
-          transaction.fromTotal > 0 ? redirect(transaction.fromTotal) : Container(),
+          transaction.fromTotal > 1
+              ? redirect(transaction.fromTotal)
+              : Container(),
         ],
       );
     }

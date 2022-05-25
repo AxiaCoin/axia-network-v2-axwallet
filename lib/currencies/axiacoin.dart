@@ -32,7 +32,8 @@ class AXIACoin implements Currency {
     WalletData walletData = Get.find();
     coinslib.HDWallet hdWallet = walletData.hdWallet!.value;
     var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
-    var ethWallet = EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
+    var ethWallet =
+        EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
     // var client = Web3Client(rpcURL, Client());
     // client.getGasPrice().then((value) => print("gasprice ${value.getInWei}"));
     // client.getBalance(ethWallet.address).then((value) => print("axc bal is ${value.getInWei}"));
@@ -89,16 +90,19 @@ class AXIACoin implements Currency {
     // var bal = (await client.getBalance(ethWallet.address)).getInEther.toDouble();
     // print(bal);
     // return bal;
-    var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     // print(amount);
-    double balance = amount["data"].first["confirmed"].toDouble() / coinData.smallestUnit;
+    double balance =
+        amount["data"].first["confirmed"].toDouble() / coinData.smallestUnit;
     // print(amount);
     // print("balance is ${balance.toStringAsFixed(6)} ${coinData.unit}");
     return balance;
   }
 
   @override
-  Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -140,8 +144,8 @@ class AXIACoin implements Currency {
       Transaction(
         to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
-        maxGas: 100000,
-        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, amount.toInt()),
+        maxGas: 21000,
+        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amount)),
       ),
       fetchChainIdFromNetworkId: true,
       chainId: null,
