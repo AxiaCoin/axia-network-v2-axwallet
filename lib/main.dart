@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/services.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
@@ -16,6 +16,10 @@ Future<void> main() async {
 initServices() async {
   // Get.changeTheme(Get.isDarkMode ? darkTheme : lightTheme);
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
+  final TokenData list = Get.put(TokenData());
+  final BalanceData balanceCont = Get.put(BalanceData());
+  SettingsState settingsState = Get.put(SettingsState());
+  WalletData walletData = Get.put(WalletData());
   await GetStorage.init();
   StorageService.instance.init();
   var mnemonics = StorageService.instance.readMnemonicSeed();

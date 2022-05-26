@@ -44,7 +44,7 @@ class _SendPageState extends State<SendPage> {
     }
   }
 
-  onSubmit() async {
+  onSubmit(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
@@ -57,17 +57,19 @@ class _SendPageState extends State<SendPage> {
           print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
           if (response != null && response["success"] == true) {
-            Get.back();
+            print("success");
+            Navigator.pop(context);
             Get.back(result: true);
           }
           if (response["success"] == false) {
-            Get.back();
+            print("failure");
+            Navigator.pop(context);
             CommonWidgets.snackBar(response["errors"], duration: 5);
           }
         } catch (e) {
-          Get.back();
+          print("caugt error");
           print(e);
-          CommonWidgets.snackBar(e.toString(), duration: 5);
+          // CommonWidgets.snackBar(e.toString(), duration: 5);
         }
       } else {
         CommonWidgets.snackBar("Failed to authenticate transaction, try again",
@@ -312,7 +314,7 @@ class _SendPageState extends State<SendPage> {
                         width: Get.width,
                         child: TextButton(
                             style: MyButtonStyles.onboardStyle,
-                            onPressed: onSubmit,
+                            onPressed: () => onSubmit(context),
                             child: Text(
                               "SEND",
                               style: TextStyle(color: Colors.white),

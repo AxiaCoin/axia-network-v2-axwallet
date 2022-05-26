@@ -152,9 +152,27 @@ class _VerificationPageState extends State<VerificationPage> {
                   Center(
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () => setState(() {
+                      onTap: () async {
+                        if (widget.resetPassword) {
+                          await APIServices().forgotPasswordOtp(
+                            email: widget.email,
+                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            phoneCode: widget.phoneNumber != null
+                                ? widget.phoneNumber?.dialCode!.substring(1)
+                                : null,
+                          );
+                        } else {
+                          await APIServices().sendVerifyOTP(
+                            email: widget.email,
+                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            phoneCode: widget.phoneNumber != null
+                                ? widget.phoneNumber?.dialCode!.substring(1)
+                                : null,
+                          );
+                        }
+
                         CommonWidgets.snackBar("The code has been sent again");
-                      }),
+                      },
                       child: Text(
                         "Resend verification code",
                         style: context.textTheme.caption!.copyWith(),
