@@ -80,9 +80,7 @@ class _WalletPageState extends State<WalletPage> {
               Radius.circular(20),
             ),
             gradient: LinearGradient(
-                colors: [appColor[600]!, appColor],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight),
+                colors: [appColor[600]!, appColor], begin: Alignment.centerLeft, end: Alignment.centerRight),
           ),
           child: Container(
               padding: EdgeInsets.only(
@@ -121,8 +119,7 @@ class _WalletPageState extends State<WalletPage> {
                       ),
                       IconButton(
                           onPressed: () async {
-                            await CommonWidgets.bottomSheet(
-                                WalletNameUpdate(wname: walletData.name.value));
+                            await CommonWidgets.bottomSheet(WalletNameUpdate(wname: walletData.name.value));
                             setState(() {});
                           },
                           icon: Icon(
@@ -138,10 +135,7 @@ class _WalletPageState extends State<WalletPage> {
                   Obx(
                     () => Text(
                       "\$${balanceData.totalBalance.toStringAsFixed(2)}",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500),
+                      style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -174,8 +168,7 @@ class _WalletPageState extends State<WalletPage> {
                           onPressed: () {
                             pushNewScreen(
                               context,
-                              screen:
-                                  SearchPage(searchMode: SearchMode.receive),
+                              screen: SearchPage(searchMode: SearchMode.receive),
                             );
                           }),
                       SizedBox(
@@ -302,16 +295,12 @@ class _WalletPageState extends State<WalletPage> {
                   }
                   return Obx(
                     () => HomeWidgets.coinTile(
-                      balance:
-                          FormatText.roundOff((balanceData.data![currency])!) +
-                              " $unit",
+                      balance: FormatText.roundOff((balanceData.data![currency])!) + " $unit",
                       name: name,
                       rate: rate,
                       ticker: ticker,
                       unit: unit,
-                      value: "\$" +
-                          (item.rate * balanceData.data![currency]!)
-                              .toStringAsFixed(2),
+                      value: "\$" + (item.rate * balanceData.data![currency]!).toStringAsFixed(2),
                       onTap: () => pushNewScreen(
                         context,
                         screen: CoinPage(

@@ -198,6 +198,7 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(),
               ),
               validator: (val) => val!.isNotEmpty ? null : "Please provide at least the first name",
+              maxLength: 20,
             ),
             SizedBox(
               height: 16,
@@ -211,6 +212,7 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "Last Name",
                 border: OutlineInputBorder(),
               ),
+              maxLength: 20,
             ),
             SizedBox(
               height: 16,

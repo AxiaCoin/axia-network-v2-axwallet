@@ -89,8 +89,9 @@ class CommonWidgets {
     required String value,
     Function()? onPressed,
   }) =>
-      Row(
+      Wrap(
         // crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             key,

@@ -71,6 +71,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                     TextFormField(
                       controller: nameController,
                       validator: (val) => val == "" ? "Please enter a name for the wallet" : null,
+                      maxLength: 20,
                       autovalidateMode: AutovalidateMode.always,
                       decoration: InputDecoration(
                         hintText: "Name",
