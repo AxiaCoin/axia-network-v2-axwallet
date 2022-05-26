@@ -91,8 +91,7 @@ class UserModel {
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source));
+  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source));
 }
 
 class CoinData {
@@ -105,6 +104,7 @@ class CoinData {
   double rate;
   String change;
   bool selected;
+  String? blockchainURLTest;
   CoinData({
     required this.name,
     required this.unit,
@@ -115,6 +115,7 @@ class CoinData {
     this.rate = 1,
     this.change = "",
     this.selected = false,
+    this.blockchainURLTest,
   });
 
   factory CoinData.dummyCoin(int i) {
@@ -162,8 +163,7 @@ class HDWalletInfo {
 
   String toJson() => json.encode(toMap());
 
-  factory HDWalletInfo.fromJson(String source) =>
-      HDWalletInfo.fromMap(json.decode(source));
+  factory HDWalletInfo.fromJson(String source) => HDWalletInfo.fromMap(json.decode(source));
 }
 
 class CryptoWallet {
@@ -205,8 +205,7 @@ class CryptoWallet {
 
   String toJson() => json.encode(toMap());
 
-  factory CryptoWallet.fromJson(String source) =>
-      CryptoWallet.fromMap(json.decode(source));
+  factory CryptoWallet.fromJson(String source) => CryptoWallet.fromMap(json.decode(source));
 }
 
 enum SearchMode { customize, send, receive, buy, swap }

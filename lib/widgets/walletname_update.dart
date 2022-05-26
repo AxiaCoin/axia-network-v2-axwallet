@@ -54,13 +54,12 @@ class _WalletNameUpdateState extends State<WalletNameUpdate> {
           ),
           TextFormField(
             controller: wnameController,
-            validator: (val) =>
-                val == "" ? "Please enter a new name for the wallet" : null,
+            validator: (val) => val == "" ? "Please enter a new name for the wallet" : null,
+            maxLength: 20,
             autovalidateMode: AutovalidateMode.always,
             decoration: InputDecoration(
               labelText: "Wallet Name",
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15))),
+              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
             ),
             onChanged: (val) => setState(() {
               isvalid = true;
@@ -70,9 +69,7 @@ class _WalletNameUpdateState extends State<WalletNameUpdate> {
             width: Get.width,
             padding: EdgeInsets.only(top: 16),
             child: ElevatedButton(
-                style: MyButtonStyles.statefulStyle(isvalid),
-                onPressed: onupdate,
-                child: Text("UPDATE")),
+                style: MyButtonStyles.statefulStyle(isvalid), onPressed: onupdate, child: Text("UPDATE")),
           ),
         ],
       ),

@@ -85,6 +85,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
           border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
         validator: (val) => val!.isNotEmpty ? null : "Please provide at least the first name",
+        maxLength: 20,
       ),
       SizedBox(
         height: 16,
@@ -102,6 +103,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
           hintText: "Last Name",
           border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
+        maxLength: 20,
       ),
       SizedBox(
         height: 16,
