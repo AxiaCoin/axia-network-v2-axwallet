@@ -437,8 +437,16 @@ class APIServices {
       String? phoneNumber,
       String? phoneCode,
       required String otp}) async {
-    return noAuthbaseAPI("user/verify",
-        {"email":email,"phoneNumber": phoneNumber, "phoneCode": phoneCode, "otp": otp});
+    // print("User Verify");
+    // print(email);
+    // print(phoneNumber);
+    // print(phoneCode);
+    return noAuthbaseAPI("user/verify", {
+      "email": email,
+      "phoneNumber": phoneNumber,
+      "phoneCode": phoneCode,
+      "otp": otp
+    });
   }
 
   sendVerifyOTP({String? email, String? phoneNumber, String? phoneCode}) async {

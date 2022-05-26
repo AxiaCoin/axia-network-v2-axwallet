@@ -38,12 +38,12 @@ class _VerificationPageState extends State<VerificationPage> {
   _verifyCode({required String code}) async {
     if (!widget.resetPassword) {
       var response = await APIServices().userVerify(
-        phoneNumber: widget.phoneNumber != null
-            ? widget.phoneNumber!.parseNumber()
-            : null,
+        email: widget.email != null ? widget.email : "",
+        phoneNumber:
+            widget.phoneNumber != null ? widget.phoneNumber!.parseNumber() : "",
         phoneCode: widget.phoneNumber != null
             ? widget.phoneNumber!.dialCode!.substring(1)
-            : null,
+            : "",
         otp: code,
       );
       if (response["success"]) {
@@ -59,12 +59,13 @@ class _VerificationPageState extends State<VerificationPage> {
       }
     } else {
       var response = await APIServices().verifyforgotPasswordOtp(
+          email: widget.email != null ? widget.email : "",
           phoneNumber: widget.phoneNumber != null
               ? widget.phoneNumber!.parseNumber()
-              : null,
+              : "",
           phoneCode: widget.phoneNumber != null
               ? widget.phoneNumber!.dialCode!.substring(1)
-              : null,
+              : "",
           otp: code);
       if (response["success"]) {
         StorageService.instance.updateAuthToken(response["data"]["authToken"]);
@@ -88,6 +89,9 @@ class _VerificationPageState extends State<VerificationPage> {
   void initState() {
     super.initState();
     _sendCode();
+    // print(widget.email);
+    // print(widget.phoneNumber?.parseNumber());
+    // print(widget.phoneNumber?.dialCode!.substring(1));
   }
 
   @override
@@ -155,19 +159,23 @@ class _VerificationPageState extends State<VerificationPage> {
                       onTap: () async {
                         if (widget.resetPassword) {
                           await APIServices().forgotPasswordOtp(
-                            email: widget.email,
-                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            email: widget.email != null ? widget.email : "",
+                            phoneNumber: widget.phoneNumber != null
+                                ? widget.phoneNumber!.parseNumber()
+                                : "",
                             phoneCode: widget.phoneNumber != null
-                                ? widget.phoneNumber?.dialCode!.substring(1)
-                                : null,
+                                ? widget.phoneNumber!.dialCode!.substring(1)
+                                : "",
                           );
                         } else {
                           await APIServices().sendVerifyOTP(
-                            email: widget.email,
-                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            email: widget.email != null ? widget.email : "",
+                            phoneNumber: widget.phoneNumber != null
+                                ? widget.phoneNumber!.parseNumber()
+                                : "",
                             phoneCode: widget.phoneNumber != null
-                                ? widget.phoneNumber?.dialCode!.substring(1)
-                                : null,
+                                ? widget.phoneNumber!.dialCode!.substring(1)
+                                : "",
                           );
                         }
 
