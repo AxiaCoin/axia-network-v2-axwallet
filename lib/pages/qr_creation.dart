@@ -20,9 +20,13 @@ class QRCreationPage extends StatelessWidget {
               child: OnboardWidgets.title("QR Code")),
           // Spacer(),
           Container(
-            padding: EdgeInsets.only(left: Get.width * 0.15, right: Get.width * 0.15, top: Get.width * 0.1),
+            padding: EdgeInsets.only(
+                left: Get.width * 0.15,
+                right: Get.width * 0.15,
+                top: Get.width * 0.1),
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               elevation: 4,
               // margin: EdgeInsets.all(Get.width * 0.05),
               child: Container(
@@ -49,8 +53,7 @@ class QRCreationPage extends StatelessWidget {
             ),
           ),
           Container(
-              padding: EdgeInsets.all(32),
-              child: OnboardWidgets.neverShare()),
+              padding: EdgeInsets.all(32), child: OnboardWidgets.neverShare()),
           // Spacer(),
         ],
       ),

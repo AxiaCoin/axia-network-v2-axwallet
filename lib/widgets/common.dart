@@ -9,8 +9,8 @@ class CommonWidgets {
   CommonWidgets._();
 
   static snackBar(String text, {bool copyMode = false, int duration = 2}) {
-    Get.closeCurrentSnackbar();
-    Get.showSnackbar(GetSnackBar(
+    // Get.closeCurrentSnackbar();
+    Get.showSnackbar(GetBar(
       message: "${copyMode ? "Copied: " : ""}$text",
       backgroundColor: Colors.black.withOpacity(0.7),
       maxWidth: Get.width * 0.85,
@@ -45,7 +45,7 @@ class CommonWidgets {
     Uri uri = Uri.parse(url);
     (await canLaunchUrl(uri))
         ? await launchUrl(uri, mode: LaunchMode.externalApplication)
-        : CommonWidgets.snackBar("Cannot open the support link");
+        : CommonWidgets.snackBar("Cannot open the link");
   }
 
   static backButton(BuildContext context) => IconButton(
@@ -99,9 +99,12 @@ class CommonWidgets {
           ),
           Text(
             value,
-            style: context.textTheme.caption!.copyWith(fontSize: 20, color: appColor),
+            style: context.textTheme.caption!
+                .copyWith(fontSize: 20, color: appColor),
           ),
-          onPressed == null ? Container() : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
+          onPressed == null
+              ? Container()
+              : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
         ],
       );
 }

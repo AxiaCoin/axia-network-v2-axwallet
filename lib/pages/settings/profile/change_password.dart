@@ -8,9 +8,11 @@ import 'package:wallet/widgets/common.dart';
 
 class ChangePassword extends StatefulWidget {
   final bool resetPassword;
+  final String? authToken;
   const ChangePassword({
     Key? key,
     required this.resetPassword,
+    this.authToken,
   }) : super(key: key);
 
   @override
@@ -59,10 +61,9 @@ class _ChangePasswordState extends State<ChangePassword> {
           Get.back();
         }
       } else {
-        print(StorageService.instance.authToken);
         var response = await APIServices().resetPassword(
           newPassword: passwordController.text,
-          authToken: StorageService.instance.authToken!,
+          authToken: widget.authToken!,
         );
         setState(() {
           submitting = false;
@@ -72,14 +73,18 @@ class _ChangePasswordState extends State<ChangePassword> {
           await Get.dialog(
             AlertDialog(
               title: Text("Success"),
-              content: Text("Password Successfully Changed!, Please Login to continue."),
+              content: Text(
+                  "Password Successfully Changed!, Please Login to continue."),
               actions: [
                 TextButton(
-                  onPressed: () => Get.offAll(() => LoginPage()),
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
                   child: Text("Okay"),
                 ),
               ],
             ),
+            barrierDismissible: false,
           );
         }
       }
@@ -102,7 +107,10 @@ class _ChangePasswordState extends State<ChangePassword> {
       SizedBox(
         height: widget.resetPassword ? 0 : 0,
       ),
-      widget.resetPassword ? Container() : Align(alignment: Alignment.centerLeft, child: Text("Current Password")),
+      widget.resetPassword
+          ? Container()
+          : Align(
+              alignment: Alignment.centerLeft, child: Text("Current Password")),
       widget.resetPassword
           ? Container()
           : SizedBox(
@@ -111,15 +119,18 @@ class _ChangePasswordState extends State<ChangePassword> {
       widget.resetPassword
           ? Container()
           : TextFormField(
+              autofocus: !widget.resetPassword,
               controller: currentPassController,
               obscureText: obscurity1,
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 hintText: "Current Password",
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
                 suffixIcon: IconButton(
-                  icon: Icon(obscurity1 ? Icons.visibility_off : Icons.visibility),
+                  icon: Icon(
+                      obscurity1 ? Icons.visibility_off : Icons.visibility),
                   onPressed: () => setState(() => obscurity1 = !obscurity1),
                 ),
               ),
@@ -136,13 +147,15 @@ class _ChangePasswordState extends State<ChangePassword> {
       ),
       TextFormField(
         controller: passwordController,
+        autofocus: widget.resetPassword,
         focusNode: passwordFocus,
         obscureText: obscurity2,
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           hintText: "New Password",
-          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
           suffixIcon: IconButton(
             icon: Icon(obscurity2 ? Icons.visibility_off : Icons.visibility),
             onPressed: () => setState(() => obscurity2 = !obscurity2),
@@ -160,7 +173,8 @@ class _ChangePasswordState extends State<ChangePassword> {
       SizedBox(
         height: 16,
       ),
-      Align(alignment: Alignment.centerLeft, child: Text("Confirm New Password")),
+      Align(
+          alignment: Alignment.centerLeft, child: Text("Confirm New Password")),
       SizedBox(
         height: 8,
       ),
@@ -171,20 +185,25 @@ class _ChangePasswordState extends State<ChangePassword> {
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
           hintText: "Confirm New Password",
-          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
           suffixIcon: IconButton(
             icon: Icon(obscurity3 ? Icons.visibility_off : Icons.visibility),
             onPressed: () => setState(() => obscurity3 = !obscurity3),
           ),
         ),
-        validator: (val) => val == passwordController.text ? null : "The passwords do not match",
+        validator: (val) => val == passwordController.text
+            ? null
+            : "The passwords do not match",
       ),
     ];
     return Scaffold(
       appBar: AppBar(
         title: Text("Change Password"),
         centerTitle: true,
-        leading: widget.resetPassword ? Container() : CommonWidgets.backButton(context),
+        leading: widget.resetPassword
+            ? Container()
+            : CommonWidgets.backButton(context),
       ),
       body: Form(
         key: formKey,

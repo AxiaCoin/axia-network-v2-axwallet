@@ -56,13 +56,15 @@ class Bitcoin implements Currency {
 
   @override
   Future<double> getBalance({String? address}) async {
-    var amount = await APIServices().getBalance([address ?? getWallet().address], coinData.unit);
+    var amount = await APIServices()
+        .getBalance([address ?? getWallet().address], coinData.unit);
     var bal = amount["data"].first["confirmed"];
     return bal / coinData.smallestUnit;
   }
 
   @override
-  Future<TransactionListModel> getTransactions({required int offset, required int limit}) async {
+  Future<TransactionListModel> getTransactions(
+      {required int offset, required int limit}) async {
     var response = await APIServices().getTransactions(
       getWallet().address,
       coinData.unit,
@@ -79,13 +81,16 @@ class Bitcoin implements Currency {
       List outputs = e["outputs"];
       bool isInput = false;
       inputs.forEach((element) {
-        if (element["address"].toString().toLowerCase() == getWallet().address.toLowerCase()) {
+        if (element["address"].toString().toLowerCase() ==
+            getWallet().address.toLowerCase()) {
           isInput = true;
           print("isInput=$isInput");
         }
       });
-      String fromAddress = isInput ? getWallet().address : inputs.first["address"];
-      String toAddress = isInput ? outputs.first["address"] : getWallet().address;
+      String fromAddress =
+          isInput ? getWallet().address : inputs.first["address"];
+      String toAddress =
+          isInput ? outputs.first["address"] : getWallet().address;
       transactions.add(
         TransactionItem(
           isInput: isInput,
@@ -111,7 +116,8 @@ class Bitcoin implements Currency {
       amount = amount * coinData.smallestUnit;
       print(amount);
       print("Start");
-      final txb = new TransactionBuilder(network: StorageService.instance.isTestNet ? testnet : bitcoin);
+      final txb = new TransactionBuilder(
+          network: StorageService.instance.isTestNet ? testnet : bitcoin);
       BTCglobalList unspent = await getunspentamount(amount, address);
       print("got unspent");
       var availBal = await getBalance();
@@ -129,12 +135,13 @@ class Bitcoin implements Currency {
       var estimated = (180 * unspent.list!.length + noOutput * 34 + 10) * 10;
       print("estiated amount=$estimated");
       if (amount == availBal) {
-        txb.addOutput(receiverAddress, (amount.toInt() - estimated));
+        txb.addOutput(receiverAddress, BigInt.from(amount.toInt() - estimated));
       } else {
-        txb.addOutput(receiverAddress, (amount.toInt()));
+        txb.addOutput(receiverAddress, BigInt.from(amount));
       }
       if ((unspent.amount! - amount) != 0 && amount != availBal) {
-        txb.addOutput(address, ((unspent.amount! - amount)).toInt() - estimated);
+        txb.addOutput(address,
+            BigInt.from(((unspent.amount! - amount)).toInt() - estimated));
       }
       print("something");
       try {
@@ -177,8 +184,11 @@ class Bitcoin implements Currency {
     try {
       print("start");
       var response = await http.get(
-        Uri.parse("$ipAddress\address/$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
-        headers: {'Authorization': 'Bearer ' + StorageService.instance.authToken!},
+        Uri.parse(
+            "$ipAddress\address/$walletAddress/unspents?currency=${coinData.unit}&network=$network"),
+        headers: {
+          'Authorization': 'Bearer ' + StorageService.instance.authToken!
+        },
       );
       if (response.statusCode == 200) {
         print("success");
@@ -189,8 +199,9 @@ class Bitcoin implements Currency {
         for (var i = 0; i < val.data!.list!.length; i++) {
           if (val.data!.list![i].value! > amount) {
             try {
-              BTCglobalList sxn =
-                  BTCglobalList(amount: val.data!.list![i].value!.toDouble(), list: [val.data!.list![i]]);
+              BTCglobalList sxn = BTCglobalList(
+                  amount: val.data!.list![i].value!.toDouble(),
+                  list: [val.data!.list![i]]);
               // sxn.list!.forEach((element) => print(element.toJson()));
               return sxn;
             } catch (e) {
@@ -202,7 +213,8 @@ class Bitcoin implements Currency {
           }
           if (txn.amount! > amount) {
             return txn;
-          } else if ((txn.amount == amount) && (val.data!.list!.length - 1 == i)) {
+          } else if ((txn.amount == amount) &&
+              (val.data!.list!.length - 1 == i)) {
             return txn;
           }
         }
@@ -216,7 +228,8 @@ class Bitcoin implements Currency {
         if (val.toString().contains("Auth Token is invalid")) {
           String sessionID = StorageService.instance.sessionID!;
           String deviceID = StorageService.instance.deviceID!;
-          var result = await APIServices().getAuthToken(sessionId: sessionID, deviceId: deviceID);
+          var result = await APIServices()
+              .getAuthToken(sessionId: sessionID, deviceId: deviceID);
           if (result["success"]) {
             String authToken = result["data"]["authToken"];
             StorageService.instance.updateAuthToken(authToken);

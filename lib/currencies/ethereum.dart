@@ -149,7 +149,7 @@ class Ethereum implements Currency {
         to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
         maxGas: 100000,
-        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, amount.toInt()),
+        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amount)),
       ),
       fetchChainIdFromNetworkId: true,
       chainId: null,

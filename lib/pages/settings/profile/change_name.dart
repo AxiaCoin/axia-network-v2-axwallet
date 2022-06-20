@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
@@ -31,7 +32,8 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
       });
       var response = await APIServices().userNameUpdate(
         firstName: firstNameController.text,
-        lastName: lastNameController.text == "" ? null : lastNameController.text,
+        lastName:
+            lastNameController.text == "" ? null : lastNameController.text,
       );
       setState(() {
         submitting = false;
@@ -40,7 +42,8 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
         User user = Get.find();
         var userModel = user.userModel.value
           ..firstName = firstNameController.text
-          ..lastName = lastNameController.text == "" ? null : lastNameController.text;
+          ..lastName =
+              lastNameController.text == "" ? null : lastNameController.text;
         user.updateUser(userModel);
         Services().loadUser(loadController: false);
 
@@ -82,10 +85,15 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           hintText: "First Name",
-          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
-        validator: (val) => val!.isNotEmpty ? null : "Please provide at least the first name",
+        validator: (val) =>
+            val!.isNotEmpty ? null : "Please provide at least the first name",
         maxLength: 20,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+        ],
       ),
       SizedBox(
         height: 16,
@@ -101,9 +109,13 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           hintText: "Last Name",
-          border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
         maxLength: 20,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+        ],
       ),
       SizedBox(
         height: 16,

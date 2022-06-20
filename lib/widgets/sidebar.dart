@@ -158,7 +158,7 @@ class SideBar extends StatelessWidget {
               // ),
               Divider(),
               ListTile(
-                onTap: () => support(),
+                onTap: support,
                 title: Text(
                   cat[0],
                   style: TextStyle(color: appColor[800], fontSize: 16),
@@ -203,9 +203,7 @@ class SideBar extends StatelessWidget {
   }
 
   support() async {
-    Uri url = Uri.parse("https://axia.global/");
-    (await canLaunchUrl(url))
-        ? await launchUrl(url, mode: LaunchMode.externalApplication)
-        : CommonWidgets.snackBar("Cannot open the support link");
+    String url = "https://axia.global/";
+    CommonWidgets.launch(url);
   }
 }

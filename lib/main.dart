@@ -22,8 +22,8 @@ initServices() async {
   WalletData walletData = Get.put(WalletData());
   await GetStorage.init();
   StorageService.instance.init();
-  var mnemonics = StorageService.instance.readMnemonicSeed();
-  print('mnemonics are $mnemonics');
+  // var mnemonics = StorageService.instance.readMnemonicSeed();
+  // print('mnemonics are $mnemonics');
   // services.initSubstrateSDK();
   // StorageService.instance.clearTokens();
   // earn opinion sketch humble turn unaware keep defy what clay tip tribe

@@ -59,7 +59,8 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                 },
               );
             },
-            child: OnboardWidgets.wordItem(item, i + 1, showIndex: isSelected ? true : false)));
+            child: OnboardWidgets.wordItem(item, i + 1,
+                showIndex: isSelected ? true : false)));
       }
       return Container(
         child: Wrap(
@@ -84,12 +85,14 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
               ),
               TextFormField(
                 controller: nameController,
-                validator: (val) => val == "" ? "Please enter a name for the wallet" : null,
+                validator: (val) =>
+                    val == "" ? "Please enter a name for the wallet" : null,
                 maxLength: 20,
                 autovalidateMode: AutovalidateMode.always,
                 decoration: InputDecoration(
                   hintText: "Name",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
                 ),
                 onChanged: (val) => setState(() {}),
               ),
@@ -114,7 +117,8 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     OnboardWidgets.titleAlt("Verify Recovery phrase"),
-                    OnboardWidgets.subtitle("Tap the words to put them next to each other in the correct order"),
+                    OnboardWidgets.subtitle(
+                        "Tap the words to put them next to each other in the correct order"),
                     // code(),
                     // actions(),
                     SizedBox(

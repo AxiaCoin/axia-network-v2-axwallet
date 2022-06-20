@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
@@ -12,8 +13,8 @@ import 'package:wallet/code/storage.dart';
 import 'package:web3dart/web3dart.dart';
 
 class AXIACoin implements Currency {
-  final rpcURLTest = "https://rpc.archive.canary.axiacoin.network";
-  final rpcURLMain = "https://rpc.archive.canary.axiacoin.network";
+  final rpcURLTest = "http://18.222.205.99:9650/ext/bc/C/rpc";// "https://rpc-v2.test.axiacoin.network";
+  final rpcURLMain = "http://18.222.205.99:9650/ext/bc/C/rpc";// "https://rpc-v2.test.axiacoin.network";
 
   @override
   CoinData coinData = CoinData(
@@ -32,6 +33,8 @@ class AXIACoin implements Currency {
     WalletData walletData = Get.find();
     coinslib.HDWallet hdWallet = walletData.hdWallet!.value;
     var wallet = hdWallet.derivePath("m/44'/${60}'/0'/0/0");
+    // var asd = walletKey.currentState.appService.store.account.newAccount.;
+    // print(asd);
     var ethWallet =
         EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
     // var client = Web3Client(rpcURL, Client());

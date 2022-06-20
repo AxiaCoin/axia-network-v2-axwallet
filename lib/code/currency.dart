@@ -1,4 +1,5 @@
 import 'package:wallet/code/models.dart';
+import 'package:flutter/material.dart';
 
 abstract class Currency {
   CoinData coinData = CoinData.dummyCoin(0);

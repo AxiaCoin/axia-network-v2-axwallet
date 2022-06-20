@@ -38,12 +38,12 @@ class _VerificationPageState extends State<VerificationPage> {
   _verifyCode({required String code}) async {
     if (!widget.resetPassword) {
       var response = await APIServices().userVerify(
-        phoneNumber: widget.phoneNumber != null
-            ? widget.phoneNumber!.parseNumber()
-            : null,
+        email: widget.email != null ? widget.email : "",
+        phoneNumber:
+            widget.phoneNumber != null ? widget.phoneNumber!.parseNumber() : "",
         phoneCode: widget.phoneNumber != null
             ? widget.phoneNumber!.dialCode!.substring(1)
-            : null,
+            : "",
         otp: code,
       );
       if (response["success"]) {
@@ -59,17 +59,21 @@ class _VerificationPageState extends State<VerificationPage> {
       }
     } else {
       var response = await APIServices().verifyforgotPasswordOtp(
+          email: widget.email != null ? widget.email : "",
           phoneNumber: widget.phoneNumber != null
               ? widget.phoneNumber!.parseNumber()
-              : null,
+              : "",
           phoneCode: widget.phoneNumber != null
               ? widget.phoneNumber!.dialCode!.substring(1)
-              : null,
+              : "",
           otp: code);
       if (response["success"]) {
-        StorageService.instance.updateAuthToken(response["data"]["authToken"]);
+        String authToken = response["data"]["authToken"];
+        Get.off(() => ChangePassword(
+              resetPassword: true,
+              authToken: authToken,
+            ));
         CommonWidgets.snackBar("OTP Verified successfully", duration: 3);
-        Get.off(() => ChangePassword(resetPassword: true));
       } else {
         setState(() {
           submitting = false;
@@ -77,6 +81,10 @@ class _VerificationPageState extends State<VerificationPage> {
         CommonWidgets.snackBar("Incorrect code entered");
       }
     }
+    setState(() {
+      submitting = false;
+      controller.clear();
+    });
   }
 
   _sendCode() async {
@@ -88,6 +96,9 @@ class _VerificationPageState extends State<VerificationPage> {
   void initState() {
     super.initState();
     _sendCode();
+    // print(widget.email);
+    // print(widget.phoneNumber?.parseNumber());
+    // print(widget.phoneNumber?.dialCode!.substring(1));
   }
 
   @override
@@ -138,7 +149,10 @@ class _VerificationPageState extends State<VerificationPage> {
                     ),
                     onChanged: (val) {
                       if (controller.text.length == 6) {
-                        submitting = true;
+                        if (submitting) return;
+                        setState(() {
+                          submitting = true;
+                        });
                         _verifyCode(code: controller.text);
                       } else {
                         submitting = false;
@@ -155,19 +169,23 @@ class _VerificationPageState extends State<VerificationPage> {
                       onTap: () async {
                         if (widget.resetPassword) {
                           await APIServices().forgotPasswordOtp(
-                            email: widget.email,
-                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            email: widget.email != null ? widget.email : "",
+                            phoneNumber: widget.phoneNumber != null
+                                ? widget.phoneNumber!.parseNumber()
+                                : "",
                             phoneCode: widget.phoneNumber != null
-                                ? widget.phoneNumber?.dialCode!.substring(1)
-                                : null,
+                                ? widget.phoneNumber!.dialCode!.substring(1)
+                                : "",
                           );
                         } else {
                           await APIServices().sendVerifyOTP(
-                            email: widget.email,
-                            phoneNumber: widget.phoneNumber?.parseNumber(),
+                            email: widget.email != null ? widget.email : "",
+                            phoneNumber: widget.phoneNumber != null
+                                ? widget.phoneNumber!.parseNumber()
+                                : "",
                             phoneCode: widget.phoneNumber != null
-                                ? widget.phoneNumber?.dialCode!.substring(1)
-                                : null,
+                                ? widget.phoneNumber!.dialCode!.substring(1)
+                                : "",
                           );
                         }
 
