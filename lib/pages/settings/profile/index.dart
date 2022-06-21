@@ -1,3 +1,8 @@
+// import 'package:app/service/index.dart';
+// import 'package:app/utils/i18n/index.dart';
+// import 'package:axiawallet_sdk/utils/i18n.dart';
+// import 'package:biometric_storage/biometric_storage.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
@@ -7,7 +12,7 @@ import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/settings/profile/change_name.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
-import 'package:wallet/pages/new_user/login.dart';
+// import 'package:axiawallet_ui/components/passwordInputDialog.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
 
@@ -26,6 +31,9 @@ class ProfilePageState extends State<ProfilePage> {
   bool isLoading = true;
   var localAuth = LocalAuthentication();
   bool canCheckBiometrics = false;
+  // bool _supportBiometric = false; // if device support biometric
+  // bool _isBiometricAuthorized = false; // if user authorized biometric usage
+  // BiometricStorageFile _authStorage;
 
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
@@ -33,7 +41,8 @@ class ProfilePageState extends State<ProfilePage> {
   }
 
   void toggleBiometrics(bool value) async {
-    bool success = await localAuth.authenticate(localizedReason: "Please authenticate to toggle", biometricOnly: true);
+    bool success = await localAuth.authenticate(
+        localizedReason: "Please authenticate to toggle");
     if (success) StorageService.instance.updateBiometricPreference(value);
     setState(() {});
   }
@@ -97,7 +106,8 @@ class ProfilePageState extends State<ProfilePage> {
                     CommonWidgets.profileItem(
                       context,
                       key: "Name: ",
-                      value: "${userModel.firstName} ${userModel.lastName}",
+                      value:
+                          "${userModel.firstName} ${userModel.lastName ?? ""}",
                       onPressed: () {
                         Get.to(() => ChangeUserProfile(
                                   firstName: firstName,
@@ -118,7 +128,8 @@ class ProfilePageState extends State<ProfilePage> {
                         : CommonWidgets.profileItem(
                             context,
                             key: "Phone number: ",
-                            value: "+${userModel.phoneCode}${userModel.phoneNumber}",
+                            value:
+                                "+${userModel.phoneCode}${userModel.phoneNumber}",
                           ),
                     // SizedBox(
                     //   height: 8,

@@ -36,9 +36,9 @@ class _SendPageState extends State<SendPage> {
     if (result.contains(":")) {
       var data = result.split("/").last.split("?amount=");
       address = data.first;
-      amount = data.last;
+      amount = data.length > 1 ? data.last : null;
       recipientController.text = address;
-      amountController.text = amount;
+      if (amount != null) amountController.text = amount;
     } else {
       recipientController.text = result;
     }
@@ -49,6 +49,7 @@ class _SendPageState extends State<SendPage> {
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
         CommonWidgets.waitDialog(text: "Sending tokens");
+        await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Transaction started");
           var response = await currency.sendTransaction(
@@ -68,8 +69,9 @@ class _SendPageState extends State<SendPage> {
           }
         } catch (e) {
           print("caugt error");
+          Get.back();
           print(e);
-          // CommonWidgets.snackBar(e.toString(), duration: 5);
+          CommonWidgets.snackBar(e.toString(), duration: 5);
         }
       } else {
         CommonWidgets.snackBar("Failed to authenticate transaction, try again",
@@ -115,8 +117,9 @@ class _SendPageState extends State<SendPage> {
           children: [
             IconButton(
                 onPressed: () {
-                  Get.to(() => QRScanPage())!
-                      .then((value) => updateFields(value));
+                  Get.to(() => QRScanPage())!.then((value) {
+                    if (value != null) updateFields(value);
+                  });
                 },
                 icon: SvgPicture.asset(
                   "assets/icons/qr.svg",

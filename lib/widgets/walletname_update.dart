@@ -16,6 +16,7 @@ class WalletNameUpdate extends StatefulWidget {
 }
 
 class _WalletNameUpdateState extends State<WalletNameUpdate> {
+  final formKey = GlobalKey<FormState>();
   TextEditingController wnameController = TextEditingController();
   bool isvalid = false;
   @override
@@ -26,60 +27,69 @@ class _WalletNameUpdateState extends State<WalletNameUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                  child: Text(
-                "Wallet Name Update",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-              )),
-              IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(
-                    Icons.close_rounded,
-                    size: 32,
-                  )),
-            ],
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          TextFormField(
-            controller: wnameController,
-            validator: (val) => val == "" ? "Please enter a new name for the wallet" : null,
-            maxLength: 20,
-            autovalidateMode: AutovalidateMode.always,
-            decoration: InputDecoration(
-              labelText: "Wallet Name",
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+    return Form(
+      key: formKey,
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: Text(
+                  "Wallet Name Update",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                )),
+                IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 32,
+                    )),
+              ],
             ),
-            onChanged: (val) => setState(() {
-              isvalid = true;
-            }),
-          ),
-          Container(
-            width: Get.width,
-            padding: EdgeInsets.only(top: 16),
-            child: ElevatedButton(
-                style: MyButtonStyles.statefulStyle(isvalid), onPressed: onupdate, child: Text("UPDATE")),
-          ),
-        ],
+            SizedBox(
+              height: 16,
+            ),
+            TextFormField(
+              controller: wnameController,
+              validator: (val) =>
+                  val == "" ? "Please enter a new name for the wallet" : null,
+              maxLength: 20,
+              autovalidateMode: AutovalidateMode.always,
+              decoration: InputDecoration(
+                labelText: "Wallet Name",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+              ),
+              onChanged: (val) => setState(() {
+                isvalid = true;
+              }),
+            ),
+            Container(
+              width: Get.width,
+              padding: EdgeInsets.only(top: 16),
+              child: ElevatedButton(
+                  style: MyButtonStyles.statefulStyle(isvalid),
+                  onPressed: onupdate,
+                  child: Text("UPDATE")),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void onupdate() async {
-    StorageService.instance.updateWalletName(wnameController.text);
-    setState(() {});
-    Get.back();
-    CommonWidgets.snackBar("Wallet Name Successfully Updated!");
+    if (formKey.currentState!.validate()) {
+      StorageService.instance.updateWalletName(wnameController.text);
+      setState(() {});
+      Get.back();
+      CommonWidgets.snackBar("Wallet Name Successfully Updated!");
+    }
   }
 }

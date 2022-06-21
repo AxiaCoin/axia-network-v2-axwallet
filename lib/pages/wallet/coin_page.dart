@@ -235,6 +235,10 @@ class _CoinPageState extends State<CoinPage> {
                                 if (success ?? false) {
                                   isRefreshing = true;
                                   refreshData();
+                                  await Future.delayed(
+                                      Duration(milliseconds: 200));
+                                  CommonWidgets.snackBar(
+                                      "Transferred Successfully");
                                 }
                               },
                               whiteBG: true),

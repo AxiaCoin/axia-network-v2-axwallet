@@ -85,7 +85,8 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OnboardWidgets.titleAlt("Your Recovery phrase"),
-              OnboardWidgets.subtitle("Write down or copy these words in the right order and save them somewhere safe"),
+              OnboardWidgets.subtitle(
+                  "Write down or copy these words in the right order and save them somewhere safe"),
               code(),
               actions(),
               Spacer(),

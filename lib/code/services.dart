@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
-import 'package:substrate_sdk/substrate_sdk.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -40,10 +39,10 @@ class Services {
   Map<String, HDWalletInfo> hdWallets = {};
   Timer? timer;
 
-  SubstrateSDK substrateSDK = SubstrateSDK();
+  // SubstrateSDK substrateSDK = SubstrateSDK();
 
   initSubstrateSDK() async {
-    if (substrateSDK.api == null) await substrateSDK.init();
+    // if (substrateSDK.api == null) await substrateSDK.init();
   }
 
   // generateAXIAMnemonic() async {
@@ -141,7 +140,7 @@ class Services {
     }
 
     if (timer != null) {
-      timer!.cancel();
+      timer?.cancel();
       print("timer cancelled");
     }
     update();
@@ -175,7 +174,7 @@ class Services {
     var response =
         await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
     if (response["success"]) {
-      timer!.cancel();
+      timer?.cancel();
       StorageService.instance
         ..clearTokens()
         ..init();

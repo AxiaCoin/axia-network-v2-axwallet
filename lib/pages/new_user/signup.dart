@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
@@ -33,6 +34,7 @@ class _SignupPageState extends State<SignupPage> {
   PhoneNumber phoneNumber = PhoneNumber();
   Mode mode = Mode.phone;
   bool obscurity = true;
+  bool obscurity2 = true;
   bool submitting = false;
 
   onSubmit() async {
@@ -182,7 +184,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             TextFormField(
               focusNode: confirmPasswordFocus,
-              obscureText: obscurity,
+              obscureText: obscurity2,
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
@@ -226,6 +228,9 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "Last Name",
                 border: OutlineInputBorder(),
               ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+              ],
               maxLength: 20,
             ),
             SizedBox(

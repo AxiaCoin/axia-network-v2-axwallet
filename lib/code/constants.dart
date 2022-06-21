@@ -7,18 +7,43 @@ import 'package:wallet/currencies/sub_axiacoin.dart';
 import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/currencies/ethereum.dart';
 
-MaterialColor appColor = MaterialColor(0xff178FE1, {
-  50: Color(0xFFE3F2FD),
-  100: Color(0xFFBBDEFB),
-  200: Color(0xFF90CAF9),
-  300: Color(0xFF64B5F6),
-  400: Color(0xFF42A5F5),
-  500: Color(0xff178FE1),
-  600: Color(0xFF007CBD),
-  700: Color(0xFF1976D2),
-  800: Color(0xFF1565C0),
-  900: Color(0xFF0D47A1),
-});
+Map<int, Color> getSwatch(Color color) {
+  final hslColor = HSLColor.fromColor(color);
+  final lightness = hslColor.lightness;
+  final lowDivisor = 6;
+  final highDivisor = 5;
+
+  final lowStep = (1.0 - lightness) / lowDivisor;
+  final highStep = lightness / highDivisor;
+
+  return {
+    50: (hslColor.withLightness(lightness + (lowStep * 5))).toColor(),
+    100: (hslColor.withLightness(lightness + (lowStep * 4))).toColor(),
+    200: (hslColor.withLightness(lightness + (lowStep * 3))).toColor(),
+    300: (hslColor.withLightness(lightness + (lowStep * 2))).toColor(),
+    400: (hslColor.withLightness(lightness + lowStep)).toColor(),
+    500: (hslColor.withLightness(lightness)).toColor(),
+    600: (hslColor.withLightness(lightness - highStep)).toColor(),
+    700: (hslColor.withLightness(lightness - (highStep * 2))).toColor(),
+    800: (hslColor.withLightness(lightness - (highStep * 3))).toColor(),
+    900: (hslColor.withLightness(lightness - (highStep * 4))).toColor(),
+  };
+}
+
+MaterialColor appColor =
+    MaterialColor(Color(0xff178fe1).value, getSwatch(Color(0xff178fe1)));
+// MaterialColor appColor = MaterialColor(0xff178FE1, {
+//   50: Color(0xFFE3F2FD),
+//   100: Color(0xFFBBDEFB),
+//   200: Color(0xFF90CAF9),
+//   300: Color(0xFF64B5F6),
+//   400: Color(0xFF42A5F5),
+//   500: Color(0xff178FE1),
+//   600: Color(0xFF007CBD),
+//   700: Color(0xFF1976D2),
+//   800: Color(0xFF1565C0),
+//   900: Color(0xFF0D47A1),
+// });
 Color tickerRed = Color(0xffF12F2F);
 Color tickerGreen = Color(0xff35B994);
 
@@ -43,7 +68,8 @@ ThemeData lightTheme = ThemeData(
 );
 ThemeData darkTheme = lightTheme.copyWith(
   brightness: Brightness.dark,
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.black38),
+  bottomNavigationBarTheme:
+      BottomNavigationBarThemeData(backgroundColor: Colors.black38),
 );
 
 class MyButtonStyles {
@@ -67,16 +93,17 @@ class MyButtonStyles {
         ),
         backgroundColor: enabled ? appColor : Colors.grey[100],
         primary: enabled ? Colors.white : Colors.black12,
-        splashFactory: enabled ? InkRipple.splashFactory : NoSplash.splashFactory,
+        splashFactory:
+            enabled ? InkRipple.splashFactory : NoSplash.splashFactory,
       );
 }
 
 // bool isTestNet = true;
 List<String> substrateNetworks = ["AXC"];
 List<Currency> currencyList = [
+  AXIACoin(),
   Bitcoin(),
   Ethereum(),
-  AXIACoin(),
 ];
 
 String encKey = "keyForEncryptingMnemonic";

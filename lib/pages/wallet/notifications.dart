@@ -47,10 +47,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
       child: ListView.builder(
           itemCount: item.length,
           itemBuilder: (context, index) {
-        return Container(
-          child: item[index],
-        );
-      }),
+            return Container(
+              child: item[index],
+            );
+          }),
     );
   }
 
@@ -62,20 +62,21 @@ class _NotificationsPageState extends State<NotificationsPage> {
           Container(
             height: Get.width * 0.25,
             width: Get.width * 0.25,
-            child: FittedBox(
-
-                child: FlutterLogo()
-            ),
+            child: FittedBox(child: FlutterLogo()),
           ),
-          SizedBox(height: 16,),
+          SizedBox(
+            height: 16,
+          ),
           HomeWidgets.emptyListText("Notifications will appear here"),
           // SizedBox(height: 8,),
-          TextButton(onPressed: () async {
-            setState(() {
-              isLoading = true;
-            });
-            refreshData();
-          }, child: Text("Refresh"))
+          TextButton(
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                refreshData();
+              },
+              child: Text("Refresh"))
         ],
       ),
     );
@@ -97,7 +98,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
         body: Container(
           // padding: EdgeInsets.all(8),
           alignment: Alignment.center,
-          child: isLoading ? CircularProgressIndicator.adaptive() : data.isEmpty ? emptyList() : notificationsList(data),
+          child: isLoading
+              ? CircularProgressIndicator.adaptive()
+              : data.isEmpty
+                  ? emptyList()
+                  : notificationsList(data),
         ));
   }
 }

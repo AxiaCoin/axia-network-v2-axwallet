@@ -68,9 +68,12 @@ class _VerificationPageState extends State<VerificationPage> {
               : "",
           otp: code);
       if (response["success"]) {
-        StorageService.instance.updateAuthToken(response["data"]["authToken"]);
+        String authToken = response["data"]["authToken"];
+        Get.off(() => ChangePassword(
+              resetPassword: true,
+              authToken: authToken,
+            ));
         CommonWidgets.snackBar("OTP Verified successfully", duration: 3);
-        Get.off(() => ChangePassword(resetPassword: true));
       } else {
         setState(() {
           submitting = false;
@@ -78,6 +81,10 @@ class _VerificationPageState extends State<VerificationPage> {
         CommonWidgets.snackBar("Incorrect code entered");
       }
     }
+    setState(() {
+      submitting = false;
+      controller.clear();
+    });
   }
 
   _sendCode() async {
@@ -142,7 +149,10 @@ class _VerificationPageState extends State<VerificationPage> {
                     ),
                     onChanged: (val) {
                       if (controller.text.length == 6) {
-                        submitting = true;
+                        if (submitting) return;
+                        setState(() {
+                          submitting = true;
+                        });
                         _verifyCode(code: controller.text);
                       } else {
                         submitting = false;

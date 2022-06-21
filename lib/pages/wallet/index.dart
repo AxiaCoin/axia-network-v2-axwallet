@@ -18,13 +18,17 @@ import 'package:wallet/widgets/sidebar.dart';
 import 'package:wallet/widgets/walletname_update.dart';
 
 class WalletPage extends StatefulWidget {
-  const WalletPage({Key? key}) : super(key: key);
+  WalletPage({Key? key}) : super(key: newWalletKey);
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
 
-class _WalletPageState extends State<WalletPage> {
+final newWalletKey = GlobalKey<_WalletPageState>();
+
+class _WalletPageState extends State<WalletPage>
+    with AutomaticKeepAliveClientMixin {
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   int slidingIndex = 0;
   PageController pageController = PageController(keepPage: false);
   List<Widget> pages = [TokensPage(), FinancePage(), CollectiblesPage()];
@@ -80,7 +84,9 @@ class _WalletPageState extends State<WalletPage> {
               Radius.circular(20),
             ),
             gradient: LinearGradient(
-                colors: [appColor[600]!, appColor], begin: Alignment.centerLeft, end: Alignment.centerRight),
+                colors: [appColor[600]!, appColor],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight),
           ),
           child: Container(
               padding: EdgeInsets.only(
@@ -119,7 +125,8 @@ class _WalletPageState extends State<WalletPage> {
                       ),
                       IconButton(
                           onPressed: () async {
-                            await CommonWidgets.bottomSheet(WalletNameUpdate(wname: walletData.name.value));
+                            await CommonWidgets.bottomSheet(
+                                WalletNameUpdate(wname: walletData.name.value));
                             setState(() {});
                           },
                           icon: Icon(
@@ -135,7 +142,10 @@ class _WalletPageState extends State<WalletPage> {
                   Obx(
                     () => Text(
                       "\$${balanceData.totalBalance.toStringAsFixed(2)}",
-                      style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -168,7 +178,8 @@ class _WalletPageState extends State<WalletPage> {
                           onPressed: () {
                             pushNewScreen(
                               context,
-                              screen: SearchPage(searchMode: SearchMode.receive),
+                              screen:
+                                  SearchPage(searchMode: SearchMode.receive),
                             );
                           }),
                       SizedBox(
@@ -209,6 +220,7 @@ class _WalletPageState extends State<WalletPage> {
         );
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: appBar(),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
@@ -295,12 +307,16 @@ class _WalletPageState extends State<WalletPage> {
                   }
                   return Obx(
                     () => HomeWidgets.coinTile(
-                      balance: FormatText.roundOff((balanceData.data![currency])!) + " $unit",
+                      balance:
+                          FormatText.roundOff((balanceData.data![currency]!)) +
+                              " $unit",
                       name: name,
                       rate: rate,
                       ticker: ticker,
                       unit: unit,
-                      value: "\$" + (item.rate * balanceData.data![currency]!).toStringAsFixed(2),
+                      value: "\$" +
+                          (item.rate * balanceData.data![currency]!)
+                              .toStringAsFixed(2),
                       onTap: () => pushNewScreen(
                         context,
                         screen: CoinPage(
@@ -376,6 +392,10 @@ class _WalletPageState extends State<WalletPage> {
   @override
   void dispose() {
     pageController.dispose();
+    print("why");
     super.dispose();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

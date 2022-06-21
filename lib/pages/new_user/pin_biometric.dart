@@ -41,7 +41,8 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
       if (useBiometric && canCheckBiometrics) {
         try {
           bool success = await localAuth.authenticate(
-              localizedReason: "Please authenticate to continue to wallet", biometricOnly: false);
+            localizedReason: "Please authenticate to continue to wallet",
+          );
           if (success) {
             finishInitialization();
           } else {
@@ -138,8 +139,10 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                           width: Get.width * 0.9,
                           child: SwitchListTile.adaptive(
                             value: useBiometric,
-                            onChanged: (val) => setState(() => useBiometric = val),
-                            title: Text("Enable FaceID/Fingerprint for even easier access"),
+                            onChanged: (val) =>
+                                setState(() => useBiometric = val),
+                            title: Text(
+                                "Enable FaceID/Fingerprint for even easier access"),
                           ),
                         )
                       : Container(),

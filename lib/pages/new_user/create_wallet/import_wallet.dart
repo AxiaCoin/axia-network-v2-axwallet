@@ -17,11 +17,12 @@ class ImportWalletPage extends StatefulWidget {
 }
 
 class _ImportWalletPageState extends State<ImportWalletPage> {
-  var nameController = new TextEditingController(text: kDebugMode ? "Wallet 1" : "");
+  var nameController =
+      new TextEditingController(text: kDebugMode ? "Wallet 1" : "");
   var phraseController = new TextEditingController();
   var isValid = false;
 
-  updateFields(String? value) {
+  updateFields(String value) {
     if (value != null) {
       setState(() {
         phraseController.text = value;
@@ -42,7 +43,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
           IconButton(
             icon: Icon(Icons.qr_code_scanner),
             onPressed: () {
-              Get.to(() => QRScanPage())!.then((value) => updateFields(value));
+              // Get.to(() => QRScanPage()).then((value) => updateFields(value));
             },
           )
         ],
@@ -70,19 +71,24 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                     ),
                     TextFormField(
                       controller: nameController,
-                      validator: (val) => val == "" ? "Please enter a name for the wallet" : null,
+                      validator: (val) => val == ""
+                          ? "Please enter a name for the wallet"
+                          : null,
                       maxLength: 20,
                       autovalidateMode: AutovalidateMode.always,
                       decoration: InputDecoration(
                         hintText: "Name",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
                       ),
                       onChanged: (val) => setState(() {}),
                     ),
                     SizedBox(
                       height: 16,
                     ),
-                    Align(alignment: Alignment.centerLeft, child: Text("Phrase")),
+                    Align(
+                        alignment: Alignment.centerLeft, child: Text("Phrase")),
                     SizedBox(
                       height: 8,
                     ),
@@ -91,7 +97,9 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       decoration: InputDecoration(
                         hintText: "Phrase",
                         alignLabelWithHint: true,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
                       ),
                       onChanged: (val) => setState(() {}),
                       minLines: 4,
@@ -102,7 +110,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       child: TextButton(
                         child: Text("Paste"),
                         onPressed: () async {
-                          ClipboardData? data = await Clipboard.getData('text/plain');
+                          ClipboardData? data =
+                              await Clipboard.getData('text/plain');
                           setState(
                             () {
                               phraseController.text = data!.text!;
@@ -111,7 +120,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         },
                       ),
                     ),
-                    OnboardWidgets.subtitle("Typically 12 (sometimes 24) words separated by single spaces"),
+                    OnboardWidgets.subtitle(
+                        "Typically 12 (sometimes 24) words separated by single spaces"),
                     // Spacer(),
                   ],
                 ),

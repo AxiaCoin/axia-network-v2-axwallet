@@ -50,7 +50,9 @@ class _NetworkSwitcherState extends State<NetworkSwitcher> {
               height: 20,
               margin: EdgeInsets.only(right: 4),
               decoration: BoxDecoration(
-                color: StorageService.instance.isTestNet ? Colors.amber : tickerGreen,
+                color: StorageService.instance.isTestNet
+                    ? Colors.amber
+                    : tickerGreen,
                 shape: BoxShape.circle,
               ),
             ),
