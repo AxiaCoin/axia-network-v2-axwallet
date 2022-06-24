@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/currencies/axiacoin.dart';
-import 'package:wallet/currencies/sub_axiacoin.dart';
 import 'package:wallet/currencies/bitcoin.dart';
 import 'package:wallet/currencies/ethereum.dart';
 

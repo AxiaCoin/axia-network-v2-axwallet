@@ -4,6 +4,8 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/pages/cross_chain/index.dart';
+import 'package:wallet/pages/earn/delegate.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
 
@@ -22,26 +24,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final BalanceData balanceCont = Get.find();
   SettingsState settingsState = Get.find();
   WalletData walletData = Get.find();
-
   int pageIndex = 0;
 
-  List<Widget> pages = [WalletPage(), ProfilePage()];
+  List<Widget> pages = [
+    WalletPage(),
+    DelegatePage(),
+    CrossChainPage(),
+    ProfilePage(),
+  ];
+
   List<PersistentBottomNavBarItem> bottomNavBarItems = [
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.shield),
+        icon: Icon(Icons.wallet),
         title: "Wallet",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
-    // PersistentBottomNavBarItem(
-    //     icon: Icon(Icons.apps),
-    //     title: "DApps",
-    //     activeColorPrimary: appColor,
-    //     inactiveColorPrimary: Colors.grey),
-    // PersistentBottomNavBarItem(
-    //     icon: Icon(Icons.swap_horiz),
-    //     title: "DEX",
-    //     activeColorPrimary: appColor,
-    //     inactiveColorPrimary: Colors.grey),
+    PersistentBottomNavBarItem(
+        icon: Icon(Icons.shield),
+        title: "Delegate",
+        activeColorPrimary: appColor,
+        inactiveColorPrimary: Colors.grey),
+    PersistentBottomNavBarItem(
+        icon: Icon(Icons.swap_horiz),
+        title: "Cross Chain",
+        activeColorPrimary: appColor,
+        inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
         icon: Icon(Icons.account_circle),
         title: "Profile",

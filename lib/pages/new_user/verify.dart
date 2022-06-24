@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';

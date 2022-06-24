@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:wallet/code/constants.dart';
-import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/pages/search.dart';
-import 'package:wallet/pages/webview.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
-import 'package:wallet/widgets/network_switcher.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({Key? key}) : super(key: key);
