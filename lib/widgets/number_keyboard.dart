@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wallet/code/constants.dart';
 
 class NumberKeyboard extends StatefulWidget {
   final TextEditingController controller;
@@ -145,12 +146,13 @@ class _NumberKeyboardState extends State<NumberKeyboard> {
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // widget.showClose
-        //     ? Icon(
-        //         Icons.cancel,
-        //         color: appColor,
-        //       )
-        //     : Container(),
+        widget.showClose
+            ? Icon(
+                Icons.cancel,
+                size: 28,
+                color: appColor,
+              )
+            : Container(),
         Container(
           // color: Colors.white,
           height: Get.height * widget.viewFraction,

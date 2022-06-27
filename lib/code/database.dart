@@ -1,5 +1,6 @@
 import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
@@ -80,5 +81,18 @@ class User extends GetxController {
 
   updateUser(UserModel user) {
     userModel.value = user;
+  }
+}
+
+class AXCWalletData extends GetxController {
+  var wallet = AXCWallet().obs;
+  var balance = AXCBalance().obs;
+
+  updateWallet(AXCWallet data) {
+    wallet.value = data;
+  }
+
+  updateBalance(AXCBalance data) {
+    balance.value = data;
   }
 }

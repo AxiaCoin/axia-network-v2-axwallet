@@ -2,6 +2,9 @@
 
 import 'dart:math';
 
+import 'package:wallet/code/constants.dart';
+import 'package:intl/intl.dart';
+
 class FormatText {
   FormatText._();
 
@@ -44,5 +47,38 @@ class FormatText {
     return input.substring(0, pad) +
         '...' +
         input.substring(input.length - pad);
+  }
+
+  static String commaNumber(String value) {
+    var f = NumberFormat("###,###.#", "en_US");
+    return f.format(double.parse(value));
+  }
+
+  static String stakeAmount(String value) {
+    double div = (int.parse(value) / pow(10, denomination));
+    return commaNumber(roundOff(div, maxDecimals: 0));
+  }
+
+  static String remainingTime(int time) {
+    // String formatSingle(int value) =>
+
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(time);
+    DateTime now = DateTime.now();
+    Duration remaining = dateTime.difference(now);
+    int years = (remaining.inDays / 365).floor();
+    int months = (remaining.inDays / 30).floor();
+    int days = remaining.inDays;
+    if (years > 0) {
+      return "in ${years == 1 ? "a year" : "$years years"}";
+    } else if (months > 0) {
+      return "in ${months == 1 ? "a month" : "$months months"}";
+    } else if (days > 0) {
+      return "in ${days == 1 ? "a day" : "$days days"}";
+    } else {
+      return "in a day";
+    }
+    // if (remaining.inDays > 365) {
+    //   return "in ${remaining.inDays} year(s)";
+    // } else if (remaining.inDays > 365)
   }
 }

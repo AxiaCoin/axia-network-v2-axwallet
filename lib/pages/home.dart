@@ -28,8 +28,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   List<Widget> pages = [
     WalletPage(),
-    DelegatePage(),
     CrossChainPage(),
+    DelegatePage(),
     ProfilePage(),
   ];
 
@@ -40,13 +40,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.shield),
-        title: "Delegate",
+        icon: Icon(Icons.swap_horiz),
+        title: "Cross Chain",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.swap_horiz),
-        title: "Cross Chain",
+        icon: Icon(Icons.shield),
+        title: "Delegate",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     Services().loadUser();
     services.updateBalances();
+    // services.getAXCWalletDetails();
   }
 
   @override

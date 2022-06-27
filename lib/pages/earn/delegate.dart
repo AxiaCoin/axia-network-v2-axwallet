@@ -1,5 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:searchable_listview/searchable_listview.dart';
+import 'package:wallet/Crypto_Models/validator.dart';
+import 'package:wallet/code/services.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/onboard_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
+import 'package:wallet/widgets/validator_tile.dart';
 
 class DelegatePage extends StatefulWidget {
   const DelegatePage({Key? key}) : super(key: key);
@@ -10,6 +20,8 @@ class DelegatePage extends StatefulWidget {
 
 class _DelegatePageState extends State<DelegatePage> {
   TextEditingController controller = new TextEditingController();
+  List<ValidatorItem> validators = [];
+  bool isLoading = false;
   List<List<String>> data = [
     [
       "NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5",
@@ -53,50 +65,57 @@ class _DelegatePageState extends State<DelegatePage> {
     ],
   ];
 
+  getValidators() async {
+    setState(() => isLoading = true);
+    var response = (await services.axSDK.api!.nomination
+        .getValidators())["validators"] as List;
+    print("response is $response");
+    validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
+    validators
+        .sort((a, b) => b.delegators.length.compareTo(a.delegators.length));
+    setState(() => isLoading = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getValidators();
+  }
+
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
           title: Text("Delegate"),
           centerTitle: true,
-          leading: CommonWidgets.backButton(context),
+          // leading: CommonWidgets.backButton(context),
         );
 
-    Widget searchbar() => Column(
-          children: [
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Select a node to delegate:",
-                  style: TextStyle(fontSize: 14),
+    Widget searchbar() => Container(
+          margin: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x4040401A),
+                spreadRadius: 0,
+                blurRadius: 16,
+              ),
+            ],
+            color: Colors.white,
+          ),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.black12,
+                ),
+                hintText: "Search Node",
+                hintStyle: TextStyle(
+                  color: Colors.black12,
                 )),
-            Container(
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x4040401A),
-                    spreadRadius: 0,
-                    blurRadius: 16,
-                  ),
-                ],
-                color: Colors.white,
-              ),
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.black12,
-                    ),
-                    hintText: "Search Node ID",
-                    hintStyle: TextStyle(
-                      color: Colors.black12,
-                    )),
-              ),
-            ),
-          ],
+          ),
         );
 
     Widget button() => TextButton(onPressed: () {}, child: Text("Select"));
@@ -211,12 +230,64 @@ class _DelegatePageState extends State<DelegatePage> {
       },
       child: Scaffold(
         appBar: appBar(),
+        // floatingActionButton: FloatingActionButton(
+        //   child: Icon(Icons.add),
+        //   onPressed: () async {
+        //     var wallet = await services.axSDK.api!.basic.getWallet();
+        //     print(wallet);
+        //     var balance = await services.axSDK.api!.basic.getBalance();
+        //     print(balance);
+        //   },
+        // ),
         body: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [searchbar(), dataTable()],
-          ),
-        ),
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: validators.isEmpty
+                ? Center(child: Spinner())
+                : SearchableList<ValidatorItem>(
+                    initialList: validators,
+                    builder: (validator) {
+                      return ValidatorTile(validator: validator);
+                    },
+                    emptyWidget:
+                        OnboardWidgets.neverShare(text: "No nodes found"),
+                    filter: (value) => validators
+                        .where((element) => element.nodeID
+                            .toLowerCase()
+                            .contains(value.toLowerCase()))
+                        .toList(),
+                    inputDecoration: InputDecoration(
+                        border: InputBorder.none,
+                        // prefixIcon: Icon(
+                        //   Icons.search,
+                        //   color: Colors.black12,
+                        // ),
+                        hintText: "Search Node",
+                        hintStyle: TextStyle(
+                          color: Colors.black12,
+                        )),
+                  )
+            // child: Column(
+            //   children: [
+            //     searchbar(),
+            //     validators.isEmpty
+            //         ? Spinner()
+            //         : Expanded(
+            //             child: RefreshIndicator(
+            //               onRefresh: () async {
+            //                 await getValidators();
+            //               },
+            //               child: ListView.builder(
+            //                   shrinkWrap: true,
+            //                   itemCount: validators.length,
+            //                   itemBuilder: ((context, index) {
+            //                     var item = validators[index];
+            //                     return ValidatorTile(validator: item);
+            //                   })),
+            //             ),
+            //           ),
+            //   ],
+            // ),
+            ),
       ),
     );
   }

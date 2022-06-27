@@ -27,6 +27,7 @@ class _NetworkSwitcherState extends State<NetworkSwitcher> {
     // CommonWidgets.waitDialog(text: "Network Switching");
     // Future.delayed(Duration(seconds: 3), () => Restart.restartApp());
     services.updateBalances();
+    services.getAXCWalletDetails();
     // print("end");
     widget.onChanged(value);
     setState(() {});

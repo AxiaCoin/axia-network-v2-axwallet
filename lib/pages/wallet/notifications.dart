@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -99,7 +100,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           // padding: EdgeInsets.all(8),
           alignment: Alignment.center,
           child: isLoading
-              ? CircularProgressIndicator.adaptive()
+              ? Spinner()
               : data.isEmpty
                   ? emptyList()
                   : notificationsList(data),

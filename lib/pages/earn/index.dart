@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/pages/earn/delegate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
-import 'package:wallet/pages/earn/validate.dart';
+import 'package:wallet/pages/earn/confirm_delegate.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class EarnPage extends StatefulWidget {
@@ -82,7 +82,7 @@ class _EarnPageState extends State<EarnPage> {
                   "Validate",
                   "You have an Avalanche node that you want to stake with.",
                   Icons.people,
-                  () => Get.to(() => ValidatePage())),
+                  () => null),
               SizedBox(height: 8),
               earntiles(
                   "Delegate",

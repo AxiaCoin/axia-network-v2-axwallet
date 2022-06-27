@@ -5,6 +5,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class ChangeUserProfile extends StatefulWidget {
   final String? firstName;
@@ -153,7 +154,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                   ),
                   submitting
                       ? Center(
-                          child: CircularProgressIndicator(),
+                          child: Spinner(),
                         )
                       : SizedBox(
                           width: Get.width,

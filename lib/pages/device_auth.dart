@@ -61,7 +61,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
     if (isSettingUp) {
       String pubKey = StorageService.instance.readCurrentPubKey()!;
       CommonWidgets.waitDialog();
-      services.initMCWallet(pubKey);
+      await services.initMCWallet(pubKey);
       Get.offAll(() => HomePage());
     } else {
       Get.back(result: true);

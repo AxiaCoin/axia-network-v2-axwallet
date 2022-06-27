@@ -15,6 +15,7 @@ import 'package:wallet/pages/wallet/tokens.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/sidebar.dart';
+import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/walletname_update.dart';
 
 class WalletPage extends StatefulWidget {
@@ -287,7 +288,7 @@ class _WalletPageState extends State<WalletPage>
                     return Center(
                         child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator.adaptive(),
+                      child: Spinner(),
                     ));
                   }
                   Currency currency = list.selected![index];

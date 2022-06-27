@@ -13,6 +13,7 @@ import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 // import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class LoginPage extends StatefulWidget {
@@ -293,7 +294,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             submitting
                                 ? Center(
-                                    child: CircularProgressIndicator(),
+                                    child: Spinner(),
                                   )
                                 : Container(
                                     width: Get.width,

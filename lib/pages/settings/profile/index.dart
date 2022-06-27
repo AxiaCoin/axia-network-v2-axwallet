@@ -229,7 +229,7 @@ class ProfilePageState extends State<ProfilePage> {
                     //         ),
                     //       )
                     //     : SizedBox.shrink(),
-                    // CircularProgressIndicator(),
+                    // Spinner(),
                   ],
                 ),
               ),

@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  axwallet_sdk:
+    dependency: "direct overridden"
+    description:
+      path: "../axwallet_sdk"
+      relative: true
+    source: path
+    version: "0.1.0"
   bip32:
     dependency: "direct main"
     description:
@@ -709,6 +716,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  searchable_listview:
+    dependency: "direct main"
+    description:
+      name: searchable_listview
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.6.0"
   share_plus:
     dependency: "direct main"
     description:
@@ -805,13 +819,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  substrate_sdk:
-    dependency: "direct overridden"
-    description:
-      path: "../substrate_sdk"
-      relative: true
-    source: path
-    version: "0.0.1"
   term_glyph:
     dependency: transitive
     description:
@@ -826,6 +833,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.9"
+  time_picker_widget:
+    dependency: "direct main"
+    description:
+      name: time_picker_widget
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+10"
   typed_data:
     dependency: transitive
     description:

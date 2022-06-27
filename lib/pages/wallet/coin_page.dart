@@ -12,6 +12,7 @@ import 'package:wallet/pages/send.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/transactions.dart';
 
 class CoinPage extends StatefulWidget {
@@ -329,15 +330,14 @@ class _CoinPageState extends State<CoinPage> {
                           return Center(
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator.adaptive(),
+                              child: Spinner(),
                             ),
                           );
                         } else if (transactions.isEmpty) return emptyList();
                         if (index == transactions.length &&
                             transactions.isNotEmpty &&
                             total != transactions.length) {
-                          return Center(
-                              child: CircularProgressIndicator.adaptive());
+                          return Center(child: Spinner());
                         }
                         TransactionItem item = transactions[index];
                         bool isSent = (item.isInput != null)

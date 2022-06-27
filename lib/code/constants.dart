@@ -45,6 +45,7 @@ MaterialColor appColor =
 // });
 Color tickerRed = Color(0xffF12F2F);
 Color tickerGreen = Color(0xff35B994);
+Color appGrey = Colors.grey[50]!;
 
 ThemeData lightTheme = ThemeData(
   fontFamily: "MADETommySoft",
@@ -108,6 +109,7 @@ List<Currency> currencyList = [
 String encKey = "keyForEncryptingMnemonic";
 String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";
 const ipAddress = "http://13.235.53.197:3000/";
+const denomination = 9;
 String network = StorageService.instance.isTestNet ? "TESTNET" : "MAINNET";
 // int satoshi = 100000000;
 // int wei = 1000000000000000000;

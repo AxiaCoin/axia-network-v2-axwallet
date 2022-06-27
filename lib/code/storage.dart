@@ -168,6 +168,7 @@ class StorageService {
     box.remove("authToken");
     box.remove("sessionID");
     box.remove("pubKey");
+    box.remove("seeds");
     box.remove("pin");
     box.remove("defaultWallets");
     box.remove("substrateWallets");
@@ -202,15 +203,14 @@ class StorageService {
   dynamic readMnemonicSeed({String? pubKey}) {
     var seeds = box.read("seeds");
     if (seeds == null) return null;
-    if (pubKey == null) {
-      var data = {};
-      seeds.forEach((key, value) {
-        var decryptedSeed = encrypter.decrypt16(value, iv: iv);
-        var decryptedPubKey = encrypter.decrypt16(key, iv: iv);
-        data[decryptedPubKey] = HDWalletInfo.fromJson(decryptedSeed);
-      });
-      return data;
-    }
-    return HDWalletInfo.fromJson(encrypter.decrypt16(seeds[pubKey], iv: iv));
+    // if (pubKey == null) {
+    var data = {};
+    seeds.forEach((key, value) {
+      var decryptedSeed = encrypter.decrypt16(value, iv: iv);
+      var decryptedPubKey = encrypter.decrypt16(key, iv: iv);
+      data[decryptedPubKey] = HDWalletInfo.fromJson(decryptedSeed);
+    });
+    if (pubKey != null) return data[pubKey];
+    return data;
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class CommonWidgets {
   CommonWidgets._();
@@ -29,7 +30,7 @@ class CommonWidgets {
         child: AlertDialog(
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [CircularProgressIndicator.adaptive(), Text(text)],
+            children: [Spinner(), Text(text)],
           ),
         ),
       ),

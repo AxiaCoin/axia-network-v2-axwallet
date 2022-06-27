@@ -8,6 +8,7 @@ import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class VerificationPage extends StatefulWidget {
   final String? email;
@@ -199,9 +200,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   SizedBox(
                     height: 16,
                   ),
-                  submitting
-                      ? Center(child: CircularProgressIndicator())
-                      : Container()
+                  submitting ? Center(child: Spinner()) : Container()
                 ],
               ),
             ),
