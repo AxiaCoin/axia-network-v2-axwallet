@@ -163,10 +163,7 @@ class _ReceivePageState extends State<ReceivePage> {
                             child: TextFormField(
                               controller: amountController,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d*\.?\d*$'))
-                              ],
+                              inputFormatters: InputFormatters.amountFilter(),
                               decoration: InputDecoration(
                                 hintText: "0.1",
                                 border: OutlineInputBorder(

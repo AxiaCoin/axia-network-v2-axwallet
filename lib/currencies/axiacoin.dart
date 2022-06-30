@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
@@ -94,6 +95,7 @@ class AXIACoin implements Currency {
     // var bal = (await client.getBalance(ethWallet.address)).getInEther.toDouble();
     // print(bal);
     // return bal;
+    if (kDebugMode) return 0;
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
     // print(amount);

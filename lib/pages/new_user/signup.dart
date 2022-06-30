@@ -7,6 +7,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
@@ -229,9 +230,7 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "Last Name",
                 border: OutlineInputBorder(),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-              ],
+              inputFormatters: InputFormatters.wordsAndSpacesFilter(),
               maxLength: 20,
             ),
             SizedBox(

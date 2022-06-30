@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -23,7 +24,14 @@ initServices() async {
   Get.put(SettingsState());
   Get.put(WalletData());
   Get.put(AXCWalletData());
-  await GetStorage.init();
+  await Future.wait(
+    [
+      GetStorage.init(),
+      GetStorage.init(CustomCacheManager.key),
+    ],
+  );
+  // CustomCacheManager.instance.box.erase();
+
   StorageService.instance.init();
   // await services.initAXSDK(jsOnly: true);
   initAXCSDK();

@@ -4,9 +4,9 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
-import 'package:wallet/pages/cross_chain/index.dart';
-import 'package:wallet/pages/earn/delegate.dart';
+import 'package:wallet/pages/earn/index.dart';
 import 'package:wallet/pages/settings/profile/index.dart';
+import 'package:wallet/pages/transfers/index.dart';
 import 'package:wallet/pages/wallet/index.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,8 +28,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   List<Widget> pages = [
     WalletPage(),
-    CrossChainPage(),
-    DelegatePage(),
+    EarnPage(),
+    TransferPage(),
     ProfilePage(),
   ];
 
@@ -40,13 +40,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.swap_horiz),
-        title: "Cross Chain",
+        icon: Icon(Icons.trending_up),
+        title: "Earn",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
-        icon: Icon(Icons.shield),
-        title: "Delegate",
+        icon: Icon(Icons.send_to_mobile),
+        title: "Transfer",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(

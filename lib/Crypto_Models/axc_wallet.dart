@@ -1,13 +1,23 @@
 import 'dart:convert';
 
+enum Chain {
+  Swap, // X
+  Core, // P
+  AX, // C
+}
+
 class AXCWallet {
   String? X;
   String? P;
   String? C;
+  List<String>? allX;
+  List<String>? allP;
   AXCWallet({
     this.X,
     this.P,
     this.C,
+    this.allX,
+    this.allP,
   });
 
   Map<String, dynamic> toMap() {
@@ -15,6 +25,8 @@ class AXCWallet {
       'X': X,
       'P': P,
       'C': C,
+      'allX': allX,
+      'allP': allP,
     };
   }
 
@@ -23,6 +35,8 @@ class AXCWallet {
       X: map['X'],
       P: map['P'],
       C: map['C'],
+      allX: List<String>.from(map['allX']),
+      allP: List<String>.from(map['allP']),
     );
   }
 
@@ -36,10 +50,12 @@ class AXCBalance {
   String? X;
   String? P;
   String? C;
+  String? staked;
   AXCBalance({
     this.X,
     this.P,
     this.C,
+    this.staked,
   });
 
   Map<String, dynamic> toMap() {
@@ -47,6 +63,7 @@ class AXCBalance {
       'X': X,
       'P': P,
       'C': C,
+      'staked': staked,
     };
   }
 
@@ -55,6 +72,7 @@ class AXCBalance {
       X: map['X'],
       P: map['P'],
       C: map['C'],
+      staked: map['staked'],
     );
   }
 

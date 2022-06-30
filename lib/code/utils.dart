@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:intl/intl.dart';
 
@@ -16,7 +17,7 @@ class FormatText {
     return formatted;
   }
 
-  static String roundOff(double input, {int maxDecimals = 8}) {
+  static String roundOff(double input, {int maxDecimals = 9}) {
     var regex = RegExp(r"([.]*0+)(?!.*\d)");
     String text = input.toString();
     if (maxDecimals != 0) text = input.toStringAsFixed(maxDecimals);
@@ -80,5 +81,33 @@ class FormatText {
     // if (remaining.inDays > 365) {
     //   return "in ${remaining.inDays} year(s)";
     // } else if (remaining.inDays > 365)
+  }
+
+  static String readableDate(DateTime time) {
+    return DateFormat.yMMMMd().addPattern(",", "").add_jm().format(time);
+  }
+}
+
+class InputFormatters {
+  InputFormatters._();
+
+  static List<TextInputFormatter> amountFilter() {
+    return [
+      FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+      TextInputFormatter.withFunction((oldValue, newValue) {
+        try {
+          final text = newValue.text;
+          if (text.isNotEmpty) double.parse(text);
+          return newValue;
+        } catch (e) {}
+        return oldValue;
+      }),
+    ];
+  }
+
+  static List<TextInputFormatter> wordsAndSpacesFilter() {
+    return [
+      FilteringTextInputFormatter.allow(RegExp('[a-zA-Z ]')),
+    ];
   }
 }

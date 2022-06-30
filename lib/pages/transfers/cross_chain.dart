@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
@@ -12,8 +11,8 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/widgets/common.dart';
-import 'package:wallet/widgets/number_keyboard.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
+import 'package:wallet/widgets/plugin_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 
 class CrossChainPage extends StatefulWidget {
@@ -25,26 +24,19 @@ class CrossChainPage extends StatefulWidget {
   State<CrossChainPage> createState() => _CrossChainPageState();
 }
 
-enum Chain {
-  X,
-  P,
-  C,
-}
-
 class _CrossChainPageState extends State<CrossChainPage> {
   final formKey = GlobalKey<FormState>();
   var api = services.axSDK.api!;
   TextEditingController amountController = new TextEditingController();
   late Currency currency;
   FocusNode amountFocus = new FocusNode();
-  bool numPadVisibility = false;
   bool autoValidate = false;
   final BalanceData balanceData = Get.find();
   final AXCWalletData axcWalletData = Get.find();
   // String sourceController = "X Chain";
   // String destController = "P Chain";
-  Chain source = Chain.X;
-  Chain dest = Chain.P;
+  Chain source = Chain.Swap;
+  Chain dest = Chain.Core;
   double cExFee = 0.001;
   double cImFee = 0.001;
   late Map<Chain, double> exportFees;
@@ -52,9 +44,9 @@ class _CrossChainPageState extends State<CrossChainPage> {
   late Map<Chain, String?> balances;
   List<DropdownMenuItem<Chain>> get dropdownItems {
     List<DropdownMenuItem<Chain>> menuItems = [
-      DropdownMenuItem(child: Text("X Chain"), value: Chain.X),
-      DropdownMenuItem(child: Text("P Chain"), value: Chain.P),
-      DropdownMenuItem(child: Text("C Chain"), value: Chain.C),
+      DropdownMenuItem(child: Text("Swap-Chain"), value: Chain.Swap),
+      DropdownMenuItem(child: Text("Core-Chain"), value: Chain.Core),
+      DropdownMenuItem(child: Text("AX-Chain"), value: Chain.AX),
     ];
     return menuItems;
   }
@@ -72,9 +64,9 @@ class _CrossChainPageState extends State<CrossChainPage> {
   double? getSourceBalance() {
     var balances = axcWalletData.balance.value;
     if (balances.X == null) return null;
-    double bal = double.parse(source == Chain.X
+    double bal = double.parse(source == Chain.Swap
         ? balances.X!
-        : source == Chain.P
+        : source == Chain.Core
             ? balances.P!
             : balances.C!);
     return bal;
@@ -135,8 +127,8 @@ class _CrossChainPageState extends State<CrossChainPage> {
     print(data[0].runtimeType);
     cExFee = double.parse(data[0]);
     cImFee = double.parse(data[1]);
-    exportFees = {Chain.X: 0.001, Chain.P: 0.001, Chain.C: cExFee};
-    importFees = {Chain.X: 0.001, Chain.P: 0.001, Chain.C: cImFee};
+    exportFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cExFee};
+    importFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cImFee};
     setState(() {});
   }
 
@@ -144,10 +136,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
   void initState() {
     super.initState();
     currency = AXIACoin();
-    exportFees = {Chain.X: 0.001, Chain.P: 0.001, Chain.C: cExFee};
-    importFees = {Chain.X: 0.001, Chain.P: 0.001, Chain.C: cImFee};
+    exportFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cExFee};
+    importFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cImFee};
     var bal = axcWalletData.balance.value;
-    balances = {Chain.X: bal.X, Chain.P: bal.P, Chain.C: bal.C};
+    balances = {Chain.Swap: bal.X, Chain.Core: bal.P, Chain.AX: bal.C};
     updateFees();
   }
 
@@ -156,6 +148,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
     AppBar appBar() => AppBar(
           title: Text("Cross Chain"),
           centerTitle: true,
+          leading: CommonWidgets.backButton(context),
         );
 
     Widget amountSuffixWidget() => Row(
@@ -164,9 +157,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
           children: [
             TextButton(
               onPressed: () {
-                // amountController.text =
-                //     FormatText.roundOff((balanceData.data![currency])!);
-                amountController.text = calculateMax().toString();
+                amountController.text = calculateMax()?.toString() ?? "";
               },
               child: Text("MAX"),
             ),
@@ -329,18 +320,20 @@ class _CrossChainPageState extends State<CrossChainPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text(source.name,
+                              style: TextStyle(
+                                  fontSize: 36, fontWeight: FontWeight.w400)),
                           Expanded(
-                            child: Text(source.name,
-                                style: TextStyle(
-                                    fontSize: 36, fontWeight: FontWeight.w400)),
-                          ),
-                          Text(
-                              source == Chain.X
+                            child: Text(
+                              source == Chain.Swap
                                   ? "Exchange Chain"
-                                  : source == Chain.P
+                                  : source == Chain.Core
                                       ? "Platform Chain"
                                       : "Contract Chain",
-                              style: TextStyle(fontSize: 16)),
+                              style: TextStyle(fontSize: 16),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -354,16 +347,12 @@ class _CrossChainPageState extends State<CrossChainPage> {
                         ),
                         Obx(
                           () => axcWalletData.balance.value.X == null
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Spinner(
-                                    alt: true,
-                                  ),
+                              ? Spinner(
+                                  alt: true,
                                 )
-                              : Text((source == Chain.X
+                              : Text((source == Chain.Swap
                                       ? axcWalletData.balance.value.X
-                                      : source == Chain.P
+                                      : source == Chain.Core
                                           ? axcWalletData.balance.value.P
                                           : axcWalletData.balance.value.C) ??
                                   "~"),
@@ -408,18 +397,20 @@ class _CrossChainPageState extends State<CrossChainPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text(dest.name,
+                              style: TextStyle(
+                                  fontSize: 36, fontWeight: FontWeight.w400)),
                           Expanded(
-                            child: Text(dest.name,
-                                style: TextStyle(
-                                    fontSize: 36, fontWeight: FontWeight.w400)),
-                          ),
-                          Text(
-                              dest == Chain.X
+                            child: Text(
+                              dest == Chain.Swap
                                   ? "Exchange Chain"
-                                  : dest == Chain.P
+                                  : dest == Chain.Core
                                       ? "Platform Chain"
                                       : "Contract Chain",
-                              style: TextStyle(fontSize: 16)),
+                              style: TextStyle(fontSize: 16),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -433,16 +424,12 @@ class _CrossChainPageState extends State<CrossChainPage> {
                         ),
                         Obx(
                           () => axcWalletData.balance.value.X == null
-                              ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Spinner(
-                                    alt: true,
-                                  ),
+                              ? Spinner(
+                                  alt: true,
                                 )
-                              : Text((dest == Chain.X
+                              : Text((dest == Chain.Swap
                                       ? axcWalletData.balance.value.X
-                                      : dest == Chain.P
+                                      : dest == Chain.Core
                                           ? axcWalletData.balance.value.P
                                           : axcWalletData.balance.value.C) ??
                                   "~"),
@@ -456,146 +443,112 @@ class _CrossChainPageState extends State<CrossChainPage> {
           ],
         );
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (numPadVisibility) {
-          setState(() {
-            numPadVisibility = false;
-          });
-          return false;
-        }
-        return true;
-      },
-      child: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
 
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-            numPadVisibility = false;
-          }
-        },
-        child: Form(
-          key: formKey,
-          child: Scaffold(
-            appBar: appBar(),
-            // floatingActionButton: FloatingActionButton(
-            //   child: Icon(Icons.add),
-            //   onPressed: () async {
-            //     services.test();
-            //   },
-            // ),
-            body: Container(
-              padding: EdgeInsets.all(16),
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height:
-                        numPadVisibility ? Get.height * 0.5 : Get.height * 1,
-                    child: ListView(
-                      children: [
-                        OnboardWidgets.neverShare(
-                            text:
-                                "Transfer tokens between Exchange (X) , Platform (P) and Contract (C) chains."),
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Source Chain")),
-                        SizedBox(height: 8),
-                        sourceWidget(),
-                        SizedBox(height: 8),
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Destination Chain")),
-                        SizedBox(height: 8),
-                        destWidget(),
-                        SizedBox(height: 8),
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Transfer Amount")),
-                        SizedBox(height: 8),
-                        Stack(
-                          alignment: Alignment.centerRight,
-                          children: [
-                            TextFormField(
-                              controller: amountController,
-                              focusNode: amountFocus,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d*\.?\d*$'))
-                              ],
-                              readOnly: true,
-                              showCursor: true,
-                              decoration: InputDecoration(
-                                hintText: "0.1",
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15))),
-                              ),
-                              validator: (val) => val != null &&
-                                      val.isNotEmpty &&
-                                      val != "." &&
-                                      double.parse(val) != 0 &&
-                                      (getSourceBalance() == null ||
-                                          double.parse(val) <
-                                              getSourceBalance()!)
-                                  ? null
-                                  : "Amount should be lower than the balance (including fees)\nand not zero",
-                              autovalidateMode: autoValidate
-                                  ? AutovalidateMode.onUserInteraction
-                                  : AutovalidateMode.disabled,
-                              onChanged: (_) {
-                                setState(() => autoValidate = true);
-                              },
-                              onTap: () {
-                                if (getSourceBalance() == null) {
-                                  CommonWidgets.snackBar(
-                                      "Wait for the wallet/balances to load before proceeding");
-                                  return;
-                                }
-                                if (!numPadVisibility)
-                                  setState(
-                                    () {
-                                      numPadVisibility = true;
-                                    },
-                                  );
-                              },
-                            ),
-                            amountSuffixWidget()
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        feeWidget(),
-                        SizedBox(height: 8),
-                        sourceDestContainer(),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          width: Get.width,
-                          child: TextButton(
-                              style: MyButtonStyles.onboardStyle,
-                              onPressed: () {
-                                transfer();
-                              },
-                              child: Text(
-                                "Transfer",
-                                style: TextStyle(color: Colors.white),
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Visibility(
-                      visible: numPadVisibility,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 0),
-                        child: NumberKeyboard(controller: amountController),
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Form(
+        key: formKey,
+        child: Scaffold(
+          appBar: appBar(),
+          // floatingActionButton: FloatingActionButton(
+          //   child: Icon(Icons.add),
+          //   onPressed: () async {
+          //     services.test();
+          //   },
+          // ),
+          body: Container(
+            padding: EdgeInsets.all(16),
+            child: ListView(
+              children: [
+                PluginWidgets.indexTitle(
+                    "Transfer tokens between Exchange (Swap), Platform (Core) and Contract (AX) chains."),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Source Chain",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    )),
+                SizedBox(height: 8),
+                sourceWidget(),
+                SizedBox(height: 8),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Destination Chain",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    )),
+                SizedBox(height: 8),
+                destWidget(),
+                SizedBox(height: 8),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Transfer Amount",
+                      style: Theme.of(context).textTheme.subtitle2,
+                    )),
+                SizedBox(height: 8),
+                Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    TextFormField(
+                      controller: amountController,
+                      focusNode: amountFocus,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: InputFormatters.amountFilter(),
+                      decoration: InputDecoration(
+                        hintText: "0.1",
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
                       ),
+                      validator: (val) => val != null &&
+                              val.isNotEmpty &&
+                              val != "." &&
+                              double.parse(val) != 0 &&
+                              (getSourceBalance() == null ||
+                                  double.parse(val) < getSourceBalance()!)
+                          ? null
+                          : "Amount should be lower than the balance (including fees)\nand not zero",
+                      autovalidateMode: autoValidate
+                          ? AutovalidateMode.onUserInteraction
+                          : AutovalidateMode.disabled,
+                      onChanged: (_) {
+                        setState(() => autoValidate = true);
+                      },
+                      onTap: () {
+                        if (getSourceBalance() == null) {
+                          CommonWidgets.snackBar(
+                              "Wait for the wallet/balances to load before proceeding");
+                          return;
+                        }
+                      },
                     ),
-                  )
-                ],
-              ),
+                    amountSuffixWidget()
+                  ],
+                ),
+                SizedBox(height: 8),
+                feeWidget(),
+                SizedBox(height: 8),
+                sourceDestContainer(),
+                SizedBox(height: 16),
+                SizedBox(
+                  width: Get.width,
+                  child: TextButton(
+                      style: MyButtonStyles.onboardStyle,
+                      onPressed: () {
+                        transfer();
+                      },
+                      child: Text(
+                        "Transfer",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                ),
+              ],
             ),
           ),
         ),

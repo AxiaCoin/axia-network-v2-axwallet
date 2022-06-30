@@ -6,6 +6,7 @@ import 'package:pinput/pin_put/pin_put.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/home.dart';
 import 'package:wallet/widgets/common.dart';
 
@@ -124,7 +125,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                       controller: controller,
                       pinAnimationType: PinAnimationType.slide,
                       obscureText: "*",
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: InputFormatters.amountFilter(),
                       submittedFieldDecoration: _pinPutDecoration.copyWith(
                         borderRadius: BorderRadius.circular(20.0),
                       ),

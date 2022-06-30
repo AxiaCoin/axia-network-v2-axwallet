@@ -16,7 +16,6 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/widgets/common.dart';
-import 'package:wallet/widgets/number_keyboard.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 
@@ -42,7 +41,6 @@ class _ValidatePageState extends State<ValidatePage> {
   final BalanceData balanceData = Get.find();
   final AXCWalletData axcWalletData = Get.find();
   FocusNode amountFocus = new FocusNode();
-  bool numPadVisibility = false;
   late Currency currency;
   late ValidatorItem validator;
   late DateTime selectedDate;
@@ -99,8 +97,9 @@ class _ValidatePageState extends State<ValidatePage> {
             Get.back();
             Get.back();
             services.getAXCWalletDetails();
-            CommonWidgets.snackBar("The node was successfully delegated",
-                duration: 5);
+            CommonWidgets.snackBar(
+                "The node was successfully delegated, check rewards page!",
+                duration: 7);
           } else {
             Get.back();
             CommonWidgets.snackBar(response, duration: 5);
@@ -184,10 +183,7 @@ class _ValidatePageState extends State<ValidatePage> {
         date = date.add(Duration(hours: time.hour, minutes: time.minute));
         setState(() {
           selectedDate = date!;
-          dateController.text = DateFormat.yMMMMd()
-              .addPattern(",", "")
-              .add_jm()
-              .format(selectedDate);
+          dateController.text = FormatText.readableDate(selectedDate);
         });
       }
     }
@@ -196,7 +192,7 @@ class _ValidatePageState extends State<ValidatePage> {
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
-          title: Text("Confirm Delegation"),
+          title: Text("Confirm Nomination"),
           centerTitle: true,
           leading: CommonWidgets.backButton(context),
         );
@@ -208,11 +204,7 @@ class _ValidatePageState extends State<ValidatePage> {
               controller: amountController,
               focusNode: amountFocus,
               keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))
-              ],
-              readOnly: true,
-              showCursor: true,
+              inputFormatters: InputFormatters.amountFilter(),
               decoration: InputDecoration(
                 hintText: "0.1",
                 border: OutlineInputBorder(
@@ -235,12 +227,6 @@ class _ValidatePageState extends State<ValidatePage> {
                       "Wait for the wallet/balances to load before proceeding");
                   return;
                 }
-                if (!numPadVisibility)
-                  setState(
-                    () {
-                      numPadVisibility = true;
-                    },
-                  );
               },
             ),
             Row(
@@ -282,189 +268,147 @@ class _ValidatePageState extends State<ValidatePage> {
         },
         items: dropdownItems);
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (numPadVisibility) {
-          setState(() {
-            numPadVisibility = false;
-          });
-          return false;
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
         }
-        return true;
       },
-      child: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
+      child: Form(
+        key: formKey,
+        child: Scaffold(
+          appBar: appBar(),
+          // floatingActionButton: FloatingActionButton(
+          //   child: Icon(Icons.add),
+          //   onPressed: () async {
+          //     print(addressController.text.isEmpty);
+          //   },
+          // ),
+          body: Container(
+            padding: EdgeInsets.all(16),
+            child: ListView(children: [
+              OnboardWidgets.neverShare(
+                  text:
+                      "If it is your first time staking, start small. Staked tokens are locked until the end of the staking period."),
 
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-            numPadVisibility = false;
-          }
-        },
-        child: Form(
-          key: formKey,
-          child: Scaffold(
-            appBar: appBar(),
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () async {
-                print(addressController.text.isEmpty);
-              },
-            ),
-            body: Container(
-              padding: EdgeInsets.all(16),
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height:
-                        numPadVisibility ? Get.height * 0.55 : Get.height * 1,
-                    child: ListView(children: [
-                      OnboardWidgets.neverShare(
-                          text:
-                              "If it is your first time staking, start small. Staked tokens are locked until the end of the staking period."),
-
-                      Text("Node ID",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500)),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: nodeIdController,
-                        keyboardType: TextInputType.text,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          hintText: "Node ID",
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                      ),
-                      SizedBox(height: 8),
-                      Text("Fee",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500)),
-                      // Text(
-                      //     "You will claim this % of the rewards from the delegators on your node."),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: feeController,
-                        keyboardType: TextInputType.text,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          hintText: "Fee",
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                      ),
-                      SizedBox(height: 8),
-                      Text("Staking End Date",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500)),
-                      Text("Your AXC tokens will be locked until this date."),
-                      Text(
-                        "(Start date will be 5 minutes from when you submit this form)",
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: dateController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          hintText: "Staking End Date",
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onTap: () => _selectDate(context),
-                      ),
-                      SizedBox(height: 8),
-                      Text("Stake Amount",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500)),
-                      Text("The amount of AXC to lock for staking."),
-                      SizedBox(height: 8),
-                      amountWidget(),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(top: 4),
-                          child: Obx(
-                            () => axcWalletData.balance.value.P == null
-                                ? Row(
-                                    children: [
-                                      Text(
-                                        "Balance: ",
-                                        style: context.textTheme.caption,
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: Spinner(
-                                          alt: true,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Text(
-                                    "Balance: ${getPBalance()} ${currency.coinData.unit}",
-                                    style: context.textTheme.caption,
-                                    textAlign: TextAlign.start,
-                                  ),
-                          )),
-                      SizedBox(height: 8),
-                      Text("Reward Address",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500)),
-                      Text("Where to send the staking rewards."),
-                      SizedBox(height: 8),
-                      rewardAddress(),
-                      SizedBox(height: isCustomVisible ? 8 : 0),
-                      isCustomVisible
-                          ? TextFormField(
-                              controller: addressController,
-                              keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
-                                hintText: "Reward Address",
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15))),
-                              ),
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                            )
-                          : SizedBox.shrink(),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        width: Get.width,
-                        child: TextButton(
-                            style: MyButtonStyles.onboardStyle,
-                            onPressed: onSubmit,
-                            child: Text(
-                              "Confirm",
-                              style: TextStyle(color: Colors.white),
-                            )),
-                      ),
-                    ]),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Visibility(
-                      visible: numPadVisibility,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 0),
-                        child: NumberKeyboard(
-                          controller: amountController,
-                          showClose: true,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+              Text("Node ID",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: nodeIdController,
+                keyboardType: TextInputType.text,
+                readOnly: true,
+                decoration: InputDecoration(
+                  hintText: "Node ID",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
               ),
-            ),
+              SizedBox(height: 8),
+              Text("Fee",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              // Text(
+              //     "You will claim this % of the rewards from the delegators on your node."),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: feeController,
+                keyboardType: TextInputType.text,
+                readOnly: true,
+                decoration: InputDecoration(
+                  hintText: "Fee",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+              SizedBox(height: 8),
+              Text("Staking End Date",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text("Your AXC tokens will be locked until this date."),
+              Text(
+                "(Start date will be 5 minutes from when you submit this form)",
+                style: Theme.of(context).textTheme.caption,
+              ),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: dateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  hintText: "Staking End Date",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onTap: () => _selectDate(context),
+              ),
+              SizedBox(height: 8),
+              Text("Stake Amount",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text("The amount of AXC to lock for staking."),
+              SizedBox(height: 8),
+              amountWidget(),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(top: 4),
+                  child: Obx(
+                    () => axcWalletData.balance.value.P == null
+                        ? Row(
+                            children: [
+                              Text(
+                                "Balance: ",
+                                style: context.textTheme.caption,
+                                textAlign: TextAlign.start,
+                              ),
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: Spinner(
+                                  alt: true,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            "Balance: ${getPBalance()} ${currency.coinData.unit}",
+                            style: context.textTheme.caption,
+                            textAlign: TextAlign.start,
+                          ),
+                  )),
+              SizedBox(height: 8),
+              Text("Reward Address",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text("Where to send the staking rewards."),
+              SizedBox(height: 8),
+              rewardAddress(),
+              SizedBox(height: isCustomVisible ? 8 : 0),
+              isCustomVisible
+                  ? TextFormField(
+                      controller: addressController,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        hintText: "Reward Address",
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                    )
+                  : SizedBox.shrink(),
+              SizedBox(height: 8),
+              SizedBox(
+                width: Get.width,
+                child: TextButton(
+                    style: MyButtonStyles.onboardStyle,
+                    onPressed: onSubmit,
+                    child: Text(
+                      "Confirm",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ),
+            ]),
           ),
         ),
       ),

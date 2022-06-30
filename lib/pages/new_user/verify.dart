@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
@@ -136,7 +137,7 @@ class _VerificationPageState extends State<VerificationPage> {
                     fieldsCount: 6,
                     autofocus: true,
                     controller: controller,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    inputFormatters: InputFormatters.amountFilter(),
                     submittedFieldDecoration: _pinPutDecoration.copyWith(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
