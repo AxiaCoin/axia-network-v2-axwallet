@@ -99,12 +99,14 @@ class _AddressCardState extends State<AddressCard> {
                 ),
               ),
               Expanded(
-                child: Text(
-                  axcWalletData.mappedWallet[chain] ?? "Fetching wallet",
-                  style: Theme.of(context)
-                      .textTheme
-                      .subtitle1!
-                      .copyWith(color: Colors.white),
+                child: Obx(
+                  () => Text(
+                    axcWalletData.mappedWallet[chain] ?? "Fetching wallet",
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle1!
+                        .copyWith(color: Colors.white),
+                  ),
                 ),
               )
             ],
