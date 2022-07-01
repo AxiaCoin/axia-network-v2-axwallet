@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Widget> pages = [
     WalletPage(),
     EarnPage(),
-    TransferPage(),
+    // TransferPage(),
     ProfilePage(),
   ];
 
@@ -41,14 +41,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
         icon: Icon(Icons.trending_up),
-        title: "Earn",
+        title: "AXC Hub",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
-    PersistentBottomNavBarItem(
-        icon: Icon(Icons.send_to_mobile),
-        title: "Transfer",
-        activeColorPrimary: appColor,
-        inactiveColorPrimary: Colors.grey),
+    // PersistentBottomNavBarItem(
+    //     icon: Icon(Icons.send_to_mobile),
+    //     title: "Transfer",
+    //     activeColorPrimary: appColor,
+    //     inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
         icon: Icon(Icons.account_circle),
         title: "Profile",

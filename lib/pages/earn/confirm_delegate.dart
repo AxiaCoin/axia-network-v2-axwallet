@@ -60,7 +60,7 @@ class _ValidatePageState extends State<ValidatePage> {
 
   double? getPBalance() {
     var balances = axcWalletData.balance.value;
-    return double.tryParse(balances.P ?? "asd");
+    return double.tryParse(balances.core ?? "asd");
   }
 
   incrementMinStartTime() {
@@ -354,7 +354,7 @@ class _ValidatePageState extends State<ValidatePage> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(top: 4),
                   child: Obx(
-                    () => axcWalletData.balance.value.P == null
+                    () => axcWalletData.balance.value.core == null
                         ? Row(
                             children: [
                               Text(

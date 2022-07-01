@@ -31,9 +31,9 @@ class _DelegatePageState extends State<DelegatePage> {
         .getValidators())["validators"] as List;
     validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
     validators
-        .sort((a, b) => b.delegators.length.compareTo(a.delegators.length));
+        .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
     CustomCacheManager.instance.cacheValidators(validators);
-    setState(() => isLoading = false);
+    if (mounted) setState(() => isLoading = false);
   }
 
   @override

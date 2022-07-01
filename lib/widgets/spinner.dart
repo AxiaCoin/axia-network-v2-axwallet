@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
 import 'package:wallet/code/constants.dart';
 
 class Spinner extends StatefulWidget {
   final Widget? child;
   final bool alt;
   final String? text;
+  final Color? color;
   const Spinner({
     Key? key,
     this.child,
     this.alt = false,
     this.text,
+    this.color,
   }) : super(key: key);
 
   @override
@@ -48,7 +51,7 @@ class _SpinnerState extends State<Spinner> with SingleTickerProviderStateMixin {
           child: widget.child ??
               SvgPicture.asset(
                 'assets/icons/loading' + (widget.alt ? '_alt' : '') + '.svg',
-                color: Theme.of(context).primaryColor,
+                color: widget.color ?? Theme.of(context).primaryColor,
               ),
         ),
         widget.text != null

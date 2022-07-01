@@ -88,11 +88,35 @@ class AXCWalletData extends GetxController {
   var wallet = AXCWallet().obs;
   var balance = AXCBalance().obs;
 
+  var mappedWallet = {
+    Chain.Swap: AXCWallet().swap,
+    Chain.Core: AXCWallet().core,
+    Chain.AX: AXCWallet().ax,
+  }.obs;
+  var mappedBalance = {
+    Chain.Swap: AXCBalance().swap,
+    Chain.Core: AXCBalance().core,
+    Chain.AX: AXCBalance().ax,
+    "staked": AXCBalance().staked,
+  }.obs;
+
   updateWallet(AXCWallet data) {
     wallet.value = data;
+    mappedWallet.value = {
+      Chain.Swap: data.swap,
+      Chain.Core: data.core,
+      Chain.AX: data.ax,
+    };
   }
 
   updateBalance(AXCBalance data) {
     balance.value = data;
+    mappedBalance.value.updateAll((key, value) => key == Chain.Swap
+        ? data.swap
+        : key == Chain.Core
+            ? data.core
+            : key == Chain.AX
+                ? data.ax
+                : data.staked);
   }
 }

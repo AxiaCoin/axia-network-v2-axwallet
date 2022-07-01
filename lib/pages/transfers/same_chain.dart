@@ -64,12 +64,12 @@ class _SameChainTransferState extends State<SameChainTransfer> {
 
   double? getSourceBalance() {
     var balances = axcWalletData.balance.value;
-    if (balances.X == null) return null;
+    if (balances.swap == null) return null;
     double bal = double.parse(source == Chain.Swap
-        ? balances.X!
+        ? balances.swap!
         : source == Chain.Core
-            ? balances.P!
-            : balances.C!);
+            ? balances.core!
+            : balances.ax!);
     return bal;
   }
 
@@ -96,9 +96,11 @@ class _SameChainTransferState extends State<SameChainTransfer> {
             print("success");
             Get.back();
             services.getAXCWalletDetails();
-            amountController.clear();
-            addressController.clear();
-            autoValidate = false;
+            setState(() {
+              amountController.clear();
+              addressController.clear();
+              autoValidate = false;
+            });
             CommonWidgets.snackBar("The transfer was successfull", duration: 5);
           } else {
             Get.back();
@@ -370,7 +372,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.only(bottom: 4),
                     child: Obx(
-                      () => axcWalletData.balance.value.P == null
+                      () => axcWalletData.balance.value.core == null
                           ? Row(
                               children: [
                                 Text(

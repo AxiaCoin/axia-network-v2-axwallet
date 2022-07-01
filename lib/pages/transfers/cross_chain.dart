@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
@@ -63,12 +64,12 @@ class _CrossChainPageState extends State<CrossChainPage> {
 
   double? getSourceBalance() {
     var balances = axcWalletData.balance.value;
-    if (balances.X == null) return null;
+    if (balances.swap == null) return null;
     double bal = double.parse(source == Chain.Swap
-        ? balances.X!
+        ? balances.swap!
         : source == Chain.Core
-            ? balances.P!
-            : balances.C!);
+            ? balances.core!
+            : balances.ax!);
     return bal;
   }
 
@@ -97,8 +98,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
             print("success");
             Get.back();
             services.getAXCWalletDetails();
-            amountController.clear();
-            autoValidate = false;
+            setState(() {
+              amountController.clear();
+              autoValidate = false;
+            });
             CommonWidgets.snackBar("The transfer was successfull", duration: 5);
           } else {
             Get.back();
@@ -139,7 +142,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
     exportFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cExFee};
     importFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cImFee};
     var bal = axcWalletData.balance.value;
-    balances = {Chain.Swap: bal.X, Chain.Core: bal.P, Chain.AX: bal.C};
+    balances = {Chain.Swap: bal.swap, Chain.Core: bal.core, Chain.AX: bal.ax};
     updateFees();
   }
 
@@ -340,22 +343,26 @@ class _CrossChainPageState extends State<CrossChainPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Text("Balance",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ),
+                        Text("Balance",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500)),
                         Obx(
-                          () => axcWalletData.balance.value.X == null
+                          () => axcWalletData.balance.value.swap == null
                               ? Spinner(
                                   alt: true,
                                 )
-                              : Text((source == Chain.Swap
-                                      ? axcWalletData.balance.value.X
-                                      : source == Chain.Core
-                                          ? axcWalletData.balance.value.P
-                                          : axcWalletData.balance.value.C) ??
-                                  "~"),
+                              : Flexible(
+                                  child: AutoSizeText(
+                                    FormatText.roundOff(double.parse((source ==
+                                            Chain.Swap
+                                        ? axcWalletData.balance.value.swap
+                                        : source == Chain.Core
+                                            ? axcWalletData.balance.value.core
+                                            : axcWalletData
+                                                .balance.value.ax)!)),
+                                    maxLines: 1,
+                                  ),
+                                ),
                         ),
                       ],
                     ),
@@ -417,22 +424,26 @@ class _CrossChainPageState extends State<CrossChainPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Text("Balance",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ),
+                        Text("Balance",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500)),
                         Obx(
-                          () => axcWalletData.balance.value.X == null
+                          () => axcWalletData.balance.value.swap == null
                               ? Spinner(
                                   alt: true,
                                 )
-                              : Text((dest == Chain.Swap
-                                      ? axcWalletData.balance.value.X
-                                      : dest == Chain.Core
-                                          ? axcWalletData.balance.value.P
-                                          : axcWalletData.balance.value.C) ??
-                                  "~"),
+                              : Flexible(
+                                  child: AutoSizeText(
+                                    FormatText.roundOff(double.parse((dest ==
+                                            Chain.Swap
+                                        ? axcWalletData.balance.value.swap
+                                        : dest == Chain.Core
+                                            ? axcWalletData.balance.value.core
+                                            : axcWalletData
+                                                .balance.value.ax)!)),
+                                    maxLines: 1,
+                                  ),
+                                ),
                         ),
                       ],
                     ),

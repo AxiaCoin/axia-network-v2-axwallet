@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:wallet/widgets/home_widgets.dart';
+
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class QRCreationPage extends StatelessWidget {
   final String qrData;
-  const QRCreationPage({Key? key, required this.qrData}) : super(key: key);
+  final bool isRecovery;
+  const QRCreationPage({
+    Key? key,
+    required this.qrData,
+    this.isRecovery = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +48,9 @@ class QRCreationPage extends StatelessWidget {
                       height: 16,
                     ),
                     Text(
-                      "This QR code contains your recovery phrase",
+                      isRecovery
+                          ? "This QR code contains your recovery phrase"
+                          : "Scan to receive coins",
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(
@@ -52,8 +61,21 @@ class QRCreationPage extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-              padding: EdgeInsets.all(32), child: OnboardWidgets.neverShare()),
+          isRecovery
+              ? Container(
+                  padding: EdgeInsets.all(32),
+                  child: OnboardWidgets.neverShare())
+              : Container(),
+          SizedBox(
+            width: Get.width * 0.3,
+            child: HomeWidgets.roundedButton(
+                onPressed: () => Get.back(),
+                icon: Icon(
+                  Icons.keyboard_arrow_left,
+                  color: Colors.white,
+                ),
+                label: "Go back"),
+          )
           // Spacer(),
         ],
       ),

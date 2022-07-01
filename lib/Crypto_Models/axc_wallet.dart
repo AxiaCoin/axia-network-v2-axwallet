@@ -7,36 +7,36 @@ enum Chain {
 }
 
 class AXCWallet {
-  String? X;
-  String? P;
-  String? C;
-  List<String>? allX;
-  List<String>? allP;
+  String? swap;
+  String? core;
+  String? ax;
+  List<String>? allSwap;
+  List<String>? allCore;
   AXCWallet({
-    this.X,
-    this.P,
-    this.C,
-    this.allX,
-    this.allP,
+    this.swap,
+    this.core,
+    this.ax,
+    this.allSwap,
+    this.allCore,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'X': X,
-      'P': P,
-      'C': C,
-      'allX': allX,
-      'allP': allP,
+      'swap': swap,
+      'core': core,
+      'ax': ax,
+      'allSwap': allSwap,
+      'allCore': allCore,
     };
   }
 
   factory AXCWallet.fromMap(Map<String, dynamic> map) {
     return AXCWallet(
-      X: map['X'],
-      P: map['P'],
-      C: map['C'],
-      allX: List<String>.from(map['allX']),
-      allP: List<String>.from(map['allP']),
+      swap: map['swap'],
+      core: map['core'],
+      ax: map['ax'],
+      allSwap: List<String>.from(map['allSwap']),
+      allCore: List<String>.from(map['allCore']),
     );
   }
 
@@ -47,32 +47,32 @@ class AXCWallet {
 }
 
 class AXCBalance {
-  String? X;
-  String? P;
-  String? C;
+  String? swap;
+  String? core;
+  String? ax;
   String? staked;
   AXCBalance({
-    this.X,
-    this.P,
-    this.C,
+    this.swap,
+    this.core,
+    this.ax,
     this.staked,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'X': X,
-      'P': P,
-      'C': C,
+      'swap': swap,
+      'core': core,
+      'ax': ax,
       'staked': staked,
     };
   }
 
   factory AXCBalance.fromMap(Map<String, dynamic> map) {
     return AXCBalance(
-      X: map['X'],
-      P: map['P'],
-      C: map['C'],
-      staked: map['staked'],
+      swap: map['swap'].replaceAll(",", ""),
+      core: map['core'].replaceAll(",", ""),
+      ax: map['ax'].replaceAll(",", ""),
+      staked: map['staked'].replaceAll(",", ""),
     );
   }
 

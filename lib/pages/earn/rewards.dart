@@ -23,7 +23,7 @@ class RewardsPage extends StatefulWidget {
 class _RewardsPageState extends State<RewardsPage> {
   AXCWalletData axcWalletData = Get.find();
   List<ValidatorItem> validators = [];
-  List<Delegator> rewards = [];
+  List<Nominator> rewards = [];
   bool isLoading = false;
   int totalR = 0;
 
@@ -33,7 +33,7 @@ class _RewardsPageState extends State<RewardsPage> {
         .getValidators())["validators"] as List;
     validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
     validators
-        .sort((a, b) => b.delegators.length.compareTo(a.delegators.length));
+        .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
     CustomCacheManager.instance.cacheValidators(validators);
     if (mounted) setState(() => isLoading = false);
   }
@@ -42,8 +42,8 @@ class _RewardsPageState extends State<RewardsPage> {
     rewards.clear();
     totalR = 0;
     validators.forEach((e) {
-      if (e.delegators.isEmpty) return;
-      var thisRewards = e.delegators.where((del) {
+      if (e.nominators.isEmpty) return;
+      var thisRewards = e.nominators.where((del) {
         List<String> rewardAddrs = del.rewardOwner.addresses;
         List filtered = rewardAddrs
             .where((element) => pAddresses.contains(element))
@@ -89,8 +89,7 @@ class _RewardsPageState extends State<RewardsPage> {
               SizedBox(
                 height: 16,
               ),
-              HomeWidgets.emptyListText(
-                  "You do not have any pending rewards. Start staking to earn more rewards!"),
+              HomeWidgets.emptyListText("You do not have any pending rewards"),
               // SizedBox(
               //   height: 16,
               // ),
@@ -120,12 +119,12 @@ class _RewardsPageState extends State<RewardsPage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Obx(() =>
-              (axcWalletData.wallet.value.allP == null || validators.isEmpty)
+              (axcWalletData.wallet.value.allCore == null || validators.isEmpty)
                   ? Spinner(
                       text: "Getting your rewards",
                     )
                   : FutureBuilder(
-                      future: getRewards(axcWalletData.wallet.value.allP!),
+                      future: getRewards(axcWalletData.wallet.value.allCore!),
                       builder: ((context, snapshot) {
                         return rewards.isEmpty
                             ? empty()

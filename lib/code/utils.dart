@@ -51,8 +51,11 @@ class FormatText {
   }
 
   static String commaNumber(String value) {
-    var f = NumberFormat("###,###.#", "en_US");
-    return f.format(double.parse(value));
+    var data = value.split(".");
+    bool isTrailing = data.length != 1 && double.parse(data.last) != 0;
+    if (isTrailing) value = data.first;
+    var f = NumberFormat("###,###.###", "en_US");
+    return f.format(double.parse(value)) + (isTrailing ? ".${data.last}" : "");
   }
 
   static String stakeAmount(String value) {

@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.5.1+18
+version: 1.5.2+19
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -54,6 +54,7 @@ dependencies:
   socket_io_client: ^1.0.2
   time_picker_widget: ^1.0.0+10
   searchable_listview: ^1.6.0
+  auto_size_text: ^3.0.0
   # axwallet_sdk:
   #   git: 
   #     url: https://github.com/ashishbeck-zeeve/axwallet_sdk.git
@@ -63,10 +64,24 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   
+  flutter_launcher_icons: ^0.9.0
+  flutter_native_splash: any
+  
 dependency_overrides:
   axwallet_sdk:
     path: ../axwallet_sdk/
 
+flutter_native_splash:
+  color: "#ffffff"
+  image: ../AXwallet_splash.png
+  ios: true
+  android: true
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icons/app_logo.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

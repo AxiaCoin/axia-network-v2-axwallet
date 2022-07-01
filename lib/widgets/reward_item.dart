@@ -8,7 +8,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/utils.dart';
 
 class RewardItem extends StatelessWidget {
-  final Delegator delegator;
+  final Nominator delegator;
   const RewardItem({
     Key? key,
     required this.delegator,

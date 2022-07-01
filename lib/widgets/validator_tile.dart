@@ -82,7 +82,7 @@ class ValidatorTile extends StatelessWidget {
                         "Stake", FormatText.stakeAmount(validator.stakeAmount)),
                     Spacer(),
                     iconItem(
-                        Icons.groups, validator.delegators.length.toString()),
+                        Icons.groups, validator.nominators.length.toString()),
                   ],
                 ),
                 Row(

@@ -9,7 +9,7 @@ class ValidatorItem {
   String endTime;
   String stakeAmount;
   String delegationFee;
-  List<Delegator> delegators;
+  List<Nominator> nominators;
   ValidatorItem({
     required this.txID,
     required this.nodeID,
@@ -17,7 +17,7 @@ class ValidatorItem {
     required this.endTime,
     required this.stakeAmount,
     required this.delegationFee,
-    required this.delegators,
+    required this.nominators,
   });
 
   ValidatorItem copyWith({
@@ -27,7 +27,7 @@ class ValidatorItem {
     String? endTime,
     String? stakeAmount,
     String? delegationFee,
-    List<Delegator>? delegators,
+    List<Nominator>? nominators,
   }) {
     return ValidatorItem(
       txID: txID ?? this.txID,
@@ -36,7 +36,7 @@ class ValidatorItem {
       endTime: endTime ?? this.endTime,
       stakeAmount: stakeAmount ?? this.stakeAmount,
       delegationFee: delegationFee ?? this.delegationFee,
-      delegators: delegators ?? this.delegators,
+      nominators: nominators ?? this.nominators,
     );
   }
 
@@ -48,7 +48,7 @@ class ValidatorItem {
       'endTime': endTime,
       'stakeAmount': stakeAmount,
       'delegationFee': delegationFee,
-      'delegators': delegators.map((x) => x.toMap()).toList(),
+      'nominators': nominators.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -60,10 +60,13 @@ class ValidatorItem {
       endTime: map['endTime'] ?? '',
       stakeAmount: map['stakeAmount'] ?? '',
       delegationFee: map['delegationFee'] ?? '',
-      delegators: map['delegators'] != null
-          ? List<Delegator>.from(
-              map['delegators']?.map((x) => Delegator.fromMap(x)))
-          : [],
+      nominators: map['nominators'] != null
+          ? List<Nominator>.from(
+              map['nominators']?.map((x) => Nominator.fromMap(x)))
+          : map['delegators'] != null
+              ? List<Nominator>.from(
+                  map['delegators']?.map((x) => Nominator.fromMap(x)))
+              : [],
     );
   }
 
@@ -74,7 +77,7 @@ class ValidatorItem {
 
   @override
   String toString() {
-    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, delegationFee: $delegationFee, delegators: $delegators)';
+    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, delegationFee: $delegationFee, nominators: $nominators)';
   }
 
   @override
@@ -88,7 +91,7 @@ class ValidatorItem {
         other.endTime == endTime &&
         other.stakeAmount == stakeAmount &&
         other.delegationFee == delegationFee &&
-        listEquals(other.delegators, delegators);
+        listEquals(other.nominators, nominators);
   }
 
   @override
@@ -99,11 +102,11 @@ class ValidatorItem {
         endTime.hashCode ^
         stakeAmount.hashCode ^
         delegationFee.hashCode ^
-        delegators.hashCode;
+        nominators.hashCode;
   }
 }
 
-class Delegator {
+class Nominator {
   String txID;
   String nodeID;
   String startTime;
@@ -111,7 +114,7 @@ class Delegator {
   String stakeAmount;
   String potentialReward;
   RewardOwner rewardOwner;
-  Delegator({
+  Nominator({
     required this.txID,
     required this.nodeID,
     required this.startTime,
@@ -121,7 +124,7 @@ class Delegator {
     required this.rewardOwner,
   });
 
-  Delegator copyWith({
+  Nominator copyWith({
     String? txID,
     String? nodeID,
     String? startTime,
@@ -130,7 +133,7 @@ class Delegator {
     String? potentialReward,
     RewardOwner? rewardOwner,
   }) {
-    return Delegator(
+    return Nominator(
       txID: txID ?? this.txID,
       nodeID: nodeID ?? this.nodeID,
       startTime: startTime ?? this.startTime,
@@ -153,8 +156,8 @@ class Delegator {
     };
   }
 
-  factory Delegator.fromMap(Map<String, dynamic> map) {
-    return Delegator(
+  factory Nominator.fromMap(Map<String, dynamic> map) {
+    return Nominator(
       txID: map['txID'] ?? '',
       nodeID: map['nodeID'] ?? '',
       startTime: map['startTime'] ?? '',
@@ -167,19 +170,19 @@ class Delegator {
 
   String toJson() => json.encode(toMap());
 
-  factory Delegator.fromJson(String source) =>
-      Delegator.fromMap(json.decode(source));
+  factory Nominator.fromJson(String source) =>
+      Nominator.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'Delegators(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, potentialReward: $potentialReward, rewardOwner: $rewardOwner)';
+    return 'Nominators(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, potentialReward: $potentialReward, rewardOwner: $rewardOwner)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Delegator &&
+    return other is Nominator &&
         other.txID == txID &&
         other.nodeID == nodeID &&
         other.startTime == startTime &&
