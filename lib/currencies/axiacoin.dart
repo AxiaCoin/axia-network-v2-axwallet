@@ -13,8 +13,10 @@ import 'package:wallet/code/storage.dart';
 import 'package:web3dart/web3dart.dart';
 
 class AXIACoin implements Currency {
-  final rpcURLTest = "http://18.222.205.99:9650/ext/bc/C/rpc";// "https://rpc-v2.test.axiacoin.network";
-  final rpcURLMain = "http://18.222.205.99:9650/ext/bc/C/rpc";// "https://rpc-v2.test.axiacoin.network";
+  final rpcURLTest =
+      "http://18.222.205.99:9650/ext/bc/C/rpc"; // "https://rpc-v2.test.axiacoin.network";
+  final rpcURLMain =
+      "http://18.222.205.99:9650/ext/bc/C/rpc"; // "https://rpc-v2.test.axiacoin.network";
 
   @override
   CoinData coinData = CoinData(
@@ -93,6 +95,7 @@ class AXIACoin implements Currency {
     // var bal = (await client.getBalance(ethWallet.address)).getInEther.toDouble();
     // print(bal);
     // return bal;
+    if (true) return 0;
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
     // print(amount);

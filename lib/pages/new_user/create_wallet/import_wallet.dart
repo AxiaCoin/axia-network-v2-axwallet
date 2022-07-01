@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
-import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
@@ -23,11 +22,9 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   var isValid = false;
 
   updateFields(String value) {
-    if (value != null) {
-      setState(() {
-        phraseController.text = value;
-      });
-    }
+    setState(() {
+      phraseController.text = value;
+    });
   }
 
   @override

@@ -9,7 +9,6 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/common.dart';
-import 'package:wallet/widgets/number_keyboard.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
 class SendPage extends StatefulWidget {
@@ -27,7 +26,6 @@ class _SendPageState extends State<SendPage> {
   TextEditingController amountController = new TextEditingController();
   bool isCurrencyMode = false;
   FocusNode amountFocus = new FocusNode();
-  bool numPadVisibility = false;
   final BalanceData balanceData = Get.find();
 
   updateFields(String result) {
@@ -173,171 +171,123 @@ class _SendPageState extends State<SendPage> {
           if (!currentFocus.hasPrimaryFocus) {
             currentFocus.unfocus();
           }
-          if (numPadVisibility)
-            setState(
-              () {
-                numPadVisibility = false;
-              },
-            );
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: appBar(),
-          body: Column(
-            children: [
-              Container(
-                height: numPadVisibility
-                    ? (Get.height * 0.6 - 10)
-                    : Get.height - 90,
-                padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-                child: SingleChildScrollView(
-                  child: Column(
+          body: Container(
+            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text("Recipient Address")),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Stack(
+                    alignment: Alignment.centerRight,
                     children: [
-                      Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Recipient Address")),
-                      SizedBox(
-                        height: 8,
+                      TextFormField(
+                        controller: recipientController,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (val) {
+                          amountFocus.requestFocus();
+                        },
+                        decoration: InputDecoration(
+                            hintText: FormatText.address(
+                                currency.getWallet().address,
+                                pad: 6),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15))),
+                            contentPadding: EdgeInsets.fromLTRB(
+                                18, 18, Get.width * 0.25, 18)),
+                        validator: (val) => val != null && val.isNotEmpty
+                            ? null
+                            : "Please enter an address",
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                       ),
-                      Stack(
-                        alignment: Alignment.centerRight,
-                        children: [
-                          TextFormField(
-                            controller: recipientController,
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (val) {
-                              amountFocus.requestFocus();
-                            },
-                            decoration: InputDecoration(
-                                hintText: FormatText.address(
-                                    currency.getWallet().address,
-                                    pad: 6),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15))),
-                                contentPadding: EdgeInsets.fromLTRB(
-                                    18, 18, Get.width * 0.25, 18)),
-                            validator: (val) => val != null && val.isNotEmpty
-                                ? null
-                                : "Please enter an address",
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            onTap: () {
-                              if (numPadVisibility)
-                                setState(
-                                  () {
-                                    numPadVisibility = false;
-                                  },
-                                );
-                            },
-                          ),
-                          recipientSuffixWidget()
-                        ],
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Amount " +
-                              "(" +
-                              (isCurrencyMode
-                                  ? "USD"
-                                  : currency.coinData.unit) +
-                              ")")),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Stack(
-                        alignment: Alignment.centerRight,
-                        children: [
-                          TextFormField(
-                            controller: amountController,
-                            focusNode: amountFocus,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d*$'))
-                            ],
-                            readOnly: true,
-                            showCursor: true,
-                            decoration: InputDecoration(
-                              hintText: "0.1",
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15))),
-                            ),
-                            validator: (val) => val != null &&
-                                    val.isNotEmpty &&
-                                    val != "." &&
-                                    double.parse(val) != 0 &&
-                                    double.parse(val) <
-                                        balanceData.data![currency]!
-                                ? null
-                                : "Amount should be lower than the balance (including fees)\nand not zero",
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            onTap: () {
-                              if (!numPadVisibility)
-                                setState(
-                                  () {
-                                    numPadVisibility = true;
-                                  },
-                                );
-                            },
-                          ),
-                          amountSuffixWidget()
-                        ],
-                      ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(top: 4),
-                          child: Obx(
-                            () => Text(
-                              "Balance: ${FormatText.roundOff((balanceData.data![currency])!)} ${currency.coinData.unit}",
-                              style: context.textTheme.caption,
-                              textAlign: TextAlign.start,
-                            ),
-                          )),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      OnboardWidgets.neverShare(
-                          text:
-                              "Make sure that you are sending to the correct address otherwise you may lose your funds"),
-                      substrateNetworks.contains(currency.coinData.unit)
-                          ? OnboardWidgets.neverShare(
-                              text:
-                                  "Ensure the recipient has an existential deposit of at least ${currency.coinData.existential} ${currency.coinData.unit} for a successful transaction")
-                          : Container(),
-                      // SizedBox(
-                      //   height: 16,
-                      // ),
-                      SizedBox(
-                        width: Get.width,
-                        child: TextButton(
-                            style: MyButtonStyles.onboardStyle,
-                            onPressed: () => onSubmit(context),
-                            child: Text(
-                              "SEND",
-                              style: TextStyle(color: Colors.white),
-                            )),
-                      ),
-                      // Spacer(),
+                      recipientSuffixWidget()
                     ],
                   ),
-                ),
-              ),
-              Expanded(
-                child: Visibility(
-                  visible: numPadVisibility,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 0),
-                    child: NumberKeyboard(controller: amountController),
+                  SizedBox(
+                    height: 16,
                   ),
-                ),
-              )
-            ],
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text("Amount " +
+                          "(" +
+                          (isCurrencyMode ? "USD" : currency.coinData.unit) +
+                          ")")),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Stack(
+                    alignment: Alignment.centerRight,
+                    children: [
+                      TextFormField(
+                        controller: amountController,
+                        focusNode: amountFocus,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: InputFormatters.amountFilter(),
+                        decoration: InputDecoration(
+                          hintText: "0.1",
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                        ),
+                        validator: (val) => val != null &&
+                                val.isNotEmpty &&
+                                val != "." &&
+                                double.parse(val) != 0 &&
+                                double.parse(val) < balanceData.data![currency]!
+                            ? null
+                            : "Amount should be lower than the balance (including fees)\nand not zero",
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                      ),
+                      amountSuffixWidget()
+                    ],
+                  ),
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(top: 4),
+                      child: Obx(
+                        () => Text(
+                          "Balance: ${FormatText.roundOff((balanceData.data![currency])!)} ${currency.coinData.unit}",
+                          style: context.textTheme.caption,
+                          textAlign: TextAlign.start,
+                        ),
+                      )),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  OnboardWidgets.neverShare(
+                      text:
+                          "Make sure that you are sending to the correct address otherwise you may lose your funds"),
+                  substrateNetworks.contains(currency.coinData.unit)
+                      ? OnboardWidgets.neverShare(
+                          text:
+                              "Ensure the recipient has an existential deposit of at least ${currency.coinData.existential} ${currency.coinData.unit} for a successful transaction")
+                      : Container(),
+                  // SizedBox(
+                  //   height: 16,
+                  // ),
+                  SizedBox(
+                    width: Get.width,
+                    child: TextButton(
+                        style: MyButtonStyles.onboardStyle,
+                        onPressed: () => onSubmit(context),
+                        child: Text(
+                          "SEND",
+                          style: TextStyle(color: Colors.white),
+                        )),
+                  ),
+                  // Spacer(),
+                ],
+              ),
+            ),
           ),
         ),
       ),

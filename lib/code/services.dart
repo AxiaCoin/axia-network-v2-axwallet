@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -17,6 +18,7 @@ import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 
 class IsolateParams {
   String mnemonic;
@@ -33,16 +35,32 @@ String toSeed(String mnemonic) {
 
 Services services = Services();
 
+enum AXCWalletStatus {
+  idle,
+  loading,
+  finished,
+}
+
 class Services {
   HDWallet? hdWallet;
   WalletData walletData = Get.put(WalletData());
   Map<String, HDWalletInfo> hdWallets = {};
   Timer? timer;
+  Timer? timerAXC;
+  AXCWalletStatus axcWalletStatus = AXCWalletStatus.idle;
 
-  // SubstrateSDK substrateSDK = SubstrateSDK();
+  AXwalletSDK axSDK = AXwalletSDK();
 
-  initSubstrateSDK() async {
-    // if (substrateSDK.api == null) await substrateSDK.init();
+  initAXSDK({String? mnemonic}) async {
+    if (mnemonic != null) axcWalletStatus = AXCWalletStatus.loading;
+    if (axSDK.api == null) {
+      await axSDK.init();
+    }
+    if (mnemonic != null) {
+      await axSDK.api!.basic.init(mnemonic: mnemonic);
+      getAXCWalletDetails();
+      axcWalletStatus = AXCWalletStatus.finished;
+    }
   }
 
   // generateAXIAMnemonic() async {
@@ -64,7 +82,7 @@ class Services {
   // }
 
   String generateMnemonic() {
-    return bip39.generateMnemonic();
+    return bip39.generateMnemonic(strength: 256);
   }
 
   validateMnemonic(String mnemonic) {
@@ -77,27 +95,27 @@ class Services {
     }
   }
 
-  Future<void> initWallet(String mnemonic) async {
-    void toSeed(IsolateParams isolateParams) {
-      var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
-      print("a");
-      var b = HexEncoder().convert(seed);
-      print("aaa");
-      var c = HexDecoder().convert(b);
-      print("bbbb");
-      isolateParams.sendPort.send(c);
-    }
+  // Future<void> initWallet(String mnemonic) async {
+  //   void toSeed(IsolateParams isolateParams) {
+  //     var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
+  //     print("a");
+  //     var b = HexEncoder().convert(seed);
+  //     print("aaa");
+  //     var c = HexDecoder().convert(b);
+  //     print("bbbb");
+  //     isolateParams.sendPort.send(c);
+  //   }
 
-    var receivePort = ReceivePort();
-    await Isolate.spawn(toSeed, IsolateParams(mnemonic, receivePort.sendPort));
-    var seed = await receivePort.first;
-    receivePort.close();
-    hdWallet = new HDWallet.fromSeed(seed);
-    print("wallet created");
-    currencyList.forEach(
-      (e) => e.getWallet(),
-    );
-  }
+  //   var receivePort = ReceivePort();
+  //   await Isolate.spawn(toSeed, IsolateParams(mnemonic, receivePort.sendPort));
+  //   var seed = await receivePort.first;
+  //   receivePort.close();
+  //   hdWallet = new HDWallet.fromSeed(seed);
+  //   print("wallet created");
+  //   currencyList.forEach(
+  //     (e) => e.getWallet(),
+  //   );
+  // }
 
   Future<void> createMCWallet(String mnemonic, String name) async {
     String seed = await compute(toSeed, mnemonic);
@@ -111,9 +129,11 @@ class Services {
     initMCWallet(wallet.pubKey!);
   }
 
-  void initMCWallet(
-    String? pubKey,
-  ) {
+  initMCWallet(String? pubKey, {int retryCount = 0}) async {
+    String? currentPubKey = walletData.hdWallet?.value.pubKey!;
+    bool isChangingWallet =
+        pubKey != null && currentPubKey != null && currentPubKey != pubKey;
+    print("isChangingWallet = $isChangingWallet");
     var mnemonicSeeds = StorageService.instance.readMnemonicSeed();
     if (mnemonicSeeds == null || mnemonicSeeds.isEmpty) return;
     mnemonicSeeds.forEach((key, value) {
@@ -122,12 +142,44 @@ class Services {
       hdWallets[key] = value;
     });
     if (pubKey != null) {
+      // if (axcWalletStatus == AXCWalletStatus.loading) {
+      //   print("Wallet Loading. Please wait ($retryCount)");
+      //   await Future.delayed(Duration(milliseconds: 1000));
+      //   return await initMCWallet(pubKey, retryCount: retryCount + 1);
+      // }
+      if (axcWalletStatus != AXCWalletStatus.loading || isChangingWallet) {
+        await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
+      }
       walletData.updateWallet(pubKey);
       print("wallet created");
       currencyList.forEach(
         (e) => e.getWallet(),
       );
     }
+  }
+
+  getAXCWalletDetails() async {
+    AXCWalletData axcWalletData = Get.find();
+    void update() async {
+      var api = this.axSDK.api!;
+      var data = await Future.wait([
+        api.basic.getWallet(),
+        api.basic.getBalance(),
+      ]);
+      var wallet = AXCWallet.fromMap(data[0]);
+      var balance = AXCBalance.fromMap(data[1]);
+      axcWalletData.updateWallet(wallet);
+      axcWalletData.updateBalance(balance);
+    }
+
+    if (timerAXC != null) {
+      timerAXC?.cancel();
+      print("timer cancelled");
+    }
+    update();
+    timerAXC = Timer.periodic(Duration(minutes: 1), (t) {
+      update();
+    });
   }
 
   updateBalances() async {
@@ -175,6 +227,7 @@ class Services {
         await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
     if (response["success"]) {
       timer?.cancel();
+      timerAXC?.cancel();
       StorageService.instance
         ..clearTokens()
         ..init();
@@ -436,6 +489,10 @@ class APIServices {
       String? phoneNumber,
       String? phoneCode,
       required String otp}) async {
+    // print("User Verify");
+    // print(email);
+    // print(phoneNumber);
+    // print(phoneCode);
     return noAuthbaseAPI("user/verify", {
       "email": email,
       "phoneNumber": phoneNumber,

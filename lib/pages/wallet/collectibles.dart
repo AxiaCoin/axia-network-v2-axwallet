@@ -5,6 +5,7 @@ import 'package:wallet/code/database.dart';
 import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/webview.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class CollectiblesPage extends StatefulWidget {
   const CollectiblesPage({Key? key}) : super(key: key);
@@ -78,9 +79,7 @@ class _CollectiblesPageState extends State<CollectiblesPage>
     return Scaffold(
       body: Container(
         child: Center(
-          child: isLoading
-              ? Center(child: CircularProgressIndicator.adaptive())
-              : emptyList(),
+          child: isLoading ? Center(child: Spinner()) : emptyList(),
         ),
       ),
     );

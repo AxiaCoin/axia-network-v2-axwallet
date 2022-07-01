@@ -6,6 +6,7 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class FinancePage extends StatefulWidget {
   const FinancePage({Key? key}) : super(key: key);
@@ -67,7 +68,7 @@ class _FinancePageState extends State<FinancePage>
     return Scaffold(
       body: Container(
         child: data.isEmpty
-            ? Center(child: CircularProgressIndicator.adaptive())
+            ? Center(child: Spinner())
             : ListView.builder(
                 itemCount: titles.length,
                 itemBuilder: (context, index) {

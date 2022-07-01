@@ -13,6 +13,7 @@ import 'package:wallet/pages/new_user/signup.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 // import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class LoginPage extends StatefulWidget {
@@ -28,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController =
       new TextEditingController(text: kDebugMode ? "test@test.com" : "");
   TextEditingController passwordController =
-      new TextEditingController(text: kDebugMode ? "111111q%" : "");
+      new TextEditingController(text: kDebugMode ? "1111111q%" : "");
   FocusNode emailFocus = FocusNode();
   FocusNode passwordFocus = FocusNode();
   FocusNode confirmPasswordFocus = FocusNode();
@@ -293,7 +294,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             submitting
                                 ? Center(
-                                    child: CircularProgressIndicator(),
+                                    child: Spinner(),
                                   )
                                 : Container(
                                     width: Get.width,
@@ -318,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                                 }),
                                 child: Text(
                                   mode == Mode.phone
-                                      ? "Use email instead"
+                                      ? "Use email insead"
                                       : "Use phone number instead",
                                   style: context.textTheme.caption!.copyWith(),
                                 ),

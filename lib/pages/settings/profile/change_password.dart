@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class ChangePassword extends StatefulWidget {
   final bool resetPassword;
@@ -248,7 +247,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 ),
                 submitting
                     ? Center(
-                        child: CircularProgressIndicator(),
+                        child: Spinner(),
                       )
                     : SizedBox(
                         width: Get.width,

@@ -4,8 +4,6 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/pages/settings/feedback.dart';
 import 'package:wallet/pages/settings/preferences.dart';
 import 'package:wallet/pages/settings/price_alerts.dart';

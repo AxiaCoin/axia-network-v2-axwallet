@@ -14,10 +14,13 @@ import 'package:wallet/pages/webview.dart';
 class HomeWidgets {
   HomeWidgets._();
 
-  static Widget segmentedText(String text) => Text(
-        text,
-        style: TextStyle(fontSize: 13),
-        maxLines: 1,
+  static Widget segmentedText(String text) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white),
+          maxLines: 1,
+        ),
       );
 
   static Widget emptyListText(String text) => Text(

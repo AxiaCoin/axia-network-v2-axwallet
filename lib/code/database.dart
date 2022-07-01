@@ -1,5 +1,6 @@
 import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
@@ -80,5 +81,42 @@ class User extends GetxController {
 
   updateUser(UserModel user) {
     userModel.value = user;
+  }
+}
+
+class AXCWalletData extends GetxController {
+  var wallet = AXCWallet().obs;
+  var balance = AXCBalance().obs;
+
+  var mappedWallet = {
+    Chain.Swap: AXCWallet().swap,
+    Chain.Core: AXCWallet().core,
+    Chain.AX: AXCWallet().ax,
+  }.obs;
+  var mappedBalance = {
+    Chain.Swap: AXCBalance().swap,
+    Chain.Core: AXCBalance().core,
+    Chain.AX: AXCBalance().ax,
+    "staked": AXCBalance().staked,
+  }.obs;
+
+  updateWallet(AXCWallet data) {
+    wallet.value = data;
+    mappedWallet.value = {
+      Chain.Swap: data.swap,
+      Chain.Core: data.core,
+      Chain.AX: data.ax,
+    };
+  }
+
+  updateBalance(AXCBalance data) {
+    balance.value = data;
+    mappedBalance.value.updateAll((key, value) => key == Chain.Swap
+        ? data.swap
+        : key == Chain.Core
+            ? data.core
+            : key == Chain.AX
+                ? data.ax
+                : data.staked);
   }
 }

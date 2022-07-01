@@ -9,6 +9,7 @@ import 'package:wallet/code/models.dart';
 import 'package:wallet/pages/search.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 final tokensKey = new GlobalKey<_TokensPageState>();
 
@@ -240,7 +241,7 @@ class _TokensPageState extends State<TokensPage>
                   return Center(
                       child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator.adaptive(),
+                    child: Spinner(),
                   ));
                 }
                 Currency currency = list.selected![index];

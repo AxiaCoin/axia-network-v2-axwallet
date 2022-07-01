@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
+import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
@@ -16,18 +19,38 @@ Future<void> main() async {
 initServices() async {
   // Get.changeTheme(Get.isDarkMode ? darkTheme : lightTheme);
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
-  final TokenData list = Get.put(TokenData());
-  final BalanceData balanceCont = Get.put(BalanceData());
-  SettingsState settingsState = Get.put(SettingsState());
-  WalletData walletData = Get.put(WalletData());
-  await GetStorage.init();
+  Get.put(TokenData());
+  Get.put(BalanceData());
+  Get.put(SettingsState());
+  Get.put(WalletData());
+  Get.put(AXCWalletData());
+  await Future.wait(
+    [
+      GetStorage.init(),
+      GetStorage.init(CustomCacheManager.key),
+    ],
+  );
+  // CustomCacheManager.instance.box.erase();
+
   StorageService.instance.init();
+  // await services.initAXSDK(jsOnly: true);
+  initAXCSDK();
   // var mnemonics = StorageService.instance.readMnemonicSeed();
   // print('mnemonics are $mnemonics');
   // services.initSubstrateSDK();
   // StorageService.instance.clearTokens();
   // earn opinion sketch humble turn unaware keep defy what clay tip tribe
   // bone erase document label member evolve sense absent smoke dumb foster daring
+}
+
+initAXCSDK() async {
+  String? pubKey = StorageService.instance.readCurrentPubKey();
+  if (pubKey == null) {
+    return services.initAXSDK();
+  }
+  HDWalletInfo walletInfo =
+      StorageService.instance.readMnemonicSeed(pubKey: pubKey);
+  services.initAXSDK(mnemonic: walletInfo.mnemonic);
 }
 
 class MyApp extends StatelessWidget {

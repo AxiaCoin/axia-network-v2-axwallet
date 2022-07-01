@@ -7,9 +7,11 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/new_user/verify.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class SignupPage extends StatefulWidget {
   final bool resetPassword;
@@ -69,6 +71,8 @@ class _SignupPageState extends State<SignupPage> {
       }
     } else {
       print(emailController.text);
+      print(phoneNumber.parseNumber());
+      print(phoneNumber.dialCode!.substring(1));
       var response = await APIServices().forgotPasswordOtp(
         email: mode == Mode.email ? emailController.text : null,
         phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
@@ -186,13 +190,9 @@ class _SignupPageState extends State<SignupPage> {
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
-                  labelText: "Confirm Password",
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        obscurity2 ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => obscurity2 = !obscurity2),
-                  )),
+                labelText: "Confirm Password",
+                border: OutlineInputBorder(),
+              ),
               validator: (val) => val == passwordController.text
                   ? null
                   : "The passwords do not match",
@@ -213,9 +213,6 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "First Name",
                 border: OutlineInputBorder(),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-              ],
               validator: (val) => val!.isNotEmpty
                   ? null
                   : "Please provide at least the first name",
@@ -233,9 +230,7 @@ class _SignupPageState extends State<SignupPage> {
                 labelText: "Last Name",
                 border: OutlineInputBorder(),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-              ],
+              inputFormatters: InputFormatters.wordsAndSpacesFilter(),
               maxLength: 20,
             ),
             SizedBox(
@@ -292,7 +287,7 @@ class _SignupPageState extends State<SignupPage> {
                         ...passwordFields,
                         submitting
                             ? Center(
-                                child: CircularProgressIndicator(),
+                                child: Spinner(),
                               )
                             : SizedBox(
                                 width: Get.width,
@@ -318,7 +313,7 @@ class _SignupPageState extends State<SignupPage> {
                             }),
                             child: Text(
                               mode == Mode.phone
-                                  ? "Use email instead"
+                                  ? "Use email insead"
                                   : "Use phone number instead",
                               style: context.textTheme.caption!.copyWith(),
                             ),

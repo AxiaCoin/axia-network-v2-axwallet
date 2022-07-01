@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class DAppsPage extends StatefulWidget {
   const DAppsPage({Key? key}) : super(key: key);
@@ -204,7 +205,7 @@ class _DAppsPageState extends State<DAppsPage> {
         appBar: appBar(),
         body: Container(
           child: isLoading
-              ? Center(child: CircularProgressIndicator.adaptive())
+              ? Center(child: Spinner())
               : RefreshIndicator(
                   onRefresh: () async {
                     isRefreshing = true;

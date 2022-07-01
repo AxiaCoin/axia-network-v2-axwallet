@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:wallet/widgets/common.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class ChangeUserProfile extends StatefulWidget {
   final String? firstName;
@@ -91,9 +93,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
         validator: (val) =>
             val!.isNotEmpty ? null : "Please provide at least the first name",
         maxLength: 20,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-        ],
+        inputFormatters: InputFormatters.wordsAndSpacesFilter(),
       ),
       SizedBox(
         height: 16,
@@ -113,9 +113,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
               borderRadius: BorderRadius.all(Radius.circular(15))),
         ),
         maxLength: 20,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-        ],
+        inputFormatters: InputFormatters.wordsAndSpacesFilter(),
       ),
       SizedBox(
         height: 16,
@@ -153,7 +151,7 @@ class _ChangeUserProfileState extends State<ChangeUserProfile> {
                   ),
                   submitting
                       ? Center(
-                          child: CircularProgressIndicator(),
+                          child: Spinner(),
                         )
                       : SizedBox(
                           width: Get.width,
