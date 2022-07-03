@@ -39,7 +39,7 @@ class _DelegatePageState extends State<DelegatePage> {
   @override
   void initState() {
     super.initState();
-    validators = CustomCacheManager.instance.validatorsFromCache() ?? [];
+    validators = CustomCacheManager.instance.validatorsFromCache();
     getValidators();
   }
 

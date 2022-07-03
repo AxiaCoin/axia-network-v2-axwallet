@@ -45,6 +45,12 @@ initServices() async {
 
 initAXCSDK() async {
   String? pubKey = StorageService.instance.readCurrentPubKey();
+  var nodes = CustomCacheManager.instance.networkConfigs();
+  if (nodes.isEmpty) {
+    await services.fetchNetworkConfigs();
+  } else {
+    services.fetchNetworkConfigs();
+  }
   if (pubKey == null) {
     return services.initAXSDK();
   }

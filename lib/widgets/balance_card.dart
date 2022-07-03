@@ -152,7 +152,8 @@ class _BalanceCardState extends State<BalanceCard> {
     }
 
     return Container(
-      padding: EdgeInsets.all(8),
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(20),

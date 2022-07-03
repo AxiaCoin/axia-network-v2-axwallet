@@ -11,6 +11,7 @@ import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
@@ -19,6 +20,7 @@ import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:axwallet_sdk/axwallet_sdk.dart';
+import 'package:axwallet_sdk/models/network_config.dart';
 
 class IsolateParams {
   String mnemonic;
@@ -57,29 +59,32 @@ class Services {
       await axSDK.init();
     }
     if (mnemonic != null) {
-      await axSDK.api!.basic.init(mnemonic: mnemonic);
+      var networks = CustomCacheManager.instance
+          .networkConfigs(); // This is never empty by design
+      NetworkConfig? lastConnected = StorageService.instance.connectedNetwork;
+      NetworkConfig? network;
+      NetworkConfig first = networks.first;
+      if (lastConnected != null) {
+        try {
+          network = networks.firstWhere((element) => element == lastConnected);
+        } catch (e) {}
+      }
+      network ??= first;
+      bool isSuccessful =
+          await axSDK.api!.basic.init(mnemonic: mnemonic, network: network);
+      if (isSuccessful) {
+        StorageService.instance.updateConnectedNetwork(network);
+      } else {
+        // Will return false when the cached network config is out of order.
+        // New active network configs will have been fetched by this time and
+        // another attempt can be made.
+        await Future.delayed(Duration(milliseconds: 500));
+        return await initAXSDK(mnemonic: mnemonic);
+      }
       getAXCWalletDetails();
       axcWalletStatus = AXCWalletStatus.finished;
     }
   }
-
-  // generateAXIAMnemonic() async {
-  //   await _keyring.init([0]);
-  //   if (walletSDK.api == null) await walletSDK.init(_keyring);
-  //   SubstrateService subService = SubstrateService();
-  //   ServiceAccount service = ServiceAccount(subService);
-  //   AXIAWalletApi apiRoot = AXIAWalletApi(subService);
-  //   // var data = ApiAccount(apiRoot, service).apiRoot.keyring.generateMnemonic();
-  //   var data = await walletSDK.api.keyring.generateMnemonic();
-  //   print(data);
-  // }
-
-  // sendAXtransaction() async {
-  //   print("sending transaction");
-  //   var data = await walletSDK.api!.basic.signTransaction();
-  //   print("wallet app");
-  //   print(data);
-  // }
 
   String generateMnemonic() {
     return bip39.generateMnemonic(strength: 256);
@@ -94,28 +99,6 @@ class Services {
       return false;
     }
   }
-
-  // Future<void> initWallet(String mnemonic) async {
-  //   void toSeed(IsolateParams isolateParams) {
-  //     var seed = bip39.mnemonicToSeed(isolateParams.mnemonic);
-  //     print("a");
-  //     var b = HexEncoder().convert(seed);
-  //     print("aaa");
-  //     var c = HexDecoder().convert(b);
-  //     print("bbbb");
-  //     isolateParams.sendPort.send(c);
-  //   }
-
-  //   var receivePort = ReceivePort();
-  //   await Isolate.spawn(toSeed, IsolateParams(mnemonic, receivePort.sendPort));
-  //   var seed = await receivePort.first;
-  //   receivePort.close();
-  //   hdWallet = new HDWallet.fromSeed(seed);
-  //   print("wallet created");
-  //   currencyList.forEach(
-  //     (e) => e.getWallet(),
-  //   );
-  // }
 
   Future<void> createMCWallet(String mnemonic, String name) async {
     String seed = await compute(toSeed, mnemonic);
@@ -253,9 +236,47 @@ class Services {
       }
     }
   }
+
+  Future<List<NetworkConfig>?> fetchNetworkConfigs() async {
+    var data = (await APIServices().generalRequest(networkConfigURL));
+    if (data == null) return null;
+    List<NetworkConfig> networkConfigs =
+        (data["data"] as List).map((e) => NetworkConfig.fromMap(e)).toList();
+    CustomCacheManager.instance.cacheNetworkConfigs(networkConfigs);
+    return networkConfigs;
+  }
 }
 
 class APIServices {
+  generalRequest(String url, {Map? body, Map<String, String>? headers}) async {
+    try {
+      var response = body == null
+          ? await http.get(Uri.parse(url))
+          : await http.post(Uri.parse(url), headers: headers, body: body);
+      print("response code:${response.statusCode}");
+      if (response.statusCode == 200) {
+        print("success");
+        Map val = jsonDecode(response.body);
+        print("result: $val");
+        return val;
+      } else {
+        print("unsuccessful");
+        Map val = jsonDecode(response.body);
+        print("error: $val");
+        CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
+        return null;
+      }
+    } on SocketException {
+      return CommonWidgets.snackBar("No internet connection");
+    } on HttpException {
+      return CommonWidgets.snackBar("Couldn't find URL");
+    } on FormatException {
+      return CommonWidgets.snackBar("Bad response format");
+    } catch (e) {
+      return CommonWidgets.snackBar("Server response:${e.toString()}");
+    }
+  }
+
   noAuthbaseAPI(String url, Map body) async {
     try {
       var response = await http.post(Uri.parse(ipAddress + url),

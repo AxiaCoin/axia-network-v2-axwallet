@@ -9,6 +9,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
+import 'package:axwallet_sdk/models/network_config.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._();
@@ -30,6 +31,7 @@ class StorageService {
   List<String>? defaultWallets;
   String? substrateWallets;
   String? isoCode;
+  NetworkConfig? connectedNetwork;
 
   init() {
     // box.remove("authToken");
@@ -40,9 +42,8 @@ class StorageService {
     pin = readPIN();
     isoCode = box.read("isoCode");
     isTestNet = true;
-    //box.read("isTestNet") ?? true;
-    print("isTestnet:$isTestNet");
     useBiometric = box.read("useBiometric") ?? true;
+    getConnectedNetwork();
     if (deviceID == null) getDeviceID();
 
     List<dynamic>? wallets = box.read("defaultWallets");
@@ -82,6 +83,15 @@ class StorageService {
     // var decoded = jsonDecode(stringified);
     substrateWallets = stringified;
     box.write("substrateWallets", stringified);
+  }
+
+  getConnectedNetwork() {
+    var data = box.read("connectedNetwork");
+    if (data == null) {
+      connectedNetwork = null;
+    } else {
+      connectedNetwork = NetworkConfig.fromJson(data);
+    }
   }
 
   updateAuthToken(String value) {
@@ -126,6 +136,11 @@ class StorageService {
     isTestNet = value;
     print("isTestnet:$isTestNet");
     box.write("isTestNet", value);
+  }
+
+  updateConnectedNetwork(NetworkConfig value) {
+    connectedNetwork = value;
+    box.write("connectedNetwork", value.toJson());
   }
 
   updateDefaultWallets(String wallet, {required isSelected}) {

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:wallet/code/database.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/earn/delegate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
+import 'package:wallet/pages/network_switch.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
 import 'package:wallet/pages/transfers/same_chain.dart';
 import 'package:wallet/widgets/address_card.dart';
 import 'package:wallet/widgets/balance_card.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
+import 'package:axwallet_sdk/models/network_config.dart';
 
 class EarnPage extends StatefulWidget {
   const EarnPage({Key? key}) : super(key: key);
@@ -17,12 +22,58 @@ class EarnPage extends StatefulWidget {
 }
 
 class _EarnPageState extends State<EarnPage> {
+  AXCWalletData axcWalletData = Get.find();
+
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
           title: Text("Earn & Transfer"),
           centerTitle: true,
         );
+
+    Widget networkStatus() {
+      NetworkConfig? network = StorageService.instance.connectedNetwork;
+      return Obx(
+        () => Center(
+          child: GestureDetector(
+            onTap: () {
+              Get.to(() => NetworkSwitchPage());
+            },
+            child: Container(
+              padding: EdgeInsets.all(4),
+              child: Text.rich(
+                TextSpan(
+                  text: axcWalletData.wallet.value.swap != null
+                      ? "Connected to "
+                      : "Connecting to a node",
+                  children: [
+                    TextSpan(
+                      text: axcWalletData.wallet.value.swap != null
+                          ? StorageService.instance.connectedNetwork?.name
+                          : null,
+                      style: Theme.of(context).textTheme.subtitle2,
+                    ),
+                    TextSpan(
+                      text: (StorageService.instance.connectedNetwork == null ||
+                              axcWalletData.wallet.value.swap == null)
+                          ? null
+                          : StorageService.instance.connectedNetwork!.isTestNet
+                              ? " (Testnet)"
+                              : " (Mainnet)",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    WidgetSpan(
+                      child: Icon(Icons.keyboard_arrow_right),
+                      alignment: PlaceholderAlignment.middle,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: () {
@@ -35,9 +86,10 @@ class _EarnPageState extends State<EarnPage> {
       child: Scaffold(
         appBar: appBar(),
         body: Container(
-          padding: EdgeInsets.all(16),
+          // padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
           child: ListView(
             children: [
+              networkStatus(),
               BalanceCard(),
               SizedBox(height: 8),
               AddressCard(),
@@ -73,6 +125,7 @@ class _EarnPageState extends State<EarnPage> {
                   "View staking rewards you will receive.",
                   Icons.currency_exchange,
                   () => pushNewScreen(context, screen: RewardsPage())),
+              SizedBox(height: 16),
             ],
           ),
         ),

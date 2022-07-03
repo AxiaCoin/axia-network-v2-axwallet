@@ -10,6 +10,7 @@ class PluginWidgets {
         onTap: onTap,
         child: Container(
           height: 100,
+          margin: EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(
               Radius.circular(8),
