@@ -1,6 +1,6 @@
 import 'package:get_storage/get_storage.dart';
 import 'package:wallet/Crypto_Models/validator.dart';
-import 'package:axwallet_sdk/models/network_config.dart';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 
 class CustomCacheManager {
   static final CustomCacheManager instance = CustomCacheManager._();

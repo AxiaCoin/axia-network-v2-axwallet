@@ -12,7 +12,7 @@ import 'package:wallet/widgets/address_card.dart';
 import 'package:wallet/widgets/balance_card.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
-import 'package:axwallet_sdk/models/network_config.dart';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 
 class EarnPage extends StatefulWidget {
   const EarnPage({Key? key}) : super(key: key);
@@ -68,6 +68,7 @@ class _EarnPageState extends State<EarnPage> {
                     )
                   ],
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           ),

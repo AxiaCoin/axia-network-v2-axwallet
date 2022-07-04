@@ -9,7 +9,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
-import 'package:axwallet_sdk/models/network_config.dart';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 
 class StorageService {
   static final StorageService instance = StorageService._();

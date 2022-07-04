@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
-import 'package:axwallet_sdk/models/network_config.dart';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/widgets/common.dart';
@@ -35,6 +35,7 @@ class _NetworkSwitchPageState extends State<NetworkSwitchPage> {
       services.getAXCWalletDetails();
     }
     Get.back();
+    // Get.back();
     CommonWidgets.snackBar(isSuccessful
         ? "Succesfully changed to ${config.name}"
         : "Failed to change network. Please try again");
@@ -119,24 +120,41 @@ class _NetworkSwitchPageState extends State<NetworkSwitchPage> {
     Widget listTile(NetworkConfig item, {bool isCustom = false}) {
       NetworkConfig? selected = StorageService.instance.connectedNetwork;
       bool isSelected = selected == item;
-      return ListTile(
-        title: Text(item.name),
-        subtitle: Text(item.url),
-        trailing: Icon(
-          isSelected ? Icons.check_circle : Icons.keyboard_arrow_right,
-          color: isSelected ? tickerGreen : null,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              item.name,
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            ListTile(
+              title: Text(
+                item.url,
+                style: TextStyle(fontWeight: FontWeight.w400),
+              ),
+              trailing: isSelected
+                  ? Icon(Icons.check_circle, color: tickerGreen, size: 24)
+                  : Icon(Icons.keyboard_arrow_right, size: 18),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: Colors.grey),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15),
+                ),
+              ),
+              onTap: () {
+                if (isSelected) return;
+                onChange(item);
+              },
+            ),
+          ],
         ),
-        leading: isCustom
-            ? IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  print("edit");
-                })
-            : null,
-        onTap: () {
-          // if (isSelected) return;
-          onChange(item);
-        },
       );
     }
 

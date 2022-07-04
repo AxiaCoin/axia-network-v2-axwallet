@@ -21,12 +21,15 @@ class DelegatePage extends StatefulWidget {
 }
 
 class _DelegatePageState extends State<DelegatePage> {
+  final GlobalKey<RefreshIndicatorState> _refreshKey =
+      new GlobalKey<RefreshIndicatorState>();
   TextEditingController controller = new TextEditingController();
   List<ValidatorItem> validators = [];
   bool isLoading = false;
 
   getValidators() async {
     setState(() => isLoading = true);
+    _refreshKey.currentState?.show();
     var response = (await services.axSDK.api!.nomination
         .getValidators())["validators"] as List;
     validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
@@ -41,6 +44,9 @@ class _DelegatePageState extends State<DelegatePage> {
     super.initState();
     validators = CustomCacheManager.instance.validatorsFromCache();
     getValidators();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshKey.currentState?.show();
+    });
   }
 
   @override
@@ -79,8 +85,6 @@ class _DelegatePageState extends State<DelegatePage> {
           ),
         );
 
-    Widget button() => TextButton(onPressed: () {}, child: Text("Select"));
-
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -104,32 +108,36 @@ class _DelegatePageState extends State<DelegatePage> {
                       text: "Fetching Validators",
                     ),
                   )
-                : SearchableList<ValidatorItem>(
-                    initialList: validators,
-                    builder: (validator) {
-                      return ValidatorTile(validator: validator);
-                    },
-                    emptyWidget:
-                        OnboardWidgets.neverShare(text: "No nodes found"),
-                    filter: (value) => validators
-                        .where((element) => element.nodeID
-                            .toLowerCase()
-                            .contains(value.toLowerCase()))
-                        .toList(),
+                : RefreshIndicator(
+                    key: _refreshKey,
                     onRefresh: () async => await getValidators(),
-                    defaultSuffixIconColor: appColor,
-                    inputDecoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                        // prefixIcon: Icon(
-                        //   Icons.search,
-                        //   color: Colors.black12,
-                        // ),
-                        hintText: "Search Node",
-                        hintStyle: TextStyle(
-                            // color: Colors.black12,
-                            )),
+                    child: SearchableList<ValidatorItem>(
+                      initialList: validators,
+                      builder: (validator) {
+                        return ValidatorTile(validator: validator);
+                      },
+                      emptyWidget:
+                          OnboardWidgets.neverShare(text: "No nodes found"),
+                      filter: (value) => validators
+                          .where((element) => element.nodeID
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                          .toList(),
+                      // onRefresh: () async => await getValidators(),
+                      defaultSuffixIconColor: appColor,
+                      inputDecoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          // prefixIcon: Icon(
+                          //   Icons.search,
+                          //   color: Colors.black12,
+                          // ),
+                          hintText: "Search Node",
+                          hintStyle: TextStyle(
+                              // color: Colors.black12,
+                              )),
+                    ),
                   )
             // child: Column(
             //   children: [

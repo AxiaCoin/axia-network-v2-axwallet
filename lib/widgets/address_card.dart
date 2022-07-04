@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +6,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
-import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/qr_creation.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
@@ -131,7 +127,7 @@ class _AddressCardState extends State<AddressCard> {
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(20),

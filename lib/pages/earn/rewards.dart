@@ -21,6 +21,8 @@ class RewardsPage extends StatefulWidget {
 }
 
 class _RewardsPageState extends State<RewardsPage> {
+  final GlobalKey<RefreshIndicatorState> _refreshKey =
+      new GlobalKey<RefreshIndicatorState>();
   AXCWalletData axcWalletData = Get.find();
   List<ValidatorItem> validators = [];
   List<Nominator> rewards = [];
@@ -64,6 +66,9 @@ class _RewardsPageState extends State<RewardsPage> {
     super.initState();
     validators = CustomCacheManager.instance.validatorsFromCache();
     getValidators();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshKey.currentState?.show();
+    });
   }
 
   @override
@@ -126,17 +131,21 @@ class _RewardsPageState extends State<RewardsPage> {
                   : FutureBuilder(
                       future: getRewards(axcWalletData.wallet.value.allCore!),
                       builder: ((context, snapshot) {
-                        return rewards.isEmpty
-                            ? empty()
-                            : ListView.builder(
-                                itemCount: rewards.length + 1,
-                                itemBuilder: (context, index) {
-                                  return index == 0
-                                      ? totalRewards()
-                                      : RewardItem(
-                                          delegator: rewards[index - 1],
-                                        );
-                                });
+                        return RefreshIndicator(
+                          key: _refreshKey,
+                          onRefresh: () async => await getValidators(),
+                          child: rewards.isEmpty
+                              ? empty()
+                              : ListView.builder(
+                                  itemCount: rewards.length + 1,
+                                  itemBuilder: (context, index) {
+                                    return index == 0
+                                        ? totalRewards()
+                                        : RewardItem(
+                                            delegator: rewards[index - 1],
+                                          );
+                                  }),
+                        );
                       }))),
         ),
       ),

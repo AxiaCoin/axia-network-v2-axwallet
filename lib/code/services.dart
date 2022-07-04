@@ -20,7 +20,6 @@ import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:axwallet_sdk/axwallet_sdk.dart';
-import 'package:axwallet_sdk/models/network_config.dart';
 
 class IsolateParams {
   String mnemonic;
