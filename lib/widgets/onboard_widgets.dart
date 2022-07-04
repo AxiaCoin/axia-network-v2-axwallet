@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wallet/code/constants.dart';
 
 class OnboardWidgets {
   OnboardWidgets._();
@@ -30,11 +31,13 @@ class OnboardWidgets {
         ),
       );
 
-  static Widget wordItem(String word, int index, {bool showIndex = true}) =>
+  static Widget wordItem(String word, int index,
+          {bool showIndex = true, bool isSelected = false}) =>
       GestureDetector(
         child: Container(
           decoration: BoxDecoration(
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(
+                  color: isSelected ? appColor : Colors.black.withOpacity(0.1)),
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.all(Radius.circular(5)),
               color: Colors.white),
