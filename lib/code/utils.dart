@@ -100,9 +100,11 @@ class InputFormatters {
       TextInputFormatter.withFunction((oldValue, newValue) {
         try {
           final text = newValue.text;
-          if (text.isNotEmpty) double.parse(text);
+          print(text);
+          if (text.isNotEmpty && text != ".") double.parse(text);
           return newValue;
         } catch (e) {}
+        print("error is $e");
         return oldValue;
       }),
     ];

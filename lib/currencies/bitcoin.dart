@@ -174,8 +174,14 @@ class Bitcoin implements Currency {
       print(response);
       return response;
     } catch (e) {
+      print("heyyo");
       print(e);
       Get.back();
+      if (e.toString().contains("has no matching")) {
+        return CommonWidgets.snackBar(
+            "Please check the address of the recipient",
+            duration: 5);
+      }
       return CommonWidgets.snackBar(e.toString(), duration: 5);
     }
   }

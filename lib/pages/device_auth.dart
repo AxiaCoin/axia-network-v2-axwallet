@@ -94,7 +94,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
         appBar: AppBar(
           title: Text("Security Check"),
           centerTitle: true,
-          leading: CommonWidgets.backButton(context),
+          leading: isSettingUp ? null : CommonWidgets.backButton(context),
         ),
         body: SafeArea(
           child: Stack(

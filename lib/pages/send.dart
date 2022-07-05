@@ -55,6 +55,7 @@ class _SendPageState extends State<SendPage> {
               recipientController.text.trim());
           print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
+          if (response == null) return;
           if (response != null && response["success"] == true) {
             print("success");
             Navigator.pop(context);
