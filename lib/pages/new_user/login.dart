@@ -319,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                                 }),
                                 child: Text(
                                   mode == Mode.phone
-                                      ? "Use email insead"
+                                      ? "Use email instead"
                                       : "Use phone number instead",
                                   style: context.textTheme.caption!.copyWith(),
                                 ),

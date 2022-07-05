@@ -108,7 +108,7 @@ class Services {
     StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
     hdWallets[wallet.pubKey!] = walletInfo;
     StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
-    initMCWallet(wallet.pubKey!);
+    await initMCWallet(wallet.pubKey!);
   }
 
   initMCWallet(String? pubKey, {int retryCount = 0}) async {
@@ -130,7 +130,7 @@ class Services {
       //   return await initMCWallet(pubKey, retryCount: retryCount + 1);
       // }
       walletData.updateWallet(pubKey);
-      if (isChangingWallet) {
+      if (isChangingWallet || axcWalletStatus == AXCWalletStatus.idle) {
         await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
       }
       print("wallet created");

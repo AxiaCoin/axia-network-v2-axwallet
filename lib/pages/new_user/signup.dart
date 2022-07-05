@@ -70,9 +70,9 @@ class _SignupPageState extends State<SignupPage> {
         }
       }
     } else {
-      print(emailController.text);
-      print(phoneNumber.parseNumber());
-      print(phoneNumber.dialCode!.substring(1));
+      // print(emailController.text);
+      // print(phoneNumber.parseNumber());
+      // print(phoneNumber.dialCode!.substring(1));
       var response = await APIServices().forgotPasswordOtp(
         email: mode == Mode.email ? emailController.text : null,
         phoneNumber: mode == Mode.phone ? phoneNumber.parseNumber() : null,
@@ -192,6 +192,11 @@ class _SignupPageState extends State<SignupPage> {
               decoration: InputDecoration(
                 labelText: "Confirm Password",
                 border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      obscurity2 ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => obscurity2 = !obscurity2),
+                ),
               ),
               validator: (val) => val == passwordController.text
                   ? null
@@ -313,7 +318,7 @@ class _SignupPageState extends State<SignupPage> {
                             }),
                             child: Text(
                               mode == Mode.phone
-                                  ? "Use email insead"
+                                  ? "Use email instead"
                                   : "Use phone number instead",
                               style: context.textTheme.caption!.copyWith(),
                             ),

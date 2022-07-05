@@ -74,10 +74,10 @@ class _ValidatePageState extends State<ValidatePage> {
     if (formKey.currentState!.validate()) {
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
-        CommonWidgets.waitDialog(text: "Delegating node");
+        CommonWidgets.waitDialog(text: "Nominating node");
         await Future.delayed(Duration(milliseconds: 200));
         try {
-          print("Delegation started");
+          print("Nomination started");
           int amount =
               (double.parse(amountController.text) * pow(10, denomination))
                   .toInt();
@@ -89,7 +89,7 @@ class _ValidatePageState extends State<ValidatePage> {
             rewardAddress:
                 addressController.text.isEmpty ? null : addressController.text,
           );
-          print("Delegation response: $response");
+          print("Nomination response: $response");
           print(response.runtimeType);
           await Future.delayed(Duration(milliseconds: 200));
           if (response != null && response["txID"] != null) {
@@ -98,7 +98,7 @@ class _ValidatePageState extends State<ValidatePage> {
             Get.back();
             services.getAXCWalletDetails();
             CommonWidgets.snackBar(
-                "The node was successfully delegated, check rewards page!",
+                "The node was successfully Nominated, check rewards page!",
                 duration: 7);
           } else {
             Get.back();
@@ -311,7 +311,7 @@ class _ValidatePageState extends State<ValidatePage> {
               Text("Fee",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               // Text(
-              //     "You will claim this % of the rewards from the delegators on your node."),
+              //     "You will claim this % of the rewards from the Nominators on your node."),
               SizedBox(height: 8),
               TextFormField(
                 controller: feeController,
