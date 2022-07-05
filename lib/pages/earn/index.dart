@@ -36,8 +36,9 @@ class _EarnPageState extends State<EarnPage> {
       return Obx(
         () => Center(
           child: GestureDetector(
-            onTap: () {
-              Get.to(() => NetworkSwitchPage());
+            onTap: () async {
+              await Get.to(() => NetworkSwitchPage());
+              setState(() {});
             },
             child: Container(
               padding: EdgeInsets.all(4),

@@ -129,10 +129,10 @@ class Services {
       //   await Future.delayed(Duration(milliseconds: 1000));
       //   return await initMCWallet(pubKey, retryCount: retryCount + 1);
       // }
-      if (axcWalletStatus != AXCWalletStatus.loading || isChangingWallet) {
+      walletData.updateWallet(pubKey);
+      if (isChangingWallet) {
         await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
       }
-      walletData.updateWallet(pubKey);
       print("wallet created");
       currencyList.forEach(
         (e) => e.getWallet(),
@@ -142,7 +142,7 @@ class Services {
 
   getAXCWalletDetails() async {
     AXCWalletData axcWalletData = Get.find();
-    void update() async {
+    update() async {
       var api = this.axSDK.api!;
       var data = await Future.wait([
         api.basic.getWallet(),
@@ -203,18 +203,22 @@ class Services {
       ),
     );
     if (confirm == null || confirm == false) return;
+    await logOutAPI();
+  }
+
+  logOutAPI() async {
     String sessionID = StorageService.instance.sessionID!;
     String deviceID = StorageService.instance.deviceID!;
     var response =
         await APIServices().logOut(sessionId: sessionID, deviceId: deviceID);
-    if (response["success"]) {
-      timer?.cancel();
-      timerAXC?.cancel();
-      StorageService.instance
-        ..clearTokens()
-        ..init();
-      Get.offAll(() => LoginPage());
-    }
+    // if (response["success"]) {
+    timer?.cancel();
+    timerAXC?.cancel();
+    StorageService.instance
+      ..clearTokens()
+      ..init();
+    Get.offAll(() => LoginPage());
+    // }
   }
 
   Future<bool> canCheckBiometrics() async {
@@ -247,6 +251,10 @@ class Services {
 }
 
 class APIServices {
+  _checkIfSessionExpired(Map val) {
+    if (val.toString().contains("Session is expired")) services.logOutAPI();
+  }
+
   generalRequest(String url, {Map? body, Map<String, String>? headers}) async {
     try {
       var response = body == null
@@ -304,6 +312,7 @@ class APIServices {
           }
           return;
         }
+        _checkIfSessionExpired(val);
         CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
         return val;
       }
@@ -349,6 +358,7 @@ class APIServices {
           }
           return;
         }
+        _checkIfSessionExpired(val);
         CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
         return val;
       }
@@ -395,6 +405,7 @@ class APIServices {
           }
           return;
         }
+        _checkIfSessionExpired(val);
         CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
         return val;
       }
@@ -439,6 +450,7 @@ class APIServices {
           }
           return;
         }
+        _checkIfSessionExpired(val);
         CommonWidgets.snackBar(val["errors"].toString(), duration: 5);
         return val;
       }

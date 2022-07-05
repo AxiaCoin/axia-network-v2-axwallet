@@ -154,7 +154,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
         SizedBox(
           height: 8,
         ),
-        Align(alignment: Alignment.centerLeft, child: Text("Name")),
+        Align(alignment: Alignment.centerLeft, child: Text("Wallet Name")),
         SizedBox(
           height: 8,
         ),
