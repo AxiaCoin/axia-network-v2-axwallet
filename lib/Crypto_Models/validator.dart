@@ -8,7 +8,7 @@ class ValidatorItem {
   String startTime;
   String endTime;
   String stakeAmount;
-  String delegationFee;
+  String nominationFee;
   List<Nominator> nominators;
   ValidatorItem({
     required this.txID,
@@ -16,7 +16,7 @@ class ValidatorItem {
     required this.startTime,
     required this.endTime,
     required this.stakeAmount,
-    required this.delegationFee,
+    required this.nominationFee,
     required this.nominators,
   });
 
@@ -26,7 +26,7 @@ class ValidatorItem {
     String? startTime,
     String? endTime,
     String? stakeAmount,
-    String? delegationFee,
+    String? nominationFee,
     List<Nominator>? nominators,
   }) {
     return ValidatorItem(
@@ -35,7 +35,7 @@ class ValidatorItem {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       stakeAmount: stakeAmount ?? this.stakeAmount,
-      delegationFee: delegationFee ?? this.delegationFee,
+      nominationFee: nominationFee ?? this.nominationFee,
       nominators: nominators ?? this.nominators,
     );
   }
@@ -47,7 +47,7 @@ class ValidatorItem {
       'startTime': startTime,
       'endTime': endTime,
       'stakeAmount': stakeAmount,
-      'delegationFee': delegationFee,
+      'nominationFee': nominationFee,
       'nominators': nominators.map((x) => x.toMap()).toList(),
     };
   }
@@ -59,7 +59,7 @@ class ValidatorItem {
       startTime: map['startTime'] ?? '',
       endTime: map['endTime'] ?? '',
       stakeAmount: map['stakeAmount'] ?? '',
-      delegationFee: map['delegationFee'] ?? '',
+      nominationFee: map['nominationFee'] ?? '',
       nominators: map['nominators'] != null
           ? List<Nominator>.from(
               map['nominators']?.map((x) => Nominator.fromMap(x)))
@@ -77,7 +77,7 @@ class ValidatorItem {
 
   @override
   String toString() {
-    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, delegationFee: $delegationFee, nominators: $nominators)';
+    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, nominationFee: $nominationFee, nominators: $nominators)';
   }
 
   @override
@@ -90,7 +90,7 @@ class ValidatorItem {
         other.startTime == startTime &&
         other.endTime == endTime &&
         other.stakeAmount == stakeAmount &&
-        other.delegationFee == delegationFee &&
+        other.nominationFee == nominationFee &&
         listEquals(other.nominators, nominators);
   }
 
@@ -101,7 +101,7 @@ class ValidatorItem {
         startTime.hashCode ^
         endTime.hashCode ^
         stakeAmount.hashCode ^
-        delegationFee.hashCode ^
+        nominationFee.hashCode ^
         nominators.hashCode;
   }
 }

@@ -124,7 +124,7 @@ class _ValidatePageState extends State<ValidatePage> {
     validator = widget.validator;
     nodeIdController.text = validator.nodeID;
     feeController.text =
-        FormatText.roundOff(double.parse(validator.delegationFee)) + "%";
+        FormatText.roundOff(double.parse(validator.nominationFee)) + "%";
     selectedDate = DateTime.now().add(Duration(days: 14, minutes: 5));
     minStartDate = selectedDate;
     endDate = DateTime.fromMillisecondsSinceEpoch(

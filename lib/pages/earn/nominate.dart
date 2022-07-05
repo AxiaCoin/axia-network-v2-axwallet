@@ -13,14 +13,14 @@ import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/validator_tile.dart';
 
-class DelegatePage extends StatefulWidget {
-  const DelegatePage({Key? key}) : super(key: key);
+class NominatePage extends StatefulWidget {
+  const NominatePage({Key? key}) : super(key: key);
 
   @override
-  State<DelegatePage> createState() => _DelegatePageState();
+  State<NominatePage> createState() => _NominatePageState();
 }
 
-class _DelegatePageState extends State<DelegatePage> {
+class _NominatePageState extends State<NominatePage> {
   final GlobalKey<RefreshIndicatorState> _refreshKey =
       new GlobalKey<RefreshIndicatorState>();
   TextEditingController controller = new TextEditingController();

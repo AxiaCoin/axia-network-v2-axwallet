@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:wallet/pages/earn/delegate.dart';
+import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
 import 'package:wallet/pages/transfers/same_chain.dart';

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/earn/delegate.dart';
+import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
 import 'package:wallet/pages/network_switch.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
@@ -120,7 +120,7 @@ class _EarnPageState extends State<EarnPage> {
                   "Nominate",
                   "You do not own a node, but you want to stake using another node.",
                   Icons.shield,
-                  () => pushNewScreen(context, screen: DelegatePage())),
+                  () => pushNewScreen(context, screen: NominatePage())),
               SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Estimated Rewards",
