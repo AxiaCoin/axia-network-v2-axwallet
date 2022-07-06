@@ -8,22 +8,22 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/utils.dart';
 
 class RewardItem extends StatelessWidget {
-  final Nominator delegator;
+  final Nominator nominator;
   const RewardItem({
     Key? key,
-    required this.delegator,
+    required this.nominator,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int startTime = int.parse(delegator.startTime) * 1000;
-    int endTime = int.parse(delegator.endTime) * 1000;
+    int startTime = int.parse(nominator.startTime) * 1000;
+    int endTime = int.parse(nominator.endTime) * 1000;
     String stakeAmount = FormatText.roundOff(
-        BigInt.from(int.parse(delegator.stakeAmount)) /
+        BigInt.from(int.parse(nominator.stakeAmount)) /
             BigInt.from(pow(10, denomination)));
-    String nodeID = delegator.nodeID;
+    String nodeID = nominator.nodeID;
     String potentialReward = FormatText.roundOff(
-        BigInt.from(int.parse(delegator.potentialReward)) /
+        BigInt.from(int.parse(nominator.potentialReward)) /
             BigInt.from(pow(10, denomination)),
         maxDecimals: 9);
     int now = DateTime.now().millisecondsSinceEpoch;

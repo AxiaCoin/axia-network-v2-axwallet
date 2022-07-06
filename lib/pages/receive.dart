@@ -170,11 +170,10 @@ class _ReceivePageState extends State<ReceivePage> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15))),
                               ),
-                              validator: (val) => val != null &&
-                                      val.isNotEmpty &&
-                                      val != "."
-                                  ? null
-                                  : "Amount should be lower than the balance (including fees)",
+                              validator: (val) =>
+                                  val != null && val.isNotEmpty && val != "."
+                                      ? null
+                                      : "Amount should be a valid number",
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
                             ),

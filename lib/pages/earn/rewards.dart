@@ -142,7 +142,7 @@ class _RewardsPageState extends State<RewardsPage> {
                                     return index == 0
                                         ? totalRewards()
                                         : RewardItem(
-                                            delegator: rewards[index - 1],
+                                            nominator: rewards[index - 1],
                                           );
                                   }),
                         );

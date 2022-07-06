@@ -108,7 +108,7 @@ class Services {
     StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
     hdWallets[wallet.pubKey!] = walletInfo;
     StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
-    await initMCWallet(wallet.pubKey!);
+    initMCWallet(wallet.pubKey!);
   }
 
   initMCWallet(String? pubKey, {int retryCount = 0}) async {
@@ -158,7 +158,7 @@ class Services {
       timerAXC?.cancel();
       print("timer cancelled");
     }
-    update();
+    await update();
     timerAXC = Timer.periodic(Duration(minutes: 1), (t) {
       update();
     });

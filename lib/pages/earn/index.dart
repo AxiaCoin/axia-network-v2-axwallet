@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/database.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
@@ -13,6 +14,7 @@ import 'package:wallet/widgets/balance_card.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
 import 'package:axwallet_sdk/axwallet_sdk.dart';
+import 'package:wallet/widgets/spinner.dart';
 
 class EarnPage extends StatefulWidget {
   const EarnPage({Key? key}) : super(key: key);
@@ -23,6 +25,7 @@ class EarnPage extends StatefulWidget {
 
 class _EarnPageState extends State<EarnPage> {
   AXCWalletData axcWalletData = Get.find();
+  bool isRefreshing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +95,26 @@ class _EarnPageState extends State<EarnPage> {
           child: ListView(
             children: [
               networkStatus(),
-              BalanceCard(),
+              Stack(
+                alignment: Alignment(0.9, -1),
+                children: [
+                  BalanceCard(),
+                  IconButton(
+                    onPressed: () async {
+                      onRefresh();
+                    },
+                    icon: isRefreshing
+                        ? Spinner(
+                            alt: true,
+                            color: Colors.white,
+                          )
+                        : Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                          ),
+                  ),
+                ],
+              ),
               SizedBox(height: 8),
               AddressCard(),
               SizedBox(height: 8),
@@ -133,5 +155,16 @@ class _EarnPageState extends State<EarnPage> {
         ),
       ),
     );
+  }
+
+  Future<void> onRefresh() async {
+    setState(() {
+      isRefreshing = true;
+    });
+    // await Future.delayed(Duration(milliseconds: 1000));
+    await services.getAXCWalletDetails();
+    setState(() {
+      isRefreshing = false;
+    });
   }
 }

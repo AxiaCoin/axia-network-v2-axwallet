@@ -132,7 +132,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
     cImFee = double.parse(data[1]);
     exportFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cExFee};
     importFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cImFee};
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override
@@ -522,7 +522,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
                               val != "." &&
                               double.parse(val) != 0 &&
                               (getSourceBalance() == null ||
-                                  double.parse(val) < getSourceBalance()!)
+                                  double.parse(val) <= calculateMax()!)
                           ? null
                           : "Amount should be lower than the balance (including fees)\nand not zero",
                       autovalidateMode: autoValidate

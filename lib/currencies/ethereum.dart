@@ -16,6 +16,7 @@ import 'dart:developer' as dev;
 class Ethereum implements Currency {
   final rpcURLTest =
       "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
+  final maxGas = 21000;
 
   @override
   CoinData coinData = CoinData(
@@ -148,7 +149,7 @@ class Ethereum implements Currency {
       Transaction(
         to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
-        maxGas: 100000,
+        maxGas: maxGas,
         value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amount)),
       ),
       fetchChainIdFromNetworkId: true,
@@ -172,5 +173,14 @@ class Ethereum implements Currency {
       print(e);
       return CommonWidgets.snackBar(e.toString(), duration: 5);
     }
+  }
+
+  @override
+  Future<double> getEstimatedFees() async {
+    var client = Web3Client(rpcURLTest, Client());
+    var gasPrice = await client.getGasPrice();
+    var fees = (gasPrice.getInWei * BigInt.from(maxGas)) /
+        BigInt.from(coinData.smallestUnit);
+    return fees;
   }
 }

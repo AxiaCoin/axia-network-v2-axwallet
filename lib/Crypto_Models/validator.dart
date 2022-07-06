@@ -63,10 +63,7 @@ class ValidatorItem {
       nominators: map['nominators'] != null
           ? List<Nominator>.from(
               map['nominators']?.map((x) => Nominator.fromMap(x)))
-          : map['delegators'] != null
-              ? List<Nominator>.from(
-                  map['delegators']?.map((x) => Nominator.fromMap(x)))
-              : [],
+          : [],
     );
   }
 

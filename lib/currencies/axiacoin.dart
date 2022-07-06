@@ -10,13 +10,15 @@ import 'package:wallet/code/models.dart';
 import 'package:coinslib/coinslib.dart' as coinslib;
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/code/utils.dart';
 import 'package:web3dart/web3dart.dart';
 
 class AXIACoin implements Currency {
   final rpcURLTest =
-      "http://18.222.205.99:9650/ext/bc/C/rpc"; // "https://rpc-v2.test.axiacoin.network";
+      "https://1.p2p-v2.testnet.axiacoin.network:443/ext/bc/AX/rpc"; // "https://rpc-v2.test.axiacoin.network";
   final rpcURLMain =
-      "http://18.222.205.99:9650/ext/bc/C/rpc"; // "https://rpc-v2.test.axiacoin.network";
+      "https://1.p2p-v2.testnet.axiacoin.network:443/ext/bc/AX/rpc"; // "https://rpc-v2.test.axiacoin.network";
+  final maxGas = 21000;
 
   @override
   CoinData coinData = CoinData(
@@ -150,7 +152,7 @@ class AXIACoin implements Currency {
       Transaction(
         to: EthereumAddress.fromHex(receiverAddress),
         gasPrice: gasPrice,
-        maxGas: 21000,
+        maxGas: maxGas,
         value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amount)),
       ),
       fetchChainIdFromNetworkId: true,
@@ -170,5 +172,15 @@ class AXIACoin implements Currency {
     var response = await APIServices().sendTransaction(body);
     print(response);
     return response;
+  }
+
+  @override
+  Future<double> getEstimatedFees({String? asd}) async {
+    var client = Web3Client(rpcURLTest, Client());
+    var gasPrice = await client.getGasPrice();
+    print(gasPrice.getInWei);
+    var fees = (gasPrice.getInWei * BigInt.from(maxGas)) /
+        BigInt.from(coinData.smallestUnit);
+    return fees;
   }
 }

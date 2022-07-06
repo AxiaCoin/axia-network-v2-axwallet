@@ -54,11 +54,38 @@ class Bitcoin implements Currency {
     );
   }
 
+  test() async {
+    var amount = 0.1;
+    var address = "mkkhTx14Jz1Sq2TZ86tBFUUVpeHPFvgphy";
+    amount = amount * coinData.smallestUnit;
+    print(amount);
+    print("Start");
+    final txb = new TransactionBuilder(
+        network: StorageService.instance.isTestNet ? testnet : bitcoin);
+    BTCglobalList unspent = await getunspentamount(amount, address);
+    print("got unspent");
+    var availBal = await getBalance();
+    print(availBal);
+    txb.setVersion(1);
+    for (var i = 0; i < unspent.list!.length; i++) {
+      txb.addInput(unspent.list![i].txid!, unspent.list![i].index!);
+    }
+    var noOutput = 0;
+    if (amount == availBal) {
+      noOutput = 1;
+    } else {
+      noOutput = 2;
+    }
+    var estimated = (180 * unspent.list!.length + noOutput * 34 + 10) * 10;
+    print("estiated amount=$estimated");
+  }
+
   @override
   Future<double> getBalance({String? address}) async {
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
     var bal = amount["data"].first["confirmed"];
+    // test();
     return bal / coinData.smallestUnit;
   }
 
@@ -255,5 +282,10 @@ class Bitcoin implements Currency {
     } catch (e) {
       return "Server response:${e.toString()}";
     }
+  }
+
+  @override
+  Future<double> getEstimatedFees() async {
+    return 0.00003740;
   }
 }

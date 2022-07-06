@@ -9,7 +9,9 @@ import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/currencies/ethereum.dart';
 import 'package:wallet/pages/device_auth.dart';
+import 'package:wallet/widgets/address_textfield.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
@@ -81,12 +83,16 @@ class _SameChainTransferState extends State<SameChainTransfer> {
         await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Transfer started");
-          int amount =
-              (double.parse(amountController.text) * pow(10, denomination))
-                  .toInt();
+          int amount = (double.parse(amountController.text) *
+                  pow(
+                      10,
+                      source == Chain.Swap
+                          ? denomination
+                          : Ethereum().coinData.smallestUnit))
+              .toInt();
           print(amount);
           var response = await api.transfer.sameChain(
-            chain: source == Chain.Swap ? "X" : "C",
+            chain: source.name,
             to: addressController.text.trim(),
             amount: amount.toString(),
           );
@@ -347,7 +353,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                               val != "." &&
                               double.parse(val) != 0 &&
                               (getSourceBalance() == null ||
-                                  double.parse(val) < getSourceBalance()!)
+                                  double.parse(val) <= calculateMax()!)
                           ? null
                           : "Amount should be lower than the balance (including fees)\nand not zero",
                       autovalidateMode: autoValidate
@@ -396,14 +402,18 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                             ),
                     )),
                 SizedBox(height: 8),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Destination Address",
-                      style: Theme.of(context).textTheme.subtitle2,
-                    )),
-                SizedBox(height: 8),
-                destinationAddress(),
+                // Align(
+                //     alignment: Alignment.centerLeft,
+                //     child: Text(
+                //       "Destination Address",
+                //       style: Theme.of(context).textTheme.subtitle2,
+                //     )),
+                // SizedBox(height: 8),
+                AddressTextField(
+                  controller: addressController,
+                  amountController: amountController,
+                  title: "Destination Address",
+                ),
                 SizedBox(height: 8),
                 feeWidget(),
                 SizedBox(height: 8),

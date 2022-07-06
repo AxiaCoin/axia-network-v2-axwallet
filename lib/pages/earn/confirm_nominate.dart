@@ -15,6 +15,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
+import 'package:wallet/widgets/address_textfield.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
@@ -82,7 +83,7 @@ class _ValidatePageState extends State<ValidatePage> {
               (double.parse(amountController.text) * pow(10, denomination))
                   .toInt();
           print(amount);
-          var response = await api.nomination.delegateNode(
+          var response = await api.nomination.nominateNode(
             nodeID: validator.nodeID,
             amount: amount.toString(),
             end: selectedDate.millisecondsSinceEpoch,
@@ -216,8 +217,8 @@ class _ValidatePageState extends State<ValidatePage> {
                       double.parse(val) != 0 &&
                       (getPBalance() == null ||
                           double.parse(val) <= getPBalance()!)
-                  ? double.parse(val) < 1
-                      ? "Minimum stake amount is 1 ${currency.coinData.unit}"
+                  ? double.parse(val) < 20
+                      ? "Minimum stake amount is 20 ${currency.coinData.unit}"
                       : null
                   : "Amount should be lower than the balance and not zero",
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -385,16 +386,9 @@ class _ValidatePageState extends State<ValidatePage> {
               rewardAddress(),
               SizedBox(height: isCustomVisible ? 8 : 0),
               isCustomVisible
-                  ? TextFormField(
+                  ? AddressTextField(
                       controller: addressController,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        hintText: "Reward Address",
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                      ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      title: "Custom Address",
                     )
                   : SizedBox.shrink(),
               SizedBox(height: 8),

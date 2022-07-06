@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -297,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: Spinner(),
                                   )
                                 : Container(
-                                    width: Get.width,
+                                    width: double.infinity,
                                     child: TextButton(
                                       onPressed: () {
                                         onSubmit();

@@ -8,6 +8,7 @@ import 'package:wallet/code/database.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/qr_scan.dart';
+import 'package:wallet/widgets/address_textfield.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
@@ -27,6 +28,7 @@ class _SendPageState extends State<SendPage> {
   bool isCurrencyMode = false;
   FocusNode amountFocus = new FocusNode();
   final BalanceData balanceData = Get.find();
+  double fees = 0.0;
 
   updateFields(String result) {
     String? address;
@@ -40,6 +42,11 @@ class _SendPageState extends State<SendPage> {
     } else {
       recipientController.text = result;
     }
+  }
+
+  getFees() async {
+    fees = await currency.getEstimatedFees();
+    setState(() {});
   }
 
   onSubmit(BuildContext context) async {
@@ -64,7 +71,7 @@ class _SendPageState extends State<SendPage> {
           if (response["success"] == false) {
             print("failure");
             Navigator.pop(context);
-            CommonWidgets.snackBar(response["errors"], duration: 5);
+            CommonWidgets.snackBar(response["errors"].toString(), duration: 5);
           }
         } catch (e) {
           print("caugt error");
@@ -91,6 +98,7 @@ class _SendPageState extends State<SendPage> {
   void initState() {
     super.initState();
     currency = widget.currency;
+    getFees();
   }
 
   @override
@@ -108,6 +116,11 @@ class _SendPageState extends State<SendPage> {
           //         style: TextStyle(color: Colors.white),
           //       ))
           // ],
+        );
+
+    Widget feesWidget() => Text(
+          "Estimated Fees: ${fees == 0.0 ? "~" : fees}",
+          style: Theme.of(context).textTheme.subtitle1,
         );
 
     Widget recipientSuffixWidget() => Row(
@@ -145,8 +158,13 @@ class _SendPageState extends State<SendPage> {
                 ? Container()
                 : TextButton(
                     onPressed: () {
-                      amountController.text =
-                          FormatText.roundOff((balanceData.data![currency])!);
+                      if ((balanceData.data![currency])! - fees <= 0) {
+                        return CommonWidgets.snackBar(
+                            "Balance too low (after fees) to transfer");
+                      }
+                      amountController.text = FormatText.roundOff(
+                          (balanceData.data![currency])! - fees,
+                          maxDecimals: 0);
                     },
                     child: Text("MAX"),
                   ),
@@ -181,47 +199,48 @@ class _SendPageState extends State<SendPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Recipient Address")),
-                  SizedBox(
-                    height: 8,
+                  AddressTextField(
+                    controller: recipientController,
+                    amountController: amountController,
                   ),
-                  Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      TextFormField(
-                        controller: recipientController,
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (val) {
-                          amountFocus.requestFocus();
-                        },
-                        decoration: InputDecoration(
-                            hintText: FormatText.address(
-                                currency.getWallet().address,
-                                pad: 6),
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            contentPadding: EdgeInsets.fromLTRB(
-                                18, 18, Get.width * 0.25, 18)),
-                        validator: (val) => val != null && val.isNotEmpty
-                            ? null
-                            : "Please enter an address",
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                      ),
-                      recipientSuffixWidget()
-                    ],
-                  ),
+                  // Stack(
+                  //   alignment: Alignment.centerRight,
+                  //   children: [
+                  //     TextFormField(
+                  //       controller: recipientController,
+                  //       textInputAction: TextInputAction.next,
+                  //       onFieldSubmitted: (val) {
+                  //         amountFocus.requestFocus();
+                  //       },
+                  //       decoration: InputDecoration(
+                  //           hintText: FormatText.address(
+                  //               currency.getWallet().address,
+                  //               pad: 6),
+                  //           border: OutlineInputBorder(
+                  //               borderRadius:
+                  //                   BorderRadius.all(Radius.circular(15))),
+                  //           contentPadding: EdgeInsets.fromLTRB(
+                  //               18, 18, Get.width * 0.25, 18)),
+                  //       validator: (val) => val != null && val.isNotEmpty
+                  //           ? null
+                  //           : "Please enter an address",
+                  //       autovalidateMode: AutovalidateMode.onUserInteraction,
+                  //     ),
+                  //     recipientSuffixWidget()
+                  //   ],
+                  // ),
                   SizedBox(
                     height: 16,
                   ),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text("Amount " +
-                          "(" +
-                          (isCurrencyMode ? "USD" : currency.coinData.unit) +
-                          ")")),
+                      child: Text(
+                        "Amount " +
+                            "(" +
+                            (isCurrencyMode ? "USD" : currency.coinData.unit) +
+                            ")",
+                        style: Theme.of(context).textTheme.subtitle2,
+                      )),
                   SizedBox(
                     height: 8,
                   ),
@@ -243,7 +262,8 @@ class _SendPageState extends State<SendPage> {
                                 val.isNotEmpty &&
                                 val != "." &&
                                 double.parse(val) != 0 &&
-                                double.parse(val) < balanceData.data![currency]!
+                                double.parse(val) <=
+                                    balanceData.data![currency]! - fees
                             ? null
                             : "Amount should be lower than the balance (including fees)\nand not zero",
                         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -256,22 +276,26 @@ class _SendPageState extends State<SendPage> {
                       padding: EdgeInsets.only(top: 4),
                       child: Obx(
                         () => Text(
-                          "Balance: ${FormatText.roundOff((balanceData.data![currency])!)} ${currency.coinData.unit}",
+                          "Balance: ${FormatText.roundOff((balanceData.data![currency])!, maxDecimals: 0)} ${currency.coinData.unit}",
                           style: context.textTheme.caption,
                           textAlign: TextAlign.start,
                         ),
                       )),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  feesWidget(),
                   SizedBox(
                     height: 16,
                   ),
                   OnboardWidgets.neverShare(
                       text:
                           "Make sure that you are sending to the correct address otherwise you may lose your funds"),
-                  substrateNetworks.contains(currency.coinData.unit)
-                      ? OnboardWidgets.neverShare(
-                          text:
-                              "Ensure the recipient has an existential deposit of at least ${currency.coinData.existential} ${currency.coinData.unit} for a successful transaction")
-                      : Container(),
+                  // substrateNetworks.contains(currency.coinData.unit)
+                  //     ? OnboardWidgets.neverShare(
+                  //         text:
+                  //             "Ensure the recipient has an existential deposit of at least ${currency.coinData.existential} ${currency.coinData.unit} for a successful transaction")
+                  //     : Container(),
                   // SizedBox(
                   //   height: 16,
                   // ),
