@@ -30,8 +30,8 @@ class Bitcoin implements Currency {
     unit: "BTC",
     prefix: "",
     smallestUnit: pow(10, 8).toInt(), //100000000 satoshi
-    coinType: StorageService.instance.isTestNet ? 1 : 0,
-    rate: 29220.60,
+    coinType: 0,
+    rate: 20461.40,
     change: "1",
     selected: true,
     blockchainURLTest: "https://www.blockchain.com/btc-testnet/tx/",

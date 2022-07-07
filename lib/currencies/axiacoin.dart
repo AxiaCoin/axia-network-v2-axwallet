@@ -17,7 +17,7 @@ class AXIACoin implements Currency {
   final rpcURLTest =
       "https://1.p2p-v2.testnet.axiacoin.network:443/ext/bc/AX/rpc"; // "https://rpc-v2.test.axiacoin.network";
   final rpcURLMain =
-      "https://1.p2p-v2.testnet.axiacoin.network:443/ext/bc/AX/rpc"; // "https://rpc-v2.test.axiacoin.network";
+      "https://1.p2p-v2.mainnet.axiacoin.network:443/ext/bc/AX/rpc"; // "https://rpc-v2.test.axiacoin.network";
   final maxGas = 21000;
 
   @override
@@ -26,7 +26,7 @@ class AXIACoin implements Currency {
     unit: "AXC",
     prefix: "0x",
     smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
-    coinType: StorageService.instance.isTestNet ? 1 : 60,
+    coinType: 60,
     rate: 13.43,
     change: "1",
     selected: true,
@@ -41,48 +41,6 @@ class AXIACoin implements Currency {
     // print(asd);
     var ethWallet =
         EthPrivateKey.fromHex("${coinData.prefix}${wallet.privKey}");
-    // var client = Web3Client(rpcURL, Client());
-    // client.getGasPrice().then((value) => print("gasprice ${value.getInWei}"));
-    // client.getBalance(ethWallet.address).then((value) => print("axc bal is ${value.getInWei}"));
-    // var signedData = await client.signTransaction(
-    //   ethWallet,
-    //   Transaction(
-    //     to: EthereumAddress.fromHex(
-    //         '0xF98863D856b1Dca7627E98CeA960BA40958774f6'),
-    //     gasPrice: EtherAmount.inWei(BigInt.one),
-    //     maxGas: 100000,
-    //     value: EtherAmount.fromUnitAndValue(EtherUnit.szabo, BigInt.one),
-    //   ),
-    //   fetchChainIdFromNetworkId: true,
-    //   chainId: null,
-    // );
-    // var sent = await client.sendRawTransaction(signedData);
-    // print(sent);
-    // var asd = await client.sendTransaction(
-    //   ethWallet!,
-    //   Transaction(
-    //     to: EthereumAddress.fromHex(
-    //         '0xF98863D856b1Dca7627E98CeA960BA40958774f6'),
-    //     gasPrice: EtherAmount.inWei(BigInt.one),
-    //     maxGas: 100000,
-    //     value: EtherAmount.fromUnitAndValue(EtherUnit.szabo, BigInt.one),
-    //   ),
-    //   fetchChainIdFromNetworkId: true,
-    //   chainId: null,
-    // );
-    // print(asd);
-    // print(asd.getInWei);
-    // print(asd.getInEther);
-    // print(asd.getValueInUnit(EtherUnit.ether));
-    // print(utf8.decode(asd));
-    // coinData.address = ethWallet.address.hexEip55;
-    // coinData.pubKey = "0x${wallet.pubKey}";
-    // coinData.privKey = "0x${wallet.privKey}";
-    // print(coinData.address);
-    // print(coinData.privKey);
-    // print(coinData.pubKey);
-    // print(ethWallet.address.hexEip55);
-    // print("eth: ${ethWallet.address.hexEip55}");
     return CryptoWallet(
         address: ethWallet.address.hexEip55,
         privKey: "${coinData.prefix}${wallet.privKey}",
@@ -92,11 +50,6 @@ class AXIACoin implements Currency {
 
   @override
   Future<double> getBalance({String? address}) async {
-    // var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
-    // var client = Web3Client(rpcURLTest, Client());
-    // var bal = (await client.getBalance(ethWallet.address)).getInEther.toDouble();
-    // print(bal);
-    // return bal;
     if (true) return 0;
     var amount = await APIServices()
         .getBalance([address ?? getWallet().address], coinData.unit);
@@ -145,7 +98,8 @@ class AXIACoin implements Currency {
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     print("address is ${ethWallet.address.hexEip55}");
     print("amount is $amount");
-    var client = Web3Client(rpcURLTest, Client());
+    var client = Web3Client(
+        StorageService.instance.isTestNet ? rpcURLTest : rpcURLMain, Client());
     var gasPrice = await client.getGasPrice();
     var signedData = await client.signTransaction(
       ethWallet,
@@ -176,7 +130,8 @@ class AXIACoin implements Currency {
 
   @override
   Future<double> getEstimatedFees({String? asd}) async {
-    var client = Web3Client(rpcURLTest, Client());
+    var client = Web3Client(
+        StorageService.instance.isTestNet ? rpcURLTest : rpcURLMain, Client());
     var gasPrice = await client.getGasPrice();
     print(gasPrice.getInWei);
     var fees = (gasPrice.getInWei * BigInt.from(maxGas)) /

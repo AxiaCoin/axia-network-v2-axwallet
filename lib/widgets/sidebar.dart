@@ -9,6 +9,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/search.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/network_switcher.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({Key? key}) : super(key: key);

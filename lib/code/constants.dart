@@ -112,5 +112,6 @@ const ipAddress = "http://13.235.53.197:3000/";
 const denomination = 9;
 String network = StorageService.instance.isTestNet ? "TESTNET" : "MAINNET";
 const networkConfigURL = "https://pastebin.com/raw/RiUt8Lsn";
+const networkConfigURLAlt = "https://pastebinp.com/raw/RiUt8Lsn";
 // int satoshi = 100000000;
 // int wei = 1000000000000000000;

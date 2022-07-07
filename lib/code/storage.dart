@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:encrypt/encrypt.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:wallet/code/constants.dart';
@@ -14,11 +14,17 @@ import 'package:axwallet_sdk/axwallet_sdk.dart';
 class StorageService {
   static final StorageService instance = StorageService._();
   StorageService._();
+  final secureStorage = new FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
   final box = GetStorage();
-  final AX1box = GetStorage('configuration');
-  final AX2box = GetStorage('axia_wallet_sdk');
-  var iv = IV.fromLength(16);
-  var encrypter = Encrypter(AES(Key.fromUtf8(encKey)));
+  // final AX1box = GetStorage('configuration');
+  // final AX2box = GetStorage('axia_wallet_sdk');
+  String _pin = "pin";
+  String _pubKey = "pubKey";
+  String _walletKey = "wallets";
+  String _authTokenKey = "authToken";
+  String _sessionIDKey = "sessionID";
 
   String? authToken;
   String? sessionID;
@@ -26,36 +32,31 @@ class StorageService {
   String? pin;
   bool? useBiometric;
   bool isTestNet = true;
-  // Map<String, double> balances = {};
-  // Map<String, String> currencies = {};
   List<String>? defaultWallets;
-  String? substrateWallets;
   String? isoCode;
   NetworkConfig? connectedNetwork;
+  bool isNotMainNetReady = false;
 
-  init() {
-    // box.remove("authToken");
-    // box.erase();
-    authToken = box.read("authToken");
-    sessionID = box.read("sessionID");
-    deviceID = box.read("deviceID");
-    pin = readPIN();
+  Future<void> init() async {
+    if (box.read("isNotMainNetReady") ?? true) await resetStorage();
     isoCode = box.read("isoCode");
-    isTestNet = true;
+    isTestNet = box.read("isTestNet") ?? true;
     useBiometric = box.read("useBiometric") ?? true;
-    getConnectedNetwork();
+    deviceID = box.read("deviceID");
     if (deviceID == null) getDeviceID();
+    getConnectedNetwork();
+    getInitialWallets();
+    await Future.wait([
+      getPIN(),
+      getAuthToken(),
+      getSessionID(),
+    ]);
+  }
 
-    List<dynamic>? wallets = box.read("defaultWallets");
-    if (wallets == null) {
-      getInitialWallets();
-    } else {
-      defaultWallets = wallets.map((e) => e.toString()).toList();
-    }
-    substrateWallets = box.read("substrateWallets");
-    if (substrateWallets == null) {
-      generateSubstrateWallets();
-    }
+  resetStorage() async {
+    box.erase();
+    await secureStorage.deleteAll();
+    box.write("isNotMainNetReady", false);
   }
 
   getDeviceID() async {
@@ -69,20 +70,15 @@ class StorageService {
   }
 
   getInitialWallets() {
-    defaultWallets = currencyList
-        .where((e) => e.coinData.selected)
-        .map((e) => e.coinData.unit)
-        .toList();
-  }
-
-  generateSubstrateWallets() {
-    Map<String, String> wallets = {};
-    substrateNetworks.forEach(
-        (e) => wallets.addAll({e: CryptoWallet.dummyWallet().toJson()}));
-    var stringified = jsonEncode(wallets);
-    // var decoded = jsonDecode(stringified);
-    substrateWallets = stringified;
-    box.write("substrateWallets", stringified);
+    List<dynamic>? data = box.read("defaultWallets");
+    if (data != null) {
+      defaultWallets = data.map((e) => e.toString()).toList();
+    } else {
+      defaultWallets = currencyList
+          .where((e) => e.coinData.selected)
+          .map((e) => e.coinData.unit)
+          .toList();
+    }
   }
 
   getConnectedNetwork() {
@@ -96,12 +92,20 @@ class StorageService {
 
   updateAuthToken(String value) {
     authToken = value;
-    box.write("authToken", value);
+    secureStorage.write(key: _authTokenKey, value: value);
+  }
+
+  Future getAuthToken() async {
+    authToken = await secureStorage.read(key: _authTokenKey);
   }
 
   updateSessionID(String value) {
     sessionID = value;
-    box.write("sessionID", value);
+    secureStorage.write(key: _sessionIDKey, value: value);
+  }
+
+  Future getSessionID() async {
+    sessionID = await secureStorage.read(key: _sessionIDKey);
   }
 
   updateDeviceID(String value) {
@@ -110,16 +114,12 @@ class StorageService {
   }
 
   updatePIN(String value) {
-    var encrypted = encrypter.encrypt(value, iv: iv);
-    pin = value;
-    box.write("pin", encrypted.base16);
+    secureStorage.write(key: _pin, value: value);
   }
 
-  String? readPIN() {
-    String? pin = box.read("pin");
-    if (pin == null) return null;
-    var decrypted = encrypter.decrypt16(pin, iv: iv);
-    return decrypted;
+  Future<String?> getPIN() async {
+    String? data = await secureStorage.read(key: _pin);
+    return pin = data;
   }
 
   updateISOCode(String? value) {
@@ -141,6 +141,12 @@ class StorageService {
   updateConnectedNetwork(NetworkConfig value) {
     connectedNetwork = value;
     box.write("connectedNetwork", value.toJson());
+    isTestNet = value.isTestNet;
+    updateNetworkType(isTestNet);
+    network = isTestNet ? "TESTNET" : "MAINNET";
+    if (services.walletData.hdWallet != null) {
+      services.updateBalances();
+    }
   }
 
   updateDefaultWallets(String wallet, {required isSelected}) {
@@ -152,22 +158,10 @@ class StorageService {
     box.write("defaultWallets", defaultWallets);
   }
 
-  CryptoWallet getSubstrateWallet(String unit) {
-    Map subWallet = jsonDecode(substrateWallets!);
-    return CryptoWallet.fromJson(subWallet[unit]!);
-  }
-
-  updateSubstrateWallets(String unit, CryptoWallet wallet) {
-    Map<String, dynamic> subWallet = jsonDecode(substrateWallets!);
-    subWallet[unit] = wallet.toJson();
-    substrateWallets = jsonEncode(subWallet);
-    box.write("substrateWallets", substrateWallets);
-  }
-
-  updateWalletName(String newname) {
+  updateWalletName(String newname) async {
     WalletData walletData = Get.find();
-    String pubKey = readCurrentPubKey()!;
-    var hdWalletInfo = readMnemonicSeed();
+    String pubKey = (await readCurrentPubKey())!;
+    var hdWalletInfo = await readMnemonicSeed();
     hdWalletInfo[pubKey].name = newname;
     HDWalletInfo walletInfo =
         HDWalletInfo.fromJson(hdWalletInfo[pubKey].toJson());
@@ -180,51 +174,69 @@ class StorageService {
   clearTokens() {
     authToken = null;
     sessionID = null;
-    box.remove("authToken");
-    box.remove("sessionID");
-    box.remove("pubKey");
-    box.remove("seeds");
-    box.remove("pin");
+    pin = null;
+    secureStorage.delete(key: _authTokenKey);
+    secureStorage.delete(key: _sessionIDKey);
+    secureStorage.delete(key: _pin);
+    secureStorage.delete(key: _pubKey);
+    secureStorage.delete(key: _walletKey);
     box.remove("defaultWallets");
-    box.remove("substrateWallets");
     box.remove("useBiometric");
     box.remove("isTestNet");
   }
 
   storeCurrentPubKey(String pubKey) {
-    var encrypted = encrypter.encrypt(pubKey, iv: iv);
-    box.write("pubKey", encrypted.base16);
+    secureStorage.write(key: _pubKey, value: pubKey);
   }
 
-  String? readCurrentPubKey() {
-    String? pubKey = box.read("pubKey");
-    if (pubKey == null) return null;
-    var decrypted = encrypter.decrypt16(pubKey, iv: iv);
-    return decrypted;
+  Future<String?> readCurrentPubKey() async {
+    return await secureStorage.read(key: _pubKey);
   }
 
-  storeMnemonicSeed(String pubKey, HDWalletInfo walletInfo) {
-    var encryptedSeed = encrypter.encrypt(walletInfo.toJson(), iv: iv);
-    var encryptedPubKey = encrypter.encrypt(pubKey, iv: iv);
-    var data = box.read("seeds");
-    if (data == null) {
-      data = {encryptedPubKey.base16: encryptedSeed.base16};
+  // storeMnemonicSeed(String pubKey, HDWalletInfo walletInfo) {
+  //   var encryptedSeed = encrypter.encrypt(walletInfo.toJson(), iv: iv);
+  //   var encryptedPubKey = encrypter.encrypt(pubKey, iv: iv);
+  //   var data = box.read("seeds");
+  //   if (data == null) {
+  //     data = {encryptedPubKey.base16: encryptedSeed.base16};
+  //   } else {
+  //     data[encryptedPubKey.base16] = encryptedSeed.base16;
+  //   }
+  //   box.write("seeds", data);
+  // }
+
+  // dynamic readMnemonicSeed({String? pubKey}) {
+  //   var seeds = box.read("seeds");
+  //   if (seeds == null) return null;
+  //   // if (pubKey == null) {
+  //   var data = {};
+  //   seeds.forEach((key, value) {
+  //     var decryptedSeed = encrypter.decrypt16(value, iv: iv);
+  //     var decryptedPubKey = encrypter.decrypt16(key, iv: iv);
+  //     data[decryptedPubKey] = HDWalletInfo.fromJson(decryptedSeed);
+  //   });
+  //   if (pubKey != null) return data[pubKey];
+  //   return data;
+  // }
+
+  storeMnemonicSeed(String pubKey, HDWalletInfo walletInfo) async {
+    var wallets = await secureStorage.read(key: _walletKey);
+    if (wallets == null) {
+      Map<String, String> map = {pubKey: walletInfo.toJson()};
+      await secureStorage.write(key: _walletKey, value: jsonEncode(map));
     } else {
-      data[encryptedPubKey.base16] = encryptedSeed.base16;
+      var map = jsonDecode(wallets);
+      map[pubKey] = walletInfo.toJson();
+      await secureStorage.write(key: _walletKey, value: jsonEncode(map));
     }
-    box.write("seeds", data);
   }
 
-  dynamic readMnemonicSeed({String? pubKey}) {
-    var seeds = box.read("seeds");
-    if (seeds == null) return null;
-    // if (pubKey == null) {
-    var data = {};
-    seeds.forEach((key, value) {
-      var decryptedSeed = encrypter.decrypt16(value, iv: iv);
-      var decryptedPubKey = encrypter.decrypt16(key, iv: iv);
-      data[decryptedPubKey] = HDWalletInfo.fromJson(decryptedSeed);
-    });
+  readMnemonicSeed({String? pubKey}) async {
+    var wallets = await secureStorage.read(key: _walletKey);
+    if (wallets == null) return;
+    Map map = jsonDecode(wallets);
+    Map<String, HDWalletInfo> data = map.map(
+        (key, value) => MapEntry(key.toString(), HDWalletInfo.fromJson(value)));
     if (pubKey != null) return data[pubKey];
     return data;
   }

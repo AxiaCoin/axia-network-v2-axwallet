@@ -311,7 +311,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
             child: ListView(
               children: [
                 PluginWidgets.indexTitle(
-                    "Transfer tokens to other wallets in Exchange (Swap) and Contract (AX) chains."),
+                    "Transfer tokens to other wallets in Swap and AX chains."),
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

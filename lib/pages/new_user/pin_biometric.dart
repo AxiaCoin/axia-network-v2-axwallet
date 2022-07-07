@@ -53,7 +53,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
         } on PlatformException catch (e) {
           if (e.code == auth_error.notAvailable) {
             print("Fingerprint Not Available");
-            return;
+            StorageService.instance.updateBiometricPreference(false);
           }
         }
       }

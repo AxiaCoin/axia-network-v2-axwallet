@@ -312,11 +312,11 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "Name",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
+                        // Text(
+                        //   "Name",
+                        //   style: TextStyle(
+                        //       fontSize: 16, fontWeight: FontWeight.w500),
+                        // )
                       ],
                     ),
                     Expanded(
@@ -326,17 +326,17 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           Text(source.name,
                               style: TextStyle(
                                   fontSize: 36, fontWeight: FontWeight.w400)),
-                          Expanded(
-                            child: Text(
-                              source == Chain.Swap
-                                  ? "Exchange Chain"
-                                  : source == Chain.Core
-                                      ? "Platform Chain"
-                                      : "Contract Chain",
-                              style: TextStyle(fontSize: 16),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: Text(
+                          //     source == Chain.Swap
+                          //         ? "Exchange Chain"
+                          //         : source == Chain.Core
+                          //             ? "Platform Chain"
+                          //             : "Contract Chain",
+                          //     style: TextStyle(fontSize: 16),
+                          //     textAlign: TextAlign.right,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -393,11 +393,11 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "Name",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
+                        // Text(
+                        //   "Name",
+                        //   style: TextStyle(
+                        //       fontSize: 16, fontWeight: FontWeight.w500),
+                        // )
                       ],
                     ),
                     Expanded(
@@ -407,17 +407,17 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           Text(dest.name,
                               style: TextStyle(
                                   fontSize: 36, fontWeight: FontWeight.w400)),
-                          Expanded(
-                            child: Text(
-                              dest == Chain.Swap
-                                  ? "Exchange Chain"
-                                  : dest == Chain.Core
-                                      ? "Platform Chain"
-                                      : "Contract Chain",
-                              style: TextStyle(fontSize: 16),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: Text(
+                          //     dest == Chain.Swap
+                          //         ? "Exchange Chain"
+                          //         : dest == Chain.Core
+                          //             ? "Platform Chain"
+                          //             : "Contract Chain",
+                          //     style: TextStyle(fontSize: 16),
+                          //     textAlign: TextAlign.right,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -477,7 +477,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
             child: ListView(
               children: [
                 PluginWidgets.indexTitle(
-                    "Transfer tokens between Exchange (Swap), Platform (Core) and Contract (AX) chains."),
+                    "Transfer tokens between Swap, Core and AX chains."),
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

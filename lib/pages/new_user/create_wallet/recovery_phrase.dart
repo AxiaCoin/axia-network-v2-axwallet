@@ -79,31 +79,46 @@ class _RecoverPhrasePageState extends State<RecoverPhrasePage> {
         leading: CommonWidgets.backButton(context),
       ),
       body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              OnboardWidgets.titleAlt("Your Recovery phrase"),
-              OnboardWidgets.subtitle(
-                  "Write down or copy these words in the right order and save them somewhere safe"),
-              code(),
-              actions(),
-              Spacer(),
-              OnboardWidgets.neverShare(),
-              Container(
-                width: Get.width,
-                padding: EdgeInsets.only(top: 8),
-                child: ElevatedButton(
-                  onPressed: () => Get.to(() => VerifyRecoveryPage(
-                        words: words,
-                      )),
-                  child: Text("CONTINUE"),
-                  style: MyButtonStyles.onboardStyle,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                padding:
+                    EdgeInsets.only(left: 16.0, right: 16, top: 16, bottom: 50),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    OnboardWidgets.titleAlt("Your Recovery phrase"),
+                    OnboardWidgets.subtitle(
+                        "Write down or copy these words in the right order and save them somewhere safe"),
+                    code(),
+                    actions(),
+                    // Spacer(),
+                    OnboardWidgets.neverShare(),
+                  ],
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                child: Container(
+                  width: Get.width,
+                  padding:
+                      EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 8),
+                  child: ElevatedButton(
+                    onPressed: () => Get.to(() => VerifyRecoveryPage(
+                          words: words,
+                        )),
+                    child: Text("CONTINUE"),
+                    style: MyButtonStyles.onboardStyle,
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );

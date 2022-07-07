@@ -30,9 +30,9 @@ initServices() async {
       GetStorage.init(CustomCacheManager.key),
     ],
   );
+  await StorageService.instance.init();
   // CustomCacheManager.instance.box.erase();
 
-  StorageService.instance.init();
   // await services.initAXSDK(jsOnly: true);
   initAXCSDK();
   // var mnemonics = StorageService.instance.readMnemonicSeed();
@@ -44,7 +44,7 @@ initServices() async {
 }
 
 initAXCSDK() async {
-  String? pubKey = StorageService.instance.readCurrentPubKey();
+  String? pubKey = await StorageService.instance.readCurrentPubKey();
   var nodes = CustomCacheManager.instance.networkConfigs();
   if (nodes.isEmpty) {
     await services.fetchNetworkConfigs();
@@ -55,7 +55,7 @@ initAXCSDK() async {
     return services.initAXSDK();
   }
   HDWalletInfo walletInfo =
-      StorageService.instance.readMnemonicSeed(pubKey: pubKey);
+      await StorageService.instance.readMnemonicSeed(pubKey: pubKey);
   services.initAXSDK(mnemonic: walletInfo.mnemonic);
 }
 
@@ -77,9 +77,16 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         home: StorageService.instance.authToken == null
             ? LoginPage()
-            : StorageService.instance.readCurrentPubKey() == null
-                ? OnboardPage()
-                : DeviceAuthPage(),
+            : FutureBuilder(
+                future: StorageService.instance.readCurrentPubKey(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Scaffold();
+                  }
+                  return snapshot.data == null
+                      ? OnboardPage()
+                      : DeviceAuthPage();
+                }),
       ),
     );
   }

@@ -28,6 +28,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
     setState(() {});
+    print(StorageService.instance.useBiometric!);
     if (canCheckBiometrics && StorageService.instance.useBiometric!) {
       bool success = await localAuth.authenticate(
         localizedReason: isSettingUp
@@ -60,7 +61,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
 
   successful() async {
     if (isSettingUp) {
-      String pubKey = StorageService.instance.readCurrentPubKey()!;
+      String pubKey = (await StorageService.instance.readCurrentPubKey())!;
       CommonWidgets.waitDialog();
       await services.initMCWallet(pubKey);
       Get.offAll(() => HomePage());
@@ -80,7 +81,6 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   @override
   void initState() {
     super.initState();
-    mnemonic = StorageService.instance.readCurrentPubKey();
     initAuthentication();
   }
 

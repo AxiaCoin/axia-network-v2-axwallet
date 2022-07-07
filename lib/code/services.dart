@@ -105,10 +105,10 @@ class Services {
     HDWallet wallet = HDWallet.fromSeed(seedData);
     HDWalletInfo walletInfo = HDWalletInfo(
         seed: seed, name: name, mnemonic: mnemonic, hdWallet: wallet);
-    StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
+    await StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
     hdWallets[wallet.pubKey!] = walletInfo;
-    StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
-    initMCWallet(wallet.pubKey!);
+    await StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
+    await initMCWallet(wallet.pubKey!);
   }
 
   initMCWallet(String? pubKey, {int retryCount = 0}) async {
@@ -116,7 +116,7 @@ class Services {
     bool isChangingWallet =
         pubKey != null && currentPubKey != null && currentPubKey != pubKey;
     print("isChangingWallet = $isChangingWallet");
-    var mnemonicSeeds = StorageService.instance.readMnemonicSeed();
+    var mnemonicSeeds = await StorageService.instance.readMnemonicSeed();
     if (mnemonicSeeds == null || mnemonicSeeds.isEmpty) return;
     mnemonicSeeds.forEach((key, value) {
       var seedData = HexDecoder().convert(value.seed) as Uint8List;
@@ -131,7 +131,7 @@ class Services {
       // }
       walletData.updateWallet(pubKey);
       if (isChangingWallet || axcWalletStatus == AXCWalletStatus.idle) {
-        await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
+        this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
       }
       print("wallet created");
       currencyList.forEach(
@@ -217,6 +217,7 @@ class Services {
     StorageService.instance
       ..clearTokens()
       ..init();
+    hdWallets.clear();
     Get.offAll(() => LoginPage());
     // }
   }
@@ -274,6 +275,9 @@ class APIServices {
         return null;
       }
     } on SocketException {
+      if (url == networkConfigURL) {
+        return generalRequest(networkConfigURLAlt);
+      }
       return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
       return CommonWidgets.snackBar("Couldn't find URL");

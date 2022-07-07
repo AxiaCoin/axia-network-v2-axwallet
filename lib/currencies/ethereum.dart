@@ -16,6 +16,8 @@ import 'dart:developer' as dev;
 class Ethereum implements Currency {
   final rpcURLTest =
       "https://ropsten.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
+  final rpcURLMain =
+      "https://mainnet.infura.io/v3/ed9107daad174d5d92cc1b16d27a0605";
   final maxGas = 21000;
 
   @override
@@ -24,8 +26,8 @@ class Ethereum implements Currency {
     unit: "ETH",
     prefix: "0x",
     smallestUnit: pow(10, 18).toInt(), //1000000000000000000 wei
-    coinType: StorageService.instance.isTestNet ? 1 : 60,
-    rate: 1963.71,
+    coinType: 60,
+    rate: 1183.18,
     change: "1",
     selected: true,
   );
@@ -142,7 +144,8 @@ class Ethereum implements Currency {
     var ethWallet = EthPrivateKey.fromHex(getWallet().privKey);
     print("address is ${ethWallet.address.hexEip55}");
     print("amount is $amount");
-    var client = Web3Client(rpcURLTest, Client());
+    var client = Web3Client(
+        StorageService.instance.isTestNet ? rpcURLTest : rpcURLMain, Client());
     var gasPrice = await client.getGasPrice();
     var signedData = await client.signTransaction(
       ethWallet,
@@ -177,7 +180,8 @@ class Ethereum implements Currency {
 
   @override
   Future<double> getEstimatedFees() async {
-    var client = Web3Client(rpcURLTest, Client());
+    var client = Web3Client(
+        StorageService.instance.isTestNet ? rpcURLTest : rpcURLMain, Client());
     var gasPrice = await client.getGasPrice();
     var fees = (gasPrice.getInWei * BigInt.from(maxGas)) /
         BigInt.from(coinData.smallestUnit);
