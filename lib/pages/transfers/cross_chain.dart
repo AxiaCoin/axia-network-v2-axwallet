@@ -11,6 +11,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
+import 'package:wallet/widgets/amount_suffix.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
@@ -160,6 +161,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
           children: [
             TextButton(
               onPressed: () {
+                if (calculateMax()! <= 0) {
+                  return CommonWidgets.snackBar(
+                      "Balance too low (after fees) to transfer");
+                }
                 amountController.text = calculateMax()?.toString() ?? "";
               },
               child: Text("MAX"),
@@ -524,7 +529,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
                               (getSourceBalance() == null ||
                                   double.parse(val) <= calculateMax()!)
                           ? null
-                          : "Amount should be lower than the balance (including fees)\nand not zero",
+                          : "Amount should be lower than the balance (including fees) and not zero",
                       autovalidateMode: autoValidate
                           ? AutovalidateMode.onUserInteraction
                           : AutovalidateMode.disabled,
@@ -539,7 +544,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
                         }
                       },
                     ),
-                    amountSuffixWidget()
+                    AmountSuffix(
+                      controller: amountController,
+                      maxAmount: calculateMax(),
+                    )
                   ],
                 ),
                 SizedBox(height: 8),

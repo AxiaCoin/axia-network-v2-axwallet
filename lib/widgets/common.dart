@@ -10,6 +10,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/qr_scan.dart';
+import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 
 class CommonWidgets {
@@ -125,5 +126,29 @@ class CommonWidgets {
               ? Container()
               : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
         ],
+      );
+
+  static Widget empty(String text) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: Get.width * 0.25,
+              width: Get.width * 0.25,
+              child: Image.asset(
+                "assets/icons/empty_txn.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            HomeWidgets.emptyListText(text),
+            // SizedBox(
+            //   height: 16,
+            // ),
+          ],
+        ),
       );
 }

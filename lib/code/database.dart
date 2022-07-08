@@ -32,6 +32,7 @@ class TokenData extends GetxController {
 
 class BalanceData extends GetxController {
   final TokenData tokenData = Get.put(TokenData());
+  final AXCWalletData axcWalletData = Get.put(AXCWalletData());
   Map<Currency, double>? data;
   var totalBalance = 0.0.obs;
   Map<Currency, double> getData() => data ??= {
@@ -43,10 +44,14 @@ class BalanceData extends GetxController {
   updateBalance(Currency currency, double value) {
     getData()[currency] = value;
     totalBalance.value = 0;
-    data!.forEach((key, value) {
-      if (key.coinData.selected)
-        totalBalance.value += value * key.coinData.rate;
-    });
+    totalBalance.value += axcWalletData.balance.value
+        .getTotalBalance(inUSD: isMulticurrencyEnabled);
+    if (isMulticurrencyEnabled) {
+      data!.forEach((key, value) {
+        if (key.coinData.selected)
+          totalBalance.value += value * key.coinData.rate;
+      });
+    }
   }
 }
 

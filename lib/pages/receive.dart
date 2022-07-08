@@ -1,75 +1,135 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
-import 'package:share_plus/share_plus.dart';
 
 class ReceivePage extends StatefulWidget {
-  final Currency currency;
-  const ReceivePage({Key? key, required this.currency}) : super(key: key);
+  final Currency? currency;
+  final Chain? chain;
+  const ReceivePage({
+    Key? key,
+    this.currency,
+    this.chain,
+  }) : super(key: key);
 
   @override
   _ReceivePageState createState() => _ReceivePageState();
 }
 
 class _ReceivePageState extends State<ReceivePage> {
+  AXCWalletData axcWalletData = Get.find();
   final formKey = GlobalKey<FormState>();
   TextEditingController amountController = TextEditingController();
   String amount = "";
-  late Currency currency;
+  Currency? currency;
+  late Chain chain;
+  Map<Chain, String> axWallet = {};
   late String shareableAddress;
-  late CryptoWallet wallet;
+  CryptoWallet? wallet;
   late String qrData;
   late String qrPrefix;
+  int slidingIndex = 0;
 
   copyAddress() {
-    Clipboard.setData(ClipboardData(text: wallet.address));
-    CommonWidgets.snackBar(wallet.address, copyMode: true);
+    Clipboard.setData(ClipboardData(text: shareableAddress));
+    CommonWidgets.snackBar(shareableAddress, copyMode: true);
   }
 
   setAmount(String value) {
     amount = FormatText.roundOff(double.parse(value));
     if (double.parse(value) != 0) {
-      qrData = qrPrefix + wallet.address + "?amount=$value";
+      qrData = qrPrefix + shareableAddress + "?amount=$value";
     } else {
       amount = "0";
-      qrData = qrPrefix + wallet.address;
+      qrData = qrPrefix + shareableAddress;
     }
     setState(() {});
   }
 
   shareAddress() {
     String message =
-        "Hello, you can send me ${currency.coinData.name} at my wallet address- $shareableAddress}";
+        "Hello, you can send me ${currency == null ? "AXC" : currency!.coinData.name} at my wallet address- $shareableAddress}";
     Share.share(message);
   }
 
   getWallet() {
-    wallet = currency.getWallet();
-    qrPrefix = "AMW:${currency.coinData.unit}/";
-    qrData = qrPrefix + wallet.address;
+    var walletData = axcWalletData.wallet.value;
+    if (currency == null) {
+      axWallet = {
+        Chain.Swap: walletData.swap!,
+        Chain.Core: walletData.core!,
+        Chain.AX: walletData.ax!,
+      };
+      slidingIndex = chain == Chain.Swap
+          ? 0
+          : chain == Chain.Core
+              ? 1
+              : 2;
+      qrPrefix = "AMW:AXC-${chain.name}/";
+      qrData =
+          qrPrefix + axWallet[chain]! + (amount != "" ? "?amount=$amount" : "");
+      shareableAddress = axWallet[chain]!;
+      return;
+    }
+    wallet = currency!.getWallet();
+    qrPrefix = "AMW:${currency!.coinData.unit}/";
+    qrData = qrPrefix + wallet!.address;
+    shareableAddress = wallet!.address;
   }
 
   @override
   void initState() {
     super.initState();
     currency = widget.currency;
+    chain = widget.chain ?? Chain.Swap;
     getWallet();
-    shareableAddress = wallet.address;
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget chainWidget() => Container(
+          width: double.infinity,
+          child: CupertinoSlidingSegmentedControl<int>(
+            children: {
+              0: HomeWidgets.segmentedText("Swap-Chain"),
+              1: HomeWidgets.segmentedText("Core-Chain"),
+              2: HomeWidgets.segmentedText("AX-Chain"),
+            },
+            groupValue: slidingIndex,
+            onValueChanged: (int? val) {
+              if (val == null) return;
+              setState(() {
+                chain = val == 0
+                    ? Chain.Swap
+                    : val == 1
+                        ? Chain.Core
+                        : Chain.AX;
+                slidingIndex = val;
+              });
+              getWallet();
+            },
+            backgroundColor: Colors.black.withOpacity(0.2),
+            thumbColor: appColor,
+          ),
+        );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Receive ${currency.coinData.name}"),
+        title: Text(
+            "Receive ${currency == null ? "AXC" : currency!.coinData.name}"),
         centerTitle: true,
         leading: CommonWidgets.backButton(context),
       ),
@@ -80,6 +140,7 @@ class _ReceivePageState extends State<ReceivePage> {
           children: [
             // Container(padding: EdgeInsets.only(top: Get.width * 0.15), child: OnboardWidgets.title("QR Code")),
             // Spacer(),
+            currency == null ? chainWidget() : Container(),
             Container(
               padding: EdgeInsets.only(
                   left: Get.width * 0.15,
@@ -102,7 +163,7 @@ class _ReceivePageState extends State<ReceivePage> {
                         height: 16,
                       ),
                       Text(
-                        wallet.address,
+                        shareableAddress,
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(
@@ -111,7 +172,8 @@ class _ReceivePageState extends State<ReceivePage> {
                       amount == "0" || amount == ""
                           ? Container()
                           : Text(
-                              amount + " ${currency.coinData.unit}",
+                              amount +
+                                  " ${currency == null ? "AXC" : currency!.coinData.name}",
                               textAlign: TextAlign.center,
                             ),
                       SizedBox(
@@ -129,7 +191,8 @@ class _ReceivePageState extends State<ReceivePage> {
             Text.rich(
               TextSpan(text: "Send only ", children: [
                 TextSpan(
-                    text: "${currency.coinData.name} ",
+                    text:
+                        "${currency == null ? "AXIA" : currency!.coinData.name} ",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(
                     text:

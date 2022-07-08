@@ -28,6 +28,7 @@ class HomeWidgets {
         style: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w300, color: appColor),
         maxLines: 1,
+        textAlign: TextAlign.center,
       );
 
   static Widget coinPageHeaderText(String text, {bool isTicker = false}) {

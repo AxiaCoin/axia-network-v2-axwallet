@@ -48,24 +48,26 @@ Color tickerGreen = Color(0xff35B994);
 Color appGrey = Colors.grey[50]!;
 
 ThemeData lightTheme = ThemeData(
-  fontFamily: "MADETommySoft",
-  scaffoldBackgroundColor: Colors.white,
-  brightness: Brightness.light,
-  // colorSchemeSeed: appColor,
-  primarySwatch: appColor,
-  // elevatedButtonTheme: ,
-  appBarTheme: AppBarTheme(
-    systemOverlayStyle: SystemUiOverlayStyle(
-      systemNavigationBarColor: Color(0xFF000000),
-      statusBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.light,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
+    fontFamily: "MADETommySoft",
+    scaffoldBackgroundColor: Colors.white,
+    brightness: Brightness.light,
+    // colorSchemeSeed: appColor,
+    primarySwatch: appColor,
+    // elevatedButtonTheme: ,
+    appBarTheme: AppBarTheme(
+      systemOverlayStyle: SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(0xFF000000),
+        statusBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      color: appColor[600],
+      elevation: 0,
     ),
-    color: appColor[600],
-    elevation: 0,
-  ),
-);
+    inputDecorationTheme: InputDecorationTheme(
+      errorMaxLines: 2,
+    ));
 ThemeData darkTheme = lightTheme.copyWith(
   brightness: Brightness.dark,
   bottomNavigationBarTheme:
@@ -101,7 +103,7 @@ class MyButtonStyles {
 // bool isTestNet = true;
 List<String> substrateNetworks = ["AXC"];
 List<Currency> currencyList = [
-  AXIACoin(),
+  // AXIACoin(),
   Bitcoin(),
   Ethereum(),
 ];
@@ -110,6 +112,7 @@ String encKey = "keyForEncryptingMnemonic";
 String dummyAddress = "1LwQsHAULv2dx8C5PVtxCGU9QG7VvFKTVn";
 const ipAddress = "http://13.235.53.197:3000/";
 const denomination = 9;
+bool isMulticurrencyEnabled = true;
 String network = StorageService.instance.isTestNet ? "TESTNET" : "MAINNET";
 const networkConfigURL = "https://pastebin.com/raw/RiUt8Lsn";
 const networkConfigURLAlt = "https://pastebinp.com/raw/RiUt8Lsn";

@@ -79,29 +79,6 @@ class _RewardsPageState extends State<RewardsPage> {
           leading: CommonWidgets.backButton(context),
         );
 
-    Widget empty() => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: Get.width * 0.25,
-                width: Get.width * 0.25,
-                child: Image.asset(
-                  "assets/icons/empty_txn.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              HomeWidgets.emptyListText("You do not have any pending rewards"),
-              // SizedBox(
-              //   height: 16,
-              // ),
-            ],
-          ),
-        );
-
     Widget totalRewards() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +112,8 @@ class _RewardsPageState extends State<RewardsPage> {
                           key: _refreshKey,
                           onRefresh: () async => await getValidators(),
                           child: rewards.isEmpty
-                              ? empty()
+                              ? CommonWidgets.empty(
+                                  "You do not have any pending rewards")
                               : ListView.builder(
                                   itemCount: rewards.length + 1,
                                   itemBuilder: (context, index) {

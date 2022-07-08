@@ -7,6 +7,7 @@ import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/pages/qr_creation.dart';
+import 'package:wallet/pages/receive.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
@@ -73,10 +74,13 @@ class _AddressCardState extends State<AddressCard> {
               GestureDetector(
                 onTap: () {
                   if (axcWalletData.wallet.value.swap == null) return;
-                  Get.to(() => QRCreationPage(
-                        qrData: axcWalletData.mappedWallet[chain]!,
-                        isRecovery: false,
+                  Get.to(() => ReceivePage(
+                        chain: chain,
                       ));
+                  // Get.to(() => QRCreationPage(
+                  //       qrData: axcWalletData.mappedWallet[chain]!,
+                  //       isRecovery: false,
+                  //     ));
                 },
                 child: SizedBox(
                   height: width,

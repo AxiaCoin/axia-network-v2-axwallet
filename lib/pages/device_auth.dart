@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -96,6 +97,15 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
           centerTitle: true,
           leading: isSettingUp ? null : CommonWidgets.backButton(context),
         ),
+        floatingActionButton: kDebugMode
+            ? FloatingActionButton(
+                child: Icon(Icons.developer_board),
+                onPressed: () {
+                  var api = services.axSDK.api!;
+                  api.basic.tests();
+                },
+              )
+            : null,
         body: SafeArea(
           child: Stack(
             children: [

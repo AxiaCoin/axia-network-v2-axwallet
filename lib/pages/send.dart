@@ -9,6 +9,7 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/address_textfield.dart';
+import 'package:wallet/widgets/amount_suffix.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
@@ -46,7 +47,14 @@ class _SendPageState extends State<SendPage> {
 
   getFees() async {
     fees = await currency.getEstimatedFees();
-    setState(() {});
+    if (mounted) setState(() {});
+  }
+
+  double? calculateMax() {
+    if (balanceData.data != null && (balanceData.data![currency]) != null) {
+      return (balanceData.data![currency])! - fees;
+    }
+    return null;
   }
 
   onSubmit(BuildContext context) async {
@@ -162,9 +170,8 @@ class _SendPageState extends State<SendPage> {
                         return CommonWidgets.snackBar(
                             "Balance too low (after fees) to transfer");
                       }
-                      amountController.text = FormatText.roundOff(
-                          (balanceData.data![currency])! - fees,
-                          maxDecimals: 0);
+                      amountController.text =
+                          ((balanceData.data![currency])! - fees).toString();
                     },
                     child: Text("MAX"),
                   ),
@@ -265,10 +272,13 @@ class _SendPageState extends State<SendPage> {
                                 double.parse(val) <=
                                     balanceData.data![currency]! - fees
                             ? null
-                            : "Amount should be lower than the balance (including fees)\nand not zero",
+                            : "Amount should be lower than the balance (including fees) and not zero",
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                       ),
-                      amountSuffixWidget()
+                      AmountSuffix(
+                        controller: amountController,
+                        maxAmount: calculateMax(),
+                      )
                     ],
                   ),
                   Container(

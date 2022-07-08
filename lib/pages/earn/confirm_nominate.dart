@@ -16,6 +16,7 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/widgets/address_textfield.dart';
+import 'package:wallet/widgets/amount_suffix.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
@@ -230,20 +231,24 @@ class _ValidatePageState extends State<ValidatePage> {
                 }
               },
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    double? bal = getPBalance();
-                    if (bal == null) return;
-                    amountController.text = bal.toString();
-                  },
-                  child: Text("MAX"),
-                ),
-              ],
+            AmountSuffix(
+              controller: amountController,
+              maxAmount: getPBalance(),
             ),
+            // Row(
+            //   mainAxisSize: MainAxisSize.min,
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {
+            //         double? bal = getPBalance();
+            //         if (bal == null) return;
+            //         amountController.text = bal.toString();
+            //       },
+            //       child: Text("MAX"),
+            //     ),
+            //   ],
+            // ),
           ],
         );
 

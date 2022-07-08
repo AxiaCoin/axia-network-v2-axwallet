@@ -12,6 +12,7 @@ import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/ethereum.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/widgets/address_textfield.dart';
+import 'package:wallet/widgets/amount_suffix.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
@@ -54,7 +55,8 @@ class _SameChainTransferState extends State<SameChainTransfer> {
     var data = await api.transfer.getAdjustedGasPrice();
     if (data != null) {
       double gWei = double.parse(data) * pow(10, denomination);
-      setState(() => gasPrice = gWei.toInt());
+      fees[Chain.AX] = (gWei * gasLimit) / pow(10, denomination);
+      if (mounted) setState(() => gasPrice = gWei.toInt());
     }
   }
 
@@ -128,29 +130,28 @@ class _SameChainTransferState extends State<SameChainTransfer> {
   @override
   void initState() {
     super.initState();
-    fees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: 0.001};
+    fees = {
+      Chain.Swap: 0.001,
+      Chain.Core: 0.001,
+      Chain.AX: (gasPrice * gasLimit) / pow(10, denomination),
+    };
     getFees();
   }
 
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
-          title: Text("Same Chain"),
+          title: Text("Send AXC"),
           centerTitle: true,
           leading: CommonWidgets.backButton(context),
         );
 
-    Widget amountSuffixWidget() => Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {
-                amountController.text = calculateMax()?.toString() ?? "";
-              },
-              child: Text("MAX"),
-            ),
-          ],
+    Widget amountSuffixWidget() => Padding(
+          padding: const EdgeInsets.only(top: kTextTabBarHeight * 0.1),
+          child: AmountSuffix(
+            controller: amountController,
+            maxAmount: calculateMax(),
+          ),
         );
 
     // Widget sourceWidget() => DropdownButtonFormField<Chain>(
@@ -223,23 +224,21 @@ class _SameChainTransferState extends State<SameChainTransfer> {
               //     ],
               //   ),
               // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    source == Chain.AX
-                        ? "Estimated Gas Price"
-                        : "Transaction Fee",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  Text(
-                    source == Chain.AX
-                        ? "$gasPrice GWEI"
-                        : "${fees[source]} AXC",
-                    style: TextStyle(fontSize: 12),
-                  )
-                ],
-              ),
+              source == Chain.AX
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Estimated Gas Price",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        Text(
+                          "$gasPrice GWEI",
+                          style: TextStyle(fontSize: 12),
+                        )
+                      ],
+                    )
+                  : Container(),
               source == Chain.AX
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -255,6 +254,19 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                       ],
                     )
                   : SizedBox.shrink(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Transaction Fee",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    "${fees[source]} AXC",
+                    style: TextStyle(fontSize: 12),
+                  )
+                ],
+              ),
               // Row(
               //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
               //   children: [
@@ -270,22 +282,6 @@ class _SameChainTransferState extends State<SameChainTransfer> {
               // ),
             ],
           ),
-        );
-
-    Widget destinationAddress() => TextFormField(
-          controller: addressController,
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            hintText: "Destination Address",
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15))),
-          ),
-          validator: (val) => val != null && val.isNotEmpty
-              ? null
-              : "Please enter a destination address",
-          autovalidateMode: autoValidate
-              ? AutovalidateMode.onUserInteraction
-              : AutovalidateMode.disabled,
         );
 
     return GestureDetector(
@@ -307,7 +303,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
           //   },
           // ),
           body: Container(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: ListView(
               children: [
                 PluginWidgets.indexTitle(
@@ -335,7 +331,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                     )),
                 SizedBox(height: 8),
                 Stack(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.topRight,
                   children: [
                     TextFormField(
                       controller: amountController,
@@ -344,6 +340,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                       inputFormatters: InputFormatters.amountFilter(),
                       decoration: InputDecoration(
                         hintText: "0.1",
+                        // errorMaxLines: 2,
                         border: OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
@@ -355,7 +352,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                               (getSourceBalance() == null ||
                                   double.parse(val) <= calculateMax()!)
                           ? null
-                          : "Amount should be lower than the balance (including fees)\nand not zero",
+                          : "Amount should be lower than the balance (including fees) and not zero",
                       autovalidateMode: autoValidate
                           ? AutovalidateMode.onUserInteraction
                           : AutovalidateMode.disabled,

@@ -164,6 +164,13 @@ class _LoginPageState extends State<LoginPage> {
                         child: Icon(Icons.next_plan),
                         label: "HomePage",
                         onTap: () => Get.offAll(() => HomePage())),
+                    // SpeedDialChild(
+                    //     child: Icon(Icons.developer_board),
+                    //     label: "Test SDK API",
+                    //     onTap: () {
+                    //       var api = services.axSDK.api!;
+                    //       api.basic.tests();
+                    //     }),
                     SpeedDialChild(
                         child: Icon(Icons.api),
                         label: "Test WS",
