@@ -39,6 +39,7 @@ class StorageService {
 
   Future<void> init() async {
     if (box.read("isNotMainNetReady") ?? true) await resetStorage();
+    // await resetStorage();
     isoCode = box.read("isoCode");
     isTestNet = box.read("isTestNet") ?? true;
     useBiometric = box.read("useBiometric") ?? true;
@@ -115,6 +116,7 @@ class StorageService {
 
   updatePIN(String value) {
     secureStorage.write(key: _pin, value: value);
+    pin = value;
   }
 
   Future<String?> getPIN() async {
@@ -158,16 +160,17 @@ class StorageService {
     box.write("defaultWallets", defaultWallets);
   }
 
-  updateWalletName(String newname) async {
+  updateWalletName(String newname, String pubKey) async {
     WalletData walletData = Get.find();
-    String pubKey = (await readCurrentPubKey())!;
-    var hdWalletInfo = await readMnemonicSeed();
-    hdWalletInfo[pubKey].name = newname;
-    HDWalletInfo walletInfo =
-        HDWalletInfo.fromJson(hdWalletInfo[pubKey].toJson());
+    // String pubKey = (readCurrentPubKey())!;
+    var hdWalletInfo = await readMnemonicSeed(pubKey: pubKey);
+    hdWalletInfo.name = newname;
+    HDWalletInfo walletInfo = HDWalletInfo.fromJson(hdWalletInfo.toJson());
     storeMnemonicSeed(pubKey, walletInfo);
     services.hdWallets[pubKey]!.name = newname;
-    walletData.updateWallet(pubKey);
+    if (pubKey == walletData.hdWallet!.value.pubKey) {
+      walletData.updateWallet(pubKey);
+    }
     print("Wallet name updated");
   }
 
@@ -178,19 +181,23 @@ class StorageService {
     secureStorage.delete(key: _authTokenKey);
     secureStorage.delete(key: _sessionIDKey);
     secureStorage.delete(key: _pin);
-    secureStorage.delete(key: _pubKey);
     secureStorage.delete(key: _walletKey);
+    box.remove(_pubKey);
     box.remove("defaultWallets");
     box.remove("useBiometric");
     box.remove("isTestNet");
   }
 
   storeCurrentPubKey(String pubKey) {
-    secureStorage.write(key: _pubKey, value: pubKey);
+    box.write(_pubKey, pubKey);
   }
 
-  Future<String?> readCurrentPubKey() async {
-    return await secureStorage.read(key: _pubKey);
+  String? readCurrentPubKey() {
+    return box.read(_pubKey);
+  }
+
+  clearCurrentPubKey() {
+    box.remove(_pubKey);
   }
 
   // storeMnemonicSeed(String pubKey, HDWalletInfo walletInfo) {
@@ -239,5 +246,15 @@ class StorageService {
         (key, value) => MapEntry(key.toString(), HDWalletInfo.fromJson(value)));
     if (pubKey != null) return data[pubKey];
     return data;
+  }
+
+  removeMnemonicSeed(String pubKey) async {
+    var wallets = await secureStorage.read(key: _walletKey);
+    if (wallets == null) return;
+    Map map = jsonDecode(wallets);
+    Map<String, String> data =
+        map.map((key, value) => MapEntry(key.toString(), value.toString()));
+    data.remove(pubKey);
+    await secureStorage.write(key: _walletKey, value: jsonEncode(data));
   }
 }

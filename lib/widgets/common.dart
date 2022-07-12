@@ -77,6 +77,17 @@ class CommonWidgets {
         Navigator.pop(context);
       });
 
+  static Widget handleBar() {
+    return Container(
+      height: 4,
+      width: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.grey,
+      ),
+    );
+  }
+
   static Widget elevatedContainer({
     required Widget child,
     double margin = 16,

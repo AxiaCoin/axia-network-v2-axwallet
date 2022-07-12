@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
@@ -31,6 +32,7 @@ class _SameChainTransferState extends State<SameChainTransfer> {
   int slidingIndex = 0;
   TextEditingController amountController = new TextEditingController();
   TextEditingController addressController = new TextEditingController();
+  TextEditingController memoController = new TextEditingController();
   late Currency currency;
   FocusNode amountFocus = new FocusNode();
   bool autoValidate = false;
@@ -77,36 +79,61 @@ class _SameChainTransferState extends State<SameChainTransfer> {
     return bal;
   }
 
+  Future<bool> checkAddress() async {
+    if (source == Chain.Swap) {
+      String chain = addressController.text.split('-').first;
+      if (chain != source.name) {
+        print("1");
+        return false;
+      }
+    } else {
+      if (addressController.text.substring(0, 2) != "0x") {
+        print("2");
+        return false;
+      }
+    }
+    bool isValid =
+        await api.utils.checkAddrValidity(address: addressController.text);
+    print("3");
+    print(addressController.text);
+    print(isValid);
+    return isValid;
+  }
+
   transfer() async {
     if (formKey.currentState!.validate()) {
+      bool isValid =
+          await Utils.validateAddress(source, addressController.text);
+      if (!isValid) {
+        CommonWidgets.snackBar(
+            "Please check if the chain and address are correct for the network!");
+        return;
+      }
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
         CommonWidgets.waitDialog(text: "Transferring tokens");
         await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Transfer started");
-          int amount = (double.parse(amountController.text) *
-                  pow(
-                      10,
-                      source == Chain.Swap
-                          ? denomination
-                          : Ethereum().coinData.smallestUnit))
-              .toInt();
-          print(amount);
+          // BigInt amount = BigInt.from(double.parse(amountController.text) *
+          //     pow(10, source == Chain.Swap ? denomination : 18));
+          print("sending amount = ${amountController.text}");
           var response = await api.transfer.sameChain(
             chain: source.name,
             to: addressController.text.trim(),
-            amount: amount.toString(),
+            amount: amountController.text,
+            memo: memoController.text,
           );
           print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
-          if (response != null && response["txID"] != null) {
+          if (response != null && response is Map && response["txID"] != null) {
             print("success");
             Get.back();
             services.getAXCWalletDetails();
             setState(() {
               amountController.clear();
               addressController.clear();
+              memoController.clear();
               autoValidate = false;
             });
             CommonWidgets.snackBar("The transfer was successfull", duration: 5);
@@ -145,38 +172,6 @@ class _SameChainTransferState extends State<SameChainTransfer> {
           centerTitle: true,
           leading: CommonWidgets.backButton(context),
         );
-
-    Widget amountSuffixWidget() => Padding(
-          padding: const EdgeInsets.only(top: kTextTabBarHeight * 0.1),
-          child: AmountSuffix(
-            controller: amountController,
-            maxAmount: calculateMax(),
-          ),
-        );
-
-    // Widget sourceWidget() => DropdownButtonFormField<Chain>(
-    //     decoration: InputDecoration(
-    //       enabledBorder: OutlineInputBorder(
-    //         borderSide: BorderSide(color: Colors.grey, width: 2),
-    //         borderRadius: BorderRadius.circular(20),
-    //       ),
-    //       border: OutlineInputBorder(
-    //           borderRadius: BorderRadius.all(Radius.circular(15))),
-    //       filled: false,
-    //     ),
-    //     value: source,
-    //     onChanged: (Chain? newValue) {
-    //       if (newValue == null) return;
-    //       setState(() {
-    //         source = newValue;
-    //       });
-    //       double max = calculateMax() ?? 0;
-    //       if (amountController.text != "" &&
-    //           double.parse(amountController.text) > max) {
-    //         amountController.text = max.toString();
-    //       }
-    //     },
-    //     items: dropdownItems);
 
     Widget sourceWidget() => CupertinoSlidingSegmentedControl<int>(
           children: {
@@ -284,6 +279,33 @@ class _SameChainTransferState extends State<SameChainTransfer> {
           ),
         );
 
+    Widget memoWidget() {
+      return Container(
+        child: Column(
+          children: [
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Memo (optional)",
+                  style: Theme.of(context).textTheme.subtitle2,
+                )),
+            SizedBox(height: 8),
+            TextFormField(
+              controller: memoController,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                hintText: "Memo",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+              ),
+              minLines: 3,
+              maxLines: 6,
+            ),
+          ],
+        ),
+      );
+    }
+
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -296,12 +318,16 @@ class _SameChainTransferState extends State<SameChainTransfer> {
         key: formKey,
         child: Scaffold(
           appBar: appBar(),
-          // floatingActionButton: FloatingActionButton(
-          //   child: Icon(Icons.add),
-          //   onPressed: () async {
-          //     services.test();
-          //   },
-          // ),
+          // floatingActionButton: kDebugMode
+          //     ? FloatingActionButton(
+          //         child: Icon(Icons.add),
+          //         onPressed: () async {
+          //           bool isValid = await api.utils
+          //               .checkAddrValidity(address: addressController.text);
+          //           print(isValid ? "is valid" : "is not valid");
+          //         },
+          //       )
+          //     : null,
           body: Container(
             padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: ListView(
@@ -367,7 +393,10 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                         }
                       },
                     ),
-                    amountSuffixWidget()
+                    AmountSuffix(
+                      controller: amountController,
+                      maxAmount: calculateMax(),
+                    ),
                   ],
                 ),
                 SizedBox(height: 8),
@@ -410,7 +439,10 @@ class _SameChainTransferState extends State<SameChainTransfer> {
                   controller: addressController,
                   amountController: amountController,
                   title: "Destination Address",
+                  autoValidate: autoValidate,
                 ),
+                SizedBox(height: 8),
+                source == Chain.Swap ? memoWidget() : Container(),
                 SizedBox(height: 8),
                 feeWidget(),
                 SizedBox(height: 8),

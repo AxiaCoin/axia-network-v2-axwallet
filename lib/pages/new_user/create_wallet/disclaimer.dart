@@ -31,7 +31,7 @@ class _DisclaimerPageState extends State<DisclaimerPage> {
             children: [
               OnboardWidgets.title("Back up your wallet now!"),
               OnboardWidgets.subtitle(
-                  "In the next step you will see 12 words that allows you to recover a wallet"),
+                  "In the next step you will see 24 words that allows you to recover a wallet"),
               Spacer(),
               Icon(
                 Icons.refresh,

@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
@@ -267,11 +269,20 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
       print(mnemonic);
       // StorageService.instance.storeMnemonic(mnemonic);
       // services.initWallet(mnemonic);
-      Get.offAll(() => PinBiometricPage(
-            mnemonic: mnemonic,
-            name: nameController.text.trim(),
-          ));
-    } else
+      String? pin = StorageService.instance.pin;
+      if (pin == null) {
+        Get.offAll(() => PinBiometricPage(
+              mnemonic: mnemonic,
+              name: nameController.text.trim(),
+            ));
+      } else {
+        Get.to(() => DeviceAuthPage(
+              mnemonic: mnemonic,
+              name: nameController.text.trim(),
+            ));
+      }
+    } else {
       CommonWidgets.snackBar("Please enter a wallet name");
+    }
   }
 }

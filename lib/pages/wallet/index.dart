@@ -1,11 +1,14 @@
 import 'dart:math';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
@@ -13,6 +16,7 @@ import 'package:wallet/pages/search.dart';
 import 'package:wallet/pages/wallet/finance.dart';
 import 'package:wallet/pages/wallet/new_wallet.dart';
 import 'package:wallet/pages/wallet/tokens.dart';
+import 'package:wallet/widgets/axc_txn_tile.dart';
 import 'package:wallet/widgets/balance_card.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
@@ -21,13 +25,11 @@ import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/walletname_update.dart';
 
 class WalletPage extends StatefulWidget {
-  WalletPage({Key? key}) : super(key: newWalletKey);
+  WalletPage({Key? key}) : super(key: key);
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
-
-final newWalletKey = GlobalKey<_WalletPageState>();
 
 class _WalletPageState extends State<WalletPage>
     with AutomaticKeepAliveClientMixin {
@@ -42,10 +44,13 @@ class _WalletPageState extends State<WalletPage>
   final TokenData list = Get.find();
   final BalanceData balanceData = Get.find();
   final WalletData walletData = Get.find();
+  final AXCWalletData axcWalletData = Get.find();
+  List<AXCTransaction> transactions = [];
 
   Future refreshData() async {
     if (isLoading || isRefreshing) {
       await 1.delay();
+      getTransactions();
       data = list.data;
       balanceInfo = balanceData.getData();
       if (list.selected == null) list.defaultSelection();
@@ -56,6 +61,15 @@ class _WalletPageState extends State<WalletPage>
         });
       print("balance is $balanceInfo");
     }
+  }
+
+  getTransactions() async {
+    // setState(() {
+    //   transactions = CustomCacheManager.instance.transactionsFromCache();
+    // });
+    // transactions = await services.axSDK.api!.transfer.getTransactions();
+    // CustomCacheManager.instance.cacheTransactions(transactions);
+    // setState(() {});
   }
 
   @override
@@ -126,17 +140,17 @@ class _WalletPageState extends State<WalletPage>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await CommonWidgets.bottomSheet(
-                                WalletNameUpdate(wname: walletData.name.value));
-                            setState(() {});
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 18,
-                          )),
+                      // IconButton(
+                      //     onPressed: () async {
+                      //       await CommonWidgets.bottomSheet(
+                      //           WalletNameUpdate(wname: walletData.name.value));
+                      //       setState(() {});
+                      //     },
+                      //     icon: Icon(
+                      //       Icons.edit,
+                      //       color: Colors.white,
+                      //       size: 18,
+                      //     )),
                     ],
                   ),
                   SizedBox(
@@ -324,6 +338,36 @@ class _WalletPageState extends State<WalletPage>
       );
     }
 
+    Widget transactionList() {
+      return Column(children: [
+        Text(
+          "Transaction History",
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Obx(
+          () => ListView.builder(
+              itemCount: axcWalletData.transactions.isEmpty
+                  ? 1
+                  : axcWalletData.transactions.length,
+              shrinkWrap: true,
+              primary: false,
+              itemBuilder: ((context, index) {
+                if (axcWalletData.transactions.isEmpty) {
+                  return CommonWidgets.empty(
+                      "You don't have any transactions in this wallet");
+                }
+                return AXCTxnTile(
+                  transaction: axcWalletData.transactions[index],
+                );
+              })),
+        ),
+      ]);
+    }
+
     return Scaffold(
       key: scaffoldKey,
       appBar: appBar(),
@@ -348,7 +392,10 @@ class _WalletPageState extends State<WalletPage>
             //   child: dash(),
             // ),
             NewWalletDashboard(),
-            isMulticurrencyEnabled ? multicurrencyModule() : Container(),
+            isMulticurrencyEnabled ? multicurrencyModule() : transactionList(),
+            SizedBox(
+              height: kBottomNavigationBarHeight,
+            )
           ],
         ),
       ),

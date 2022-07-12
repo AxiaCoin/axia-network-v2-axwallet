@@ -13,22 +13,25 @@ class AmountSuffix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-          onPressed: () {
-            if (maxAmount == null) return;
-            if (maxAmount! <= 0) {
-              return CommonWidgets.snackBar(
-                  "Balance too low (after fees) to transfer");
-            }
-            controller.text = maxAmount.toString();
-          },
-          child: Text("MAX"),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: kTextTabBarHeight * 0.1),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton(
+            onPressed: () {
+              if (maxAmount == null) return;
+              if (maxAmount! <= 0) {
+                return CommonWidgets.snackBar(
+                    "Balance too low (incl. fees) to transfer");
+              }
+              controller.text = maxAmount.toString();
+            },
+            child: Text("MAX"),
+          ),
+        ],
+      ),
     );
   }
 }

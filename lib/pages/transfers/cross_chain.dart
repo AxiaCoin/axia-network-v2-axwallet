@@ -82,20 +82,20 @@ class _CrossChainPageState extends State<CrossChainPage> {
         await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Transfer started");
-          // add import fees for destination chain
-          int amount =
-              ((double.parse(amountController.text) + importFees[dest]!) *
-                      pow(10, denomination))
-                  .toInt();
-          print(amount);
+          // BigInt amount = BigInt.from(
+          //         (double.parse(amountController.text) + importFees[dest]!)) *
+          //     BigInt.from(pow(10, denomination));
+          print(amountController.text);
           var response = await api.transfer.crossChain(
             from: source.name,
             to: dest.name,
-            amount: amount.toString(),
+            amount: amountController.text,
           );
           print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
-          if (response != null && response["exportID"] != null) {
+          if (response != null &&
+              response is Map &&
+              response["exportID"] != null) {
             print("success");
             Get.back();
             services.getAXCWalletDetails();
@@ -509,7 +509,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
                     )),
                 SizedBox(height: 8),
                 Stack(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.topRight,
                   children: [
                     TextFormField(
                       controller: amountController,

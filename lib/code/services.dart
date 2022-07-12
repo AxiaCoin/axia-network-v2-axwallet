@@ -11,11 +11,13 @@ import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/Crypto_Models/validator.dart';
 import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -131,8 +133,11 @@ class Services {
       // }
       walletData.updateWallet(pubKey);
       if (isChangingWallet || axcWalletStatus == AXCWalletStatus.idle) {
-        this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
+        await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
       }
+      StorageService.instance.storeCurrentPubKey(pubKey);
+      AXCWalletData axcWalletData = Get.find();
+      axcWalletData.setCachedData();
       print("wallet created");
       currencyList.forEach(
         (e) => e.getWallet(),
@@ -142,31 +147,51 @@ class Services {
 
   getAXCWalletDetails() async {
     AXCWalletData axcWalletData = Get.find();
+    axcWalletData.setCachedData();
     update() async {
       var api = this.axSDK.api!;
       var data = await Future.wait([
         api.basic.getWallet(),
         api.basic.getBalance(),
+        api.transfer.getTransactions(),
       ]);
-      var wallet = AXCWallet.fromMap(data[0]);
-      var balance = AXCBalance.fromMap(data[1]);
+      AXCWallet wallet = AXCWallet.fromMap(data[0]);
+      AXCBalance balance = AXCBalance.fromMap(data[1]);
+      List<AXCTransaction> transactions = data[2];
+      CustomCacheManager.instance.cacheTransactions(transactions);
+      CustomCacheManager.instance.cacheBalance(balance);
       axcWalletData.updateWallet(wallet);
       axcWalletData.updateBalance(balance);
+      axcWalletData.updateTransactions(transactions);
     }
 
     if (timerAXC != null) {
       timerAXC?.cancel();
-      print("timer cancelled");
     }
     await update();
+
+    // called only once when any configs/wallets change
+    updateValidators();
+
     timerAXC = Timer.periodic(Duration(minutes: 1), (t) {
       update();
     });
   }
 
+  updateValidators() async {
+    var response =
+        (await axSDK.api!.nomination.getValidators())["validators"] as List;
+    List<ValidatorItem> validators =
+        response.map((e) => ValidatorItem.fromMap(e)).toList();
+    validators
+        .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
+    CustomCacheManager.instance.cacheValidators(validators);
+  }
+
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     void update() async {
+      if (!isMulticurrencyEnabled) return;
       await Future.wait(currencyList.map((e) async {
         double balance = (await e.getBalance()).toDouble();
         balanceCont.updateBalance(e, balance);
@@ -175,12 +200,43 @@ class Services {
 
     if (timer != null) {
       timer?.cancel();
-      print("timer cancelled");
     }
     update();
     timer = Timer.periodic(Duration(seconds: 10), (t) {
       update();
     });
+  }
+
+  deleteWallet(BuildContext context, String pubKey) async {
+    String current = walletData.hdWallet!.value.pubKey!;
+    hdWallets.remove(pubKey);
+    StorageService.instance.removeMnemonicSeed(pubKey);
+    print("hdWallets is $hdWallets");
+    print("hdWallets g is ${services.hdWallets}");
+    print("hdWallets t is ${this.hdWallets}");
+    if (hdWallets.isEmpty) {
+      print("wallet is empty");
+      StorageService.instance.clearCurrentPubKey();
+      Get.offAll(() => OnboardPage());
+    } else if (current == pubKey) {
+      print("deleting me $pubKey");
+      String nextPubKey = hdWallets.entries.first.key;
+      CommonWidgets.waitDialog(
+          text: "Switching to a different wallet. Please wait");
+      print("new key is $nextPubKey");
+      await initMCWallet(nextPubKey);
+      hdWallets
+          .remove(pubKey); // need to call this for reasons I have no answer for
+      Get.back();
+      // CommonWidgets.snackBar("Switching to a different wallet. Please wait");
+    } else {
+      print("deleting other");
+      CommonWidgets.snackBar("Wallet Deleted!");
+      // String nextPubKey = hdWallets.entries.first.key;
+      // CommonWidgets.waitDialog(text: "Deleting. Please wait");
+      // await initMCWallet(nextPubKey);
+      // Get.back();
+    }
   }
 
   logOut() async {

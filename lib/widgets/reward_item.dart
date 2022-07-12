@@ -70,8 +70,7 @@ class RewardItem extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     height: 20,
-                    width: width *
-                        max(0.01, ((now - startTime) / (endTime - startTime))),
+                    width: width * Utils.getStakingProgress(startTime, endTime),
                     color: tickerGreen.withOpacity(0.6),
                   ),
                 ),

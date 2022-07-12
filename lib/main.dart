@@ -19,11 +19,6 @@ Future<void> main() async {
 initServices() async {
   // Get.changeTheme(Get.isDarkMode ? darkTheme : lightTheme);
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
-  Get.put(TokenData());
-  Get.put(BalanceData());
-  Get.put(SettingsState());
-  Get.put(WalletData());
-  Get.put(AXCWalletData());
   await Future.wait(
     [
       GetStorage.init(),
@@ -31,6 +26,11 @@ initServices() async {
     ],
   );
   await StorageService.instance.init();
+  Get.put(TokenData());
+  Get.put(BalanceData());
+  Get.put(SettingsState());
+  Get.put(WalletData());
+  Get.put(AXCWalletData());
   // CustomCacheManager.instance.box.erase();
 
   // await services.initAXSDK(jsOnly: true);
@@ -44,7 +44,7 @@ initServices() async {
 }
 
 initAXCSDK() async {
-  String? pubKey = await StorageService.instance.readCurrentPubKey();
+  String? pubKey = StorageService.instance.readCurrentPubKey();
   var nodes = CustomCacheManager.instance.networkConfigs();
   if (nodes.isEmpty) {
     await services.fetchNetworkConfigs();
@@ -77,16 +77,9 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         home: StorageService.instance.authToken == null
             ? LoginPage()
-            : FutureBuilder(
-                future: StorageService.instance.readCurrentPubKey(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Scaffold();
-                  }
-                  return snapshot.data == null
-                      ? OnboardPage()
-                      : DeviceAuthPage();
-                }),
+            : StorageService.instance.readCurrentPubKey() == null
+                ? OnboardPage()
+                : DeviceAuthPage(),
       ),
     );
   }

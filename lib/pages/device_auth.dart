@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
@@ -12,7 +13,13 @@ import 'package:wallet/pages/home.dart';
 import 'package:wallet/widgets/common.dart';
 
 class DeviceAuthPage extends StatefulWidget {
-  const DeviceAuthPage({Key? key}) : super(key: key);
+  final String? mnemonic;
+  final String? name;
+  const DeviceAuthPage({
+    Key? key,
+    this.mnemonic,
+    this.name,
+  }) : super(key: key);
 
   @override
   State<DeviceAuthPage> createState() => _DeviceAuthPageState();
@@ -31,11 +38,15 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
     setState(() {});
     print(StorageService.instance.useBiometric!);
     if (canCheckBiometrics && StorageService.instance.useBiometric!) {
-      bool success = await localAuth.authenticate(
+      bool success = await localAuth
+          .authenticate(
         localizedReason: isSettingUp
             ? "Please authenticate to continue to wallet"
             : "Please authenticate this Transaction",
-      );
+      )
+          .catchError((onError) {
+        return false;
+      });
       if (success) {
         successful();
       } else {
@@ -61,8 +72,10 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   }
 
   successful() async {
-    if (isSettingUp) {
-      String pubKey = (await StorageService.instance.readCurrentPubKey())!;
+    if (widget.mnemonic != null) {
+      createNewWallet();
+    } else if (isSettingUp) {
+      String pubKey = StorageService.instance.readCurrentPubKey()!;
       CommonWidgets.waitDialog();
       await services.initMCWallet(pubKey);
       Get.offAll(() => HomePage());
@@ -70,6 +83,12 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
       Get.back(result: true);
       return;
     }
+  }
+
+  createNewWallet() async {
+    CommonWidgets.waitDialog();
+    await services.createMCWallet(widget.mnemonic!, widget.name!);
+    Get.offAll(() => HomePage());
   }
 
   BoxDecoration get _pinPutDecoration {
@@ -123,7 +142,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                     Text(
                       isSettingUp
                           ? "Enter your PIN to access your Wallet"
-                          : "Enter your PIN to authenticate this Transaction",
+                          : "Enter your PIN to authenticate",
                       style: context.textTheme.headline5,
                     ),
                     SizedBox(

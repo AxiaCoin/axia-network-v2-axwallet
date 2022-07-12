@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:time_picker_widget/time_picker_widget.dart';
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
 
 import 'package:wallet/Crypto_Models/validator.dart';
 import 'package:wallet/code/constants.dart';
@@ -74,19 +75,28 @@ class _ValidatePageState extends State<ValidatePage> {
 
   onSubmit() async {
     if (formKey.currentState!.validate()) {
+      if (isCustomVisible) {
+        bool isValid =
+            await Utils.validateAddress(Chain.Core, addressController.text);
+        if (!isValid) {
+          CommonWidgets.snackBar(
+              "Please check if the address is correct for the network (Core)!");
+          return;
+        }
+      }
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
         CommonWidgets.waitDialog(text: "Nominating node");
         await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Nomination started");
-          int amount =
-              (double.parse(amountController.text) * pow(10, denomination))
-                  .toInt();
-          print(amount);
+          // int amount =
+          //     (double.parse(amountController.text) * pow(10, denomination))
+          //         .toInt();
+          print(amountController.text);
           var response = await api.nomination.nominateNode(
             nodeID: validator.nodeID,
-            amount: amount.toString(),
+            amount: amountController.text,
             end: selectedDate.millisecondsSinceEpoch,
             rewardAddress:
                 addressController.text.isEmpty ? null : addressController.text,
@@ -94,7 +104,7 @@ class _ValidatePageState extends State<ValidatePage> {
           print("Nomination response: $response");
           print(response.runtimeType);
           await Future.delayed(Duration(milliseconds: 200));
-          if (response != null && response["txID"] != null) {
+          if (response != null && response is Map && response["txID"] != null) {
             print("success");
             Get.back();
             Get.back();
@@ -127,7 +137,7 @@ class _ValidatePageState extends State<ValidatePage> {
     nodeIdController.text = validator.nodeID;
     feeController.text =
         FormatText.roundOff(double.parse(validator.nominationFee)) + "%";
-    selectedDate = DateTime.now().add(Duration(days: 14, minutes: 5));
+    selectedDate = DateTime.now().add(Duration(days: minStakeDays, minutes: 5));
     minStartDate = selectedDate;
     endDate = DateTime.fromMillisecondsSinceEpoch(
         int.parse(validator.endTime) * 1000);
@@ -200,7 +210,7 @@ class _ValidatePageState extends State<ValidatePage> {
         );
 
     Widget amountWidget() => Stack(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.topRight,
           children: [
             TextFormField(
               controller: amountController,
@@ -218,8 +228,8 @@ class _ValidatePageState extends State<ValidatePage> {
                       double.parse(val) != 0 &&
                       (getPBalance() == null ||
                           double.parse(val) <= getPBalance()!)
-                  ? double.parse(val) < 20
-                      ? "Minimum stake amount is 20 ${currency.coinData.unit}"
+                  ? double.parse(val) < minStakeAmount
+                      ? "Minimum stake amount is $minStakeAmount ${currency.coinData.unit}"
                       : null
                   : "Amount should be lower than the balance and not zero",
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -393,7 +403,7 @@ class _ValidatePageState extends State<ValidatePage> {
               isCustomVisible
                   ? AddressTextField(
                       controller: addressController,
-                      title: "Custom Address",
+                      title: "Custom Address (Core)",
                     )
                   : SizedBox.shrink(),
               SizedBox(height: 8),

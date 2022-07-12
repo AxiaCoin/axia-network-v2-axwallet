@@ -3,8 +3,46 @@
 import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/Crypto_Models/validator.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:intl/intl.dart';
+import 'package:wallet/code/services.dart';
+import 'package:wallet/widgets/common.dart';
+
+class Utils {
+  Utils._();
+
+  static List<ValidatorItem> filterValidators(List<ValidatorItem> data) {
+    data.removeWhere((element) =>
+        DateTime.fromMillisecondsSinceEpoch(int.parse(element.endTime) * 1000)
+            .difference(DateTime.now())
+            .inDays <
+        minStakeDays);
+    return data;
+  }
+
+  static double getStakingProgress(int start, int end, {double min = 0.01}) {
+    int now = DateTime.now().millisecondsSinceEpoch;
+    return max(min, ((now - start) / (end - start)));
+  }
+
+  static Future<bool> validateAddress(Chain source, String address) async {
+    if (source == Chain.Swap || source == Chain.Core) {
+      String chain = address.split('-').first;
+      if (chain != source.name) {
+        return false;
+      }
+    } else {
+      if (address.substring(0, 2) != "0x") {
+        return false;
+      }
+    }
+    bool isValid =
+        await services.axSDK.api!.utils.checkAddrValidity(address: address);
+    return isValid;
+  }
+}
 
 class FormatText {
   FormatText._();
@@ -41,9 +79,12 @@ class FormatText {
     return isDecimalZero ? formatted.toStringAsFixed(0) : formatted.toString();
   }
 
-  static String address(String input, {int pad = 6}) {
+  static String address(String input, {int pad = 6, bool hideLast = false}) {
     if (input.length < pad * 2) {
       return input;
+    }
+    if (hideLast) {
+      return input.substring(0, pad * 2) + "...";
     }
     return input.substring(0, pad) +
         '...' +
@@ -84,6 +125,32 @@ class FormatText {
     // if (remaining.inDays > 365) {
     //   return "in ${remaining.inDays} year(s)";
     // } else if (remaining.inDays > 365)
+  }
+
+  static String elapsedTime(int time) {
+    // String formatSingle(int value) =>
+
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(time);
+    DateTime now = DateTime.now();
+    Duration elapsed = now.difference(dateTime);
+    int years = (elapsed.inDays / 365).floor();
+    int months = (elapsed.inDays / 30).floor();
+    int days = elapsed.inDays;
+    int hours = elapsed.inHours;
+    int minutes = elapsed.inMinutes;
+    if (years > 0) {
+      return "${years == 1 ? "a year" : "$years years"} ago";
+    } else if (months > 0) {
+      return "${months == 1 ? "a month" : "$months months"} ago";
+    } else if (days > 0) {
+      return "${days == 1 ? "a day" : "$days days"} ago";
+    } else if (hours > 0) {
+      return "${hours == 1 ? "an hour" : "$hours hours"} ago";
+    } else if (minutes > 0) {
+      return "${minutes == 1 ? "a minute" : "$minutes minutes"} ago";
+    } else {
+      return "a few seconds ago";
+    }
   }
 
   static String readableDate(DateTime time) {

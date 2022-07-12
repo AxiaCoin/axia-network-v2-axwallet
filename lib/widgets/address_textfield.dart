@@ -14,11 +14,13 @@ class AddressTextField extends StatelessWidget {
   final TextEditingController controller;
   final TextEditingController? amountController;
   final String? title;
+  final bool? autoValidate;
   const AddressTextField({
     Key? key,
     required this.controller,
     this.amountController,
     this.title,
+    this.autoValidate,
   }) : super(key: key);
 
   updateFields(String result) {
@@ -37,29 +39,32 @@ class AddressTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget recipientSuffixWidget() => Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-                onPressed: () {
-                  Get.to(() => QRScanPage())!.then((value) {
-                    if (value != null && amountController != null) {
-                      updateFields(value);
-                    }
-                  });
-                },
-                icon: SvgPicture.asset(
-                  "assets/icons/qr.svg",
-                  color: appColor,
-                )),
-            TextButton(
-                onPressed: () async {
-                  ClipboardData? data = await Clipboard.getData('text/plain');
-                  controller.text = data!.text!;
-                },
-                child: Text("PASTE"))
-          ],
+    Widget recipientSuffixWidget() => Padding(
+          padding: const EdgeInsets.only(top: kTextTabBarHeight * 0.1),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                  onPressed: () {
+                    Get.to(() => QRScanPage())!.then((value) {
+                      if (value != null && amountController != null) {
+                        updateFields(value);
+                      }
+                    });
+                  },
+                  icon: SvgPicture.asset(
+                    "assets/icons/qr.svg",
+                    color: appColor,
+                  )),
+              TextButton(
+                  onPressed: () async {
+                    ClipboardData? data = await Clipboard.getData('text/plain');
+                    controller.text = data!.text!;
+                  },
+                  child: Text("PASTE"))
+            ],
+          ),
         );
     return Column(
       children: [
@@ -73,7 +78,7 @@ class AddressTextField extends StatelessWidget {
           height: 8,
         ),
         Stack(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.topRight,
           children: [
             TextFormField(
               controller: controller,
@@ -92,7 +97,11 @@ class AddressTextField extends StatelessWidget {
               validator: (val) => val != null && val.isNotEmpty
                   ? null
                   : "Please enter an address",
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: autoValidate != null
+                  ? autoValidate!
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled
+                  : AutovalidateMode.onUserInteraction,
             ),
             recipientSuffixWidget(),
           ],

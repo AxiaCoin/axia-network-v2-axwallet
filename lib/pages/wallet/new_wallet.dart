@@ -91,7 +91,7 @@ class _NewWalletDashboardState extends State<NewWalletDashboard> {
           children: [
             networkStatus(),
             Stack(
-              alignment: Alignment(0.9, -1),
+              alignment: Alignment(0.9, 1),
               children: [
                 BalanceCard(),
                 IconButton(

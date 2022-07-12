@@ -252,7 +252,7 @@ class _SendPageState extends State<SendPage> {
                     height: 8,
                   ),
                   Stack(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.topRight,
                     children: [
                       TextFormField(
                         controller: amountController,

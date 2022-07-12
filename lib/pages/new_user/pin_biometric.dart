@@ -13,12 +13,12 @@ import 'package:wallet/pages/home.dart';
 import 'package:wallet/widgets/common.dart';
 
 class PinBiometricPage extends StatefulWidget {
-  final String mnemonic;
-  final String name;
+  final String? mnemonic;
+  final String? name;
   const PinBiometricPage({
     Key? key,
-    required this.mnemonic,
-    required this.name,
+    this.mnemonic,
+    this.name,
   }) : super(key: key);
 
   @override
@@ -62,10 +62,15 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
   }
 
   finishInitialization() async {
+    if (widget.mnemonic == null) {
+      StorageService.instance.updatePIN(controller.text);
+      Get.back(result: true);
+      return;
+    }
     StorageService.instance.updateBiometricPreference(useBiometric);
     StorageService.instance.updatePIN(controller.text);
     CommonWidgets.waitDialog();
-    await services.createMCWallet(widget.mnemonic, widget.name);
+    await services.createMCWallet(widget.mnemonic!, widget.name!);
     Get.offAll(() => HomePage());
   }
 
@@ -85,10 +90,12 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
   @override
   Widget build(BuildContext context) {
     isValid = controller.text.length == 6;
+    bool isChangingPin = widget.mnemonic == null;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Security"),
+        title: Text(isChangingPin ? "Change PIN" : "Security"),
         centerTitle: true,
+        leading: CommonWidgets.backButton(context),
       ),
       body: SafeArea(
         child: Stack(
@@ -105,7 +112,9 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Create a PIN for secure and easy access",
+                    isChangingPin
+                        ? "Enter a new PIN for authenticating transactions"
+                        : "Create a PIN for secure and easy access",
                     style: context.textTheme.headline5,
                   ),
                   SizedBox(
@@ -135,7 +144,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                   SizedBox(
                     height: 16,
                   ),
-                  canCheckBiometrics
+                  canCheckBiometrics && !isChangingPin
                       ? SizedBox(
                           width: Get.width * 0.9,
                           child: SwitchListTile.adaptive(
