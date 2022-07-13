@@ -191,8 +191,10 @@ class Services {
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     void update() async {
-      balanceCont.updateAXCBalance();
-      if (!isMulticurrencyEnabled) return;
+      if (!isMulticurrencyEnabled) {
+        balanceCont.updateAXCBalance();
+        return;
+      }
       await Future.wait(currencyList.map((e) async {
         double balance = (await e.getBalance()).toDouble();
         balanceCont.updateBalance(e, balance);
