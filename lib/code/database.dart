@@ -46,14 +46,17 @@ class BalanceData extends GetxController {
   updateBalance(Currency currency, double value) {
     getData()[currency] = value;
     totalBalance.value = 0;
-    totalBalance.value += axcWalletData.balance.value
-        .getTotalBalance(inUSD: isMulticurrencyEnabled);
     if (isMulticurrencyEnabled) {
       data!.forEach((key, value) {
         if (key.coinData.selected)
           totalBalance.value += value * key.coinData.rate;
       });
     }
+  }
+
+  updateAXCBalance() {
+    totalBalance.value += axcWalletData.balance.value
+        .getTotalBalance(inUSD: isMulticurrencyEnabled);
   }
 }
 

@@ -15,10 +15,12 @@ import 'package:wallet/widgets/common.dart';
 class PinBiometricPage extends StatefulWidget {
   final String? mnemonic;
   final String? name;
+  final bool isChangingPin;
   const PinBiometricPage({
     Key? key,
     this.mnemonic,
     this.name,
+    this.isChangingPin = false,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
 
   onSubmit() async {
     if (isValid) {
-      if (useBiometric && canCheckBiometrics) {
+      if (useBiometric && canCheckBiometrics && !widget.isChangingPin) {
         try {
           bool success = await localAuth.authenticate(
             localizedReason: "Please authenticate to continue to wallet",
@@ -90,10 +92,9 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
   @override
   Widget build(BuildContext context) {
     isValid = controller.text.length == 6;
-    bool isChangingPin = widget.mnemonic == null;
     return Scaffold(
       appBar: AppBar(
-        title: Text(isChangingPin ? "Change PIN" : "Security"),
+        title: Text(widget.isChangingPin ? "Change PIN" : "Security"),
         centerTitle: true,
         leading: CommonWidgets.backButton(context),
       ),
@@ -112,7 +113,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isChangingPin
+                    widget.isChangingPin
                         ? "Enter a new PIN for authenticating transactions"
                         : "Create a PIN for secure and easy access",
                     style: context.textTheme.headline5,
@@ -144,7 +145,7 @@ class _PinBiometricPageState extends State<PinBiometricPage> {
                   SizedBox(
                     height: 16,
                   ),
-                  canCheckBiometrics && !isChangingPin
+                  canCheckBiometrics && !widget.isChangingPin
                       ? SizedBox(
                           width: Get.width * 0.9,
                           child: SwitchListTile.adaptive(

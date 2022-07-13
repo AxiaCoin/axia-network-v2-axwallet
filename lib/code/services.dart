@@ -191,6 +191,7 @@ class Services {
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     void update() async {
+      balanceCont.updateAXCBalance();
       if (!isMulticurrencyEnabled) return;
       await Future.wait(currencyList.map((e) async {
         double balance = (await e.getBalance()).toDouble();
@@ -212,8 +213,6 @@ class Services {
     hdWallets.remove(pubKey);
     StorageService.instance.removeMnemonicSeed(pubKey);
     print("hdWallets is $hdWallets");
-    print("hdWallets g is ${services.hdWallets}");
-    print("hdWallets t is ${this.hdWallets}");
     if (hdWallets.isEmpty) {
       print("wallet is empty");
       StorageService.instance.clearCurrentPubKey();
@@ -228,14 +227,9 @@ class Services {
       hdWallets
           .remove(pubKey); // need to call this for reasons I have no answer for
       Get.back();
-      // CommonWidgets.snackBar("Switching to a different wallet. Please wait");
     } else {
       print("deleting other");
       CommonWidgets.snackBar("Wallet Deleted!");
-      // String nextPubKey = hdWallets.entries.first.key;
-      // CommonWidgets.waitDialog(text: "Deleting. Please wait");
-      // await initMCWallet(nextPubKey);
-      // Get.back();
     }
   }
 

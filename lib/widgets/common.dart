@@ -61,10 +61,11 @@ class CommonWidgets {
     await Get.bottomSheet(bottomsheet);
   }
 
-  static launch(String url) async {
+  static launch(String url,
+      {LaunchMode launchMode = LaunchMode.externalApplication}) async {
     Uri uri = Uri.parse(url);
     (await canLaunchUrl(uri))
-        ? await launchUrl(uri, mode: LaunchMode.externalApplication)
+        ? await launchUrl(uri, mode: launchMode)
         : CommonWidgets.snackBar("Cannot open the link");
   }
 

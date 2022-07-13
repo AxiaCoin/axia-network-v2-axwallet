@@ -64,7 +64,8 @@ class _NewSettingsPageState extends State<NewSettingsPage> {
             width: Get.width,
             child: TextButton(
               onPressed: () async {
-                var data = await Get.to(() => DeviceAuthPage());
+                var data =
+                    await Get.to(() => DeviceAuthPage(isChangingPin: true));
                 if (data != null && data == true) {
                   var isChanged =
                       await Get.to(() => PinBiometricPage()) ?? false;

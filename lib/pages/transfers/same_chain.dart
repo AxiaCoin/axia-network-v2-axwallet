@@ -79,27 +79,6 @@ class _SameChainTransferState extends State<SameChainTransfer> {
     return bal;
   }
 
-  Future<bool> checkAddress() async {
-    if (source == Chain.Swap) {
-      String chain = addressController.text.split('-').first;
-      if (chain != source.name) {
-        print("1");
-        return false;
-      }
-    } else {
-      if (addressController.text.substring(0, 2) != "0x") {
-        print("2");
-        return false;
-      }
-    }
-    bool isValid =
-        await api.utils.checkAddrValidity(address: addressController.text);
-    print("3");
-    print(addressController.text);
-    print(isValid);
-    return isValid;
-  }
-
   transfer() async {
     if (formKey.currentState!.validate()) {
       bool isValid =

@@ -1,7 +1,12 @@
 import 'package:axwallet_sdk/models/index.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/storage.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/pages/webview.dart';
+import 'package:wallet/widgets/common.dart';
 
 class AXCTxnTile extends StatelessWidget {
   final AXCTransaction transaction;
@@ -153,7 +158,13 @@ class AXCTxnTile extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           splashColor: appColor[100],
-          onTap: () {},
+          onTap: () {
+            NetworkConfig network = StorageService.instance.connectedNetwork!;
+            String url = network.explorerTxnURL + "/tx/$id";
+            // CommonWidgets.launch(url,
+            //     launchMode: LaunchMode.externalApplication);
+            Get.to(() => WebViewPage(url: url));
+          },
           child: Container(
             // padding: EdgeInsets.all(8),
             child: child(),

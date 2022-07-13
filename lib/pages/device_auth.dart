@@ -15,10 +15,12 @@ import 'package:wallet/widgets/common.dart';
 class DeviceAuthPage extends StatefulWidget {
   final String? mnemonic;
   final String? name;
+  final bool isChangingPin;
   const DeviceAuthPage({
     Key? key,
     this.mnemonic,
     this.name,
+    this.isChangingPin = false,
   }) : super(key: key);
 
   @override
@@ -37,7 +39,10 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
     canCheckBiometrics = await Services().canCheckBiometrics();
     setState(() {});
     print(StorageService.instance.useBiometric!);
-    if (canCheckBiometrics && StorageService.instance.useBiometric!) {
+    bool isBiometricAllowed = canCheckBiometrics &&
+        StorageService.instance.useBiometric! &&
+        !widget.isChangingPin;
+    if (isBiometricAllowed) {
       bool success = await localAuth
           .authenticate(
         localizedReason: isSettingUp
@@ -169,12 +174,12 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                         setState(() {});
                       },
                     ),
-                    canCheckBiometrics
+                    canCheckBiometrics && !widget.isChangingPin
                         ? SizedBox(
                             height: 32,
                           )
                         : Container(),
-                    canCheckBiometrics
+                    canCheckBiometrics && !widget.isChangingPin
                         ? GestureDetector(
                             onTap: (() {
                               StorageService.instance

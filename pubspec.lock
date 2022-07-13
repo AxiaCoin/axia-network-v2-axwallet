@@ -63,7 +63,7 @@ packages:
       path: "../axwallet_sdk"
       relative: true
     source: path
-    version: "0.2.4"
+    version: "2.0.0"
   bip32:
     dependency: "direct main"
     description:
