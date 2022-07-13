@@ -209,57 +209,59 @@ class _ChangePasswordState extends State<ChangePassword> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // GestureDetector(
-                //   behavior: HitTestBehavior.opaque,
-                //   onTap: () => Get.back(),
-                //   child: Text(
-                //     "← Back to Login",
-                //     style: context.textTheme.caption!.copyWith(color: appColor),
-                //   ),
-                // ),
-                // SizedBox(
-                //   height: 16,
-                // ),
-                // Text(
-                //   "Change Password",
-                //   style: context.textTheme.headline4,
-                // ),
-                // SizedBox(
-                //   height: 32,
-                // ),
-                // Text(
-                //   "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
-                //   style: context.textTheme.caption!.copyWith(fontSize: 24),
-                // ),
-                // SizedBox(
-                //   height: 16,
-                // ),
-                // mode == Mode.phone ? phoneField() : emailField(),
-                // SizedBox(
-                //   height: 16,
-                // ),
-                ...passwordFields,
-                SizedBox(
-                  height: 16,
-                ),
-                submitting
-                    ? Center(
-                        child: Spinner(),
-                      )
-                    : SizedBox(
-                        width: Get.width,
-                        child: TextButton(
-                          onPressed: () {
-                            _changePassword();
-                          },
-                          child: Text("Save Changes"),
-                          style: MyButtonStyles.onboardStyle,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // GestureDetector(
+                  //   behavior: HitTestBehavior.opaque,
+                  //   onTap: () => Get.back(),
+                  //   child: Text(
+                  //     "← Back to Login",
+                  //     style: context.textTheme.caption!.copyWith(color: appColor),
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: 16,
+                  // ),
+                  // Text(
+                  //   "Change Password",
+                  //   style: context.textTheme.headline4,
+                  // ),
+                  // SizedBox(
+                  //   height: 32,
+                  // ),
+                  // Text(
+                  //   "Please enter your ${mode == Mode.phone ? "phone number" : "email address"}",
+                  //   style: context.textTheme.caption!.copyWith(fontSize: 24),
+                  // ),
+                  // SizedBox(
+                  //   height: 16,
+                  // ),
+                  // mode == Mode.phone ? phoneField() : emailField(),
+                  // SizedBox(
+                  //   height: 16,
+                  // ),
+                  ...passwordFields,
+                  SizedBox(
+                    height: 16,
+                  ),
+                  submitting
+                      ? Center(
+                          child: Spinner(),
+                        )
+                      : SizedBox(
+                          width: Get.width,
+                          child: TextButton(
+                            onPressed: () {
+                              _changePassword();
+                            },
+                            child: Text("Save Changes"),
+                            style: MyButtonStyles.onboardStyle,
+                          ),
                         ),
-                      ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

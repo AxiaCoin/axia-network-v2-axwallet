@@ -7,6 +7,7 @@ import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
+import 'package:wallet/pages/settings/profile/secret.dart';
 import 'package:wallet/widgets/common.dart';
 
 class NewSettingsPage extends StatefulWidget {
@@ -60,38 +61,77 @@ class _NewSettingsPageState extends State<NewSettingsPage> {
                   ),
                 )
               : Container(),
-          SizedBox(
-            width: Get.width,
-            child: TextButton(
-              onPressed: () async {
-                var data =
-                    await Get.to(() => DeviceAuthPage(isChangingPin: true));
-                if (data != null && data == true) {
-                  var isChanged =
-                      await Get.to(() => PinBiometricPage()) ?? false;
-                  if (isChanged) {
-                    CommonWidgets.snackBar("PIN successfully Changed");
-                  }
+          // canCheckBiometrics ? Divider() : Container(),
+          ListTile(
+            title: Text("Reveal Secret Phrase"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: () async {
+              var data = await Get.to(() => DeviceAuthPage());
+              if (data != null && data == true) {
+                Get.to(() => SecretPhrasePage());
+              }
+            },
+          ),
+          ListTile(
+            title: Text("Change PIN"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: () async {
+              var data =
+                  await Get.to(() => DeviceAuthPage(isChangingPin: true));
+              if (data != null && data == true) {
+                var isChanged = await Get.to(() => PinBiometricPage(
+                          isChangingPin: true,
+                        )) ??
+                    false;
+                if (isChanged) {
+                  CommonWidgets.snackBar("PIN successfully Changed");
                 }
-                // Get.to(() => ChangePassword(resetPassword: false));
-              },
-              child: Text("Change PIN"),
-              style: MyButtonStyles.onboardStyle,
-            ),
+              }
+              // Get.to(() => ChangePassword(resetPassword: false));
+            },
           ),
-          SizedBox(
-            height: 8,
+          ListTile(
+            title: Text("Change Account Password"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: () {
+              Get.to(() => ChangePassword(resetPassword: false));
+            },
           ),
-          SizedBox(
-            width: Get.width,
-            child: TextButton(
-              onPressed: () {
-                Get.to(() => ChangePassword(resetPassword: false));
-              },
-              child: Text("Change Account Password"),
-              style: MyButtonStyles.onboardStyle,
-            ),
-          ),
+          // Divider(),
+          // SizedBox(
+          //   width: Get.width,
+          //   child: TextButton(
+          //     onPressed: () async {
+          //       var data =
+          //           await Get.to(() => DeviceAuthPage(isChangingPin: true));
+          //       if (data != null && data == true) {
+          //         var isChanged = await Get.to(() => PinBiometricPage(
+          //                   isChangingPin: true,
+          //                 )) ??
+          //             false;
+          //         if (isChanged) {
+          //           CommonWidgets.snackBar("PIN successfully Changed");
+          //         }
+          //       }
+          //       // Get.to(() => ChangePassword(resetPassword: false));
+          //     },
+          //     child: Text("Change PIN"),
+          //     style: MyButtonStyles.onboardStyle,
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 8,
+          // ),
+          // SizedBox(
+          //   width: Get.width,
+          //   child: TextButton(
+          //     onPressed: () {
+          //       Get.to(() => ChangePassword(resetPassword: false));
+          //     },
+          //     child: Text("Change Account Password"),
+          //     style: MyButtonStyles.onboardStyle,
+          //   ),
+          // ),
         ]),
       ),
     );

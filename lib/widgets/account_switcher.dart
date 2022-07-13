@@ -155,7 +155,9 @@ class _AccountSwitcherState extends State<AccountSwitcher> {
               textAlign: TextAlign.center,
             ),
             onTap: () async {
-              Get.to(() => OnboardPage());
+              Get.to(() => OnboardPage(
+                    showBack: true,
+                  ));
             },
           ),
         ],

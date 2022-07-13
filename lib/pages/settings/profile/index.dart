@@ -6,11 +6,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/settings/about.dart';
 import 'package:wallet/pages/settings/profile/change_name.dart';
 import 'package:wallet/pages/settings/profile/change_password.dart';
 // import 'package:axiawallet_ui/components/passwordInputDialog.dart';
@@ -31,29 +33,53 @@ class ProfilePageState extends State<ProfilePage> {
   late String firstName = userModel.firstName;
   late String lastName = userModel.lastName ?? "";
   late String userName = "$firstName $lastName";
+  String version = "";
   bool isLoading = true;
 
-  // getProfile() async {
-  //   var response = await APIServices().getProfile();
-  //   if (response["success"]) {
-  //     userModel = UserModel.fromMap(response["data"]);
-  //     // user = response.toString();
-  //     firstName = userModel!.firstName;
-  //     lastName = userModel!.lastName;
-  //     userName = "$firstName ${lastName ?? ""}";
-  //   }
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
+  getPackageInfo() async {
+    var info = await PackageInfo.fromPlatform();
+    setState(() {
+      version = info.version + " (${info.buildNumber})";
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPackageInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
+    getPackageInfo();
     User user = Get.find();
     userModel = user.userModel.value;
     firstName = userModel.firstName;
     lastName = userModel.lastName ?? "";
     userName = "$firstName $lastName";
+
+    Widget aboutItem() {
+      return Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Get.to(() => AboutPage());
+            },
+            child: Text(
+              "About",
+              style: TextStyle(
+                  color: appColor, fontSize: 14, fontWeight: FontWeight.w100),
+            ),
+          ),
+          Text(
+            "v$version",
+            style: TextStyle(
+                color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w100),
+          )
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Account Details"),
@@ -155,6 +181,10 @@ class ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 Spacer(),
+                aboutItem(),
+                SizedBox(
+                  height: 4,
+                ),
                 Container(
                   width: Get.width,
                   padding: EdgeInsets.symmetric(horizontal: 16),
