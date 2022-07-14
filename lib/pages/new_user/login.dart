@@ -197,22 +197,21 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 )
               : Container(),
-          appBar: AppBar(
-            title: Text("Login"),
-            centerTitle: true,
-            elevation: 0,
-          ),
-          body: SafeArea(
-              child: Form(
+          // appBar: AppBar(
+          //   title: Text("Login"),
+          //   centerTitle: true,
+          //   elevation: 0,
+          // ),
+          body: Form(
             key: formKey,
             child: Stack(
               children: [
                 Container(
-                  height: Get.height * 0.15,
+                  height: Get.height * 0.3,
                   color: appColor[600],
                 ),
                 Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.only(left: 16, right: 16, top: 48),
                     child: SingleChildScrollView(
                       child: CommonWidgets.elevatedContainer(
                         padding: 16,
@@ -222,8 +221,9 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             SizedBox(
                                 height: Get.width * 0.2,
-                                width: Get.width * 0.2,
-                                child: FlutterLogo()),
+                                // width: Get.width * 0.2,
+                                child: Image.asset(
+                                    'assets/images/logo_about.png')),
                             SizedBox(
                               height: 16,
                             ),
@@ -386,7 +386,7 @@ class _LoginPageState extends State<LoginPage> {
                     )),
               ],
             ),
-          ))),
+          )),
     );
   }
 }
