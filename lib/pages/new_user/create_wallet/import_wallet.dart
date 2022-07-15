@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
 import 'package:wallet/pages/device_auth.dart';
 import 'package:wallet/pages/new_user/pin_biometric.dart';
+import 'package:wallet/pages/qr_scan.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
@@ -23,9 +25,10 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   var phraseController = new TextEditingController();
   var isValid = false;
 
-  updateFields(String value) {
+  updateFields(String? value) {
+    if (value == null) return;
     setState(() {
-      phraseController.text = value;
+      phraseController.text = value.trim();
     });
   }
 
@@ -40,9 +43,12 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         leading: CommonWidgets.backButton(context),
         actions: [
           IconButton(
-            icon: Icon(Icons.qr_code_scanner),
+            icon: SvgPicture.asset(
+              "assets/icons/qr.svg",
+              color: Colors.white,
+            ),
             onPressed: () {
-              // Get.to(() => QRScanPage()).then((value) => updateFields(value));
+              Get.to(() => QRScanPage())!.then((value) => updateFields(value));
             },
           )
         ],
@@ -165,7 +171,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         // services.initWallet(phraseController.text);
         String? pin = StorageService.instance.pin;
         if (pin == null) {
-          Get.offAll(() => PinBiometricPage(
+          Get.to(() => PinBiometricPage(
                 mnemonic: phraseController.text,
                 name: nameController.text.trim(),
               ));

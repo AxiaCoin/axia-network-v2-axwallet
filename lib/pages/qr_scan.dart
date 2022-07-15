@@ -69,7 +69,7 @@ class _QRScanPageState extends State<QRScanPage> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
+    this.controller = controller..resumeCamera();
     controller.scannedDataStream.listen(
       (scanData) {
         if (result == null) {

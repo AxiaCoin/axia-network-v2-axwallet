@@ -10,6 +10,7 @@ import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
 import 'package:wallet/pages/search.dart';
@@ -33,7 +34,7 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPageState extends State<WalletPage>
     with AutomaticKeepAliveClientMixin {
-  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  // GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   int slidingIndex = 0;
   PageController pageController = PageController(keepPage: false);
   List<Widget> pages = [TokensPage(), FinancePage(), CollectiblesPage()];
@@ -49,8 +50,8 @@ class _WalletPageState extends State<WalletPage>
 
   Future refreshData() async {
     if (isLoading || isRefreshing) {
-      await 1.delay();
-      getTransactions();
+      // await 1.delay();
+      await services.getAXCWalletDetails();
       data = list.data;
       balanceInfo = balanceData.getData();
       if (list.selected == null) list.defaultSelection();
@@ -369,7 +370,7 @@ class _WalletPageState extends State<WalletPage>
     }
 
     return Scaffold(
-      key: scaffoldKey,
+      key: drawerScaffoldKey,
       appBar: appBar(),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {

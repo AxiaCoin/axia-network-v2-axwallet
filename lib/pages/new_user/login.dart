@@ -119,14 +119,14 @@ class _LoginPageState extends State<LoginPage> {
             // setSelectorButtonAsPrefixIcon: true,
           ),
           ignoreBlank: false,
-          autoValidateMode: AutovalidateMode.disabled,
+          // autoValidateMode: AutovalidateMode.onUserInteraction,
           selectorTextStyle: TextStyle(color: Colors.black),
           // initialValue: number,
           formatInput: false,
           keyboardType:
               TextInputType.numberWithOptions(signed: true, decimal: true),
           inputBorder: OutlineInputBorder(),
-          validator: (_) => null,
+          // validator: (val) => null,
           onSaved: (PhoneNumber number) {
             print('On Saved: $number');
           },
@@ -265,10 +265,11 @@ class _LoginPageState extends State<LoginPage> {
                                         setState(() => obscurity = !obscurity),
                                   )),
                               validator: (val) => passwordController
-                                          .text.length <
-                                      8
-                                  ? "The password should be 8 characters long"
-                                  : null,
+                                      .text.isEmpty
+                                  ? "Please enter a password"
+                                  : passwordController.text.length < 8
+                                      ? "The password should be 8 characters long"
+                                      : null,
                               onFieldSubmitted: (val) {
                                 if (!isPhoneMode)
                                   confirmPasswordFocus.requestFocus();

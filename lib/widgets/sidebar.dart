@@ -169,7 +169,10 @@ class SideBar extends StatelessWidget {
               // ),
               Divider(),
               ListTile(
-                onTap: support,
+                onTap: () {
+                  Navigator.pop(context);
+                  support();
+                },
                 title: Text(
                   cat[0],
                   style: TextStyle(color: appColor[800], fontSize: 16),

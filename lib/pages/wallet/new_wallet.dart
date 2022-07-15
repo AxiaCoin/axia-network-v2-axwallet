@@ -117,7 +117,7 @@ class _NewWalletDashboardState extends State<NewWalletDashboard> {
             //     "You can earn more AXC by staking your existing tokens."),
             // PluginWidgets.earntiles(
             //     "Validate",
-            //     "You have an Avalanche node that you want to stake with.",
+            //     "You have an Axia node that you want to stake with.",
             //     Icons.people,
             //     () => null),
             // SizedBox(height: 8),

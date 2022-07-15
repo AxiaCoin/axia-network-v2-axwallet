@@ -60,6 +60,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
 
   bool checkValidity() {
     bool isValid = true;
+    if (selected.length != 3) return false;
     selected.forEach((key, value) {
       if (widget.words[key] != value) isValid = false;
     });
@@ -225,6 +226,9 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                     // ),
                     // challengeWidget(isSelected: false),
                     ...nameField(),
+                    SizedBox(
+                      height: 32,
+                    )
                     // Spacer(),
                     // OnboardWidgets.neverShare(),
                   ],
@@ -271,7 +275,7 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
       // services.initWallet(mnemonic);
       String? pin = StorageService.instance.pin;
       if (pin == null) {
-        Get.offAll(() => PinBiometricPage(
+        Get.to(() => PinBiometricPage(
               mnemonic: mnemonic,
               name: nameController.text.trim(),
             ));

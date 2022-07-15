@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/pages/qr_creation.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 
@@ -14,27 +16,12 @@ class SecretPhrasePage extends StatefulWidget {
 
 class _SecretPhrasePageState extends State<SecretPhrasePage> {
   List<String> words = [];
-
-  Widget code() {
-    List<Widget> wordItems = [];
-    for (var i = 0; i < words.length; i++) {
-      wordItems.add(OnboardWidgets.wordItem(words[i], i + 1));
-    }
-    return Container(
-      // padding: EdgeInsets.only(top: 24),
-      child: Wrap(
-        children: wordItems,
-        alignment: WrapAlignment.center,
-        spacing: 8,
-        runSpacing: 8,
-      ),
-    );
-  }
+  late String mnemonic;
 
   initWords() {
     final WalletData walletData = Get.find();
     String currentPubKey = walletData.hdWallet!.value.pubKey!;
-    String mnemonic = services.hdWallets[currentPubKey]!.mnemonic;
+    mnemonic = services.hdWallets[currentPubKey]!.mnemonic;
     words = mnemonic.split(' ');
   }
 
@@ -51,11 +38,60 @@ class _SecretPhrasePageState extends State<SecretPhrasePage> {
           centerTitle: true,
           leading: CommonWidgets.backButton(context),
         );
+
+    Widget qrView() {
+      return FractionallySizedBox(
+        widthFactor: 0.65,
+        child: Card(
+          // margin: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => QRCreationPage(
+                        qrData: mnemonic,
+                        isRecovery: true,
+                      ));
+                },
+                child: QrImage(
+                  data: mnemonic,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.copy),
+                label: Text("Copy"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget code() {
+      List<Widget> wordItems = [];
+      for (var i = 0; i < words.length; i++) {
+        wordItems.add(OnboardWidgets.wordItem(words[i], i + 1));
+      }
+      return Container(
+        child: Wrap(
+          children: wordItems,
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: appBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OnboardWidgets.neverShare(),
+            ),
             Container(
               padding: EdgeInsets.all(8),
               margin: EdgeInsets.all(8),
@@ -67,10 +103,7 @@ class _SecretPhrasePageState extends State<SecretPhrasePage> {
               ),
               child: code(),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: OnboardWidgets.neverShare(),
-            ),
+            qrView(),
           ],
         ),
       ),

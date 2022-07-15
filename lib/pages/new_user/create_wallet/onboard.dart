@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/new_user/create_wallet/disclaimer.dart';
 import 'package:wallet/pages/new_user/create_wallet/import_wallet.dart';
 import 'package:wallet/widgets/common.dart';
@@ -71,7 +72,23 @@ class _OnboardPageState extends State<OnboardPage>
       appBar: AppBar(
         title: Text("Welcome"),
         centerTitle: true,
-        leading: widget.showBack ? CommonWidgets.backButton(context) : null,
+        leading: widget.showBack
+            ? CommonWidgets.backButton(context)
+            : IconButton(
+                onPressed: () async {
+                  services.logOut(showMessage: false);
+                },
+                tooltip: "Logout",
+                icon: Icon(Icons.logout)),
+        // actions: widget.showBack
+        //     ? null
+        //     : [
+        //         IconButton(
+        //             onPressed: () async {
+        //               services.logOut(showMessage: false);
+        //             },
+        //             icon: Icon(Icons.logout))
+        //       ],
       ),
       // floatingActionButton: Column(
       //   mainAxisAlignment: MainAxisAlignment.end,

@@ -158,8 +158,9 @@ class Services {
       AXCWallet wallet = AXCWallet.fromMap(data[0]);
       AXCBalance balance = AXCBalance.fromMap(data[1]);
       List<AXCTransaction> transactions = data[2];
-      CustomCacheManager.instance.cacheTransactions(transactions);
+      CustomCacheManager.instance.cacheAddress(wallet);
       CustomCacheManager.instance.cacheBalance(balance);
+      CustomCacheManager.instance.cacheTransactions(transactions);
       axcWalletData.updateWallet(wallet);
       axcWalletData.updateBalance(balance);
       axcWalletData.updateTransactions(transactions);
@@ -235,13 +236,15 @@ class Services {
     }
   }
 
-  logOut() async {
+  logOut({bool showMessage = true}) async {
     bool? confirm = await Get.dialog(
       AlertDialog(
         title: Text("Do you want to logout of your current account?"),
-        content: Text(
-            "This will remove the wallet(s) you have created and you will need to re-import them with the secret phrase.\n"
-            "If you do not have access to the secret phrase(s) then you risk losing all the assets and we cannot help you recover them!"),
+        content: showMessage
+            ? Text(
+                "This will remove the wallet(s) you have created and you will need to re-import them with the secret phrase.\n"
+                "If you do not have access to the secret phrase(s) then you risk losing all the assets and we cannot help you recover them!")
+            : null,
         actions: [
           TextButton(
             onPressed: () => Get.back(result: true),
