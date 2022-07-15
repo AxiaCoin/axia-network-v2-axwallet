@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:wallet/Crypto_Models/validator.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/utils.dart';
-import 'package:wallet/pages/earn/confirm_delegate.dart';
+import 'package:wallet/pages/earn/confirm_nominate.dart';
 
 class ValidatorTile extends StatelessWidget {
   final ValidatorItem validator;
@@ -90,7 +90,7 @@ class ValidatorTile extends StatelessWidget {
                     infoItem(
                         "Fee",
                         FormatText.roundOff(
-                                double.parse(validator.delegationFee)) +
+                                double.parse(validator.nominationFee)) +
                             "%"),
                     Spacer(),
                     iconItem(

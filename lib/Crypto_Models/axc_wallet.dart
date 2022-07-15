@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:wallet/currencies/axiacoin.dart';
+
 enum Chain {
   Swap, // X
   Core, // P
@@ -80,4 +82,13 @@ class AXCBalance {
 
   factory AXCBalance.fromJson(String source) =>
       AXCBalance.fromMap(json.decode(source));
+
+  getTotalBalance({bool inUSD = true}) {
+    List chains = [swap, core, ax, staked];
+    double total = 0.0;
+    chains.forEach((e) {
+      total += double.parse(e ?? "0");
+    });
+    return total * (inUSD ? AXIACoin().coinData.rate : 1);
+  }
 }

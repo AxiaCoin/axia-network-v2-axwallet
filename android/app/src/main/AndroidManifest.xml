@@ -5,6 +5,8 @@
    <application
         android:label="AXwallet"
         android:usesCleartextTraffic="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
         android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"

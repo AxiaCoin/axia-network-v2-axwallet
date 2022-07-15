@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:wallet/pages/earn/delegate.dart';
+import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
 import 'package:wallet/pages/transfers/same_chain.dart';
@@ -40,7 +40,7 @@ class _TransferPageState extends State<TransferPage> {
                   "Transfer your coins between chains and other wallets"),
               // PluginWidgets.earntiles(
               //     "Validate",
-              //     "You have an Avalanche node that you want to stake with.",
+              //     "You have an Axia node that you want to stake with.",
               //     Icons.people,
               //     () => null),
               // SizedBox(height: 8),

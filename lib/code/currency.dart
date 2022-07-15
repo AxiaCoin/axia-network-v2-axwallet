@@ -11,4 +11,6 @@ abstract class Currency {
 
   Future<TransactionListModel> getTransactions(
       {required int offset, required int limit});
+
+  Future<double> getEstimatedFees() async => 0.0;
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -118,14 +119,14 @@ class _LoginPageState extends State<LoginPage> {
             // setSelectorButtonAsPrefixIcon: true,
           ),
           ignoreBlank: false,
-          autoValidateMode: AutovalidateMode.disabled,
+          // autoValidateMode: AutovalidateMode.onUserInteraction,
           selectorTextStyle: TextStyle(color: Colors.black),
           // initialValue: number,
           formatInput: false,
           keyboardType:
               TextInputType.numberWithOptions(signed: true, decimal: true),
           inputBorder: OutlineInputBorder(),
-          validator: (_) => null,
+          // validator: (val) => null,
           onSaved: (PhoneNumber number) {
             print('On Saved: $number');
           },
@@ -163,6 +164,13 @@ class _LoginPageState extends State<LoginPage> {
                         child: Icon(Icons.next_plan),
                         label: "HomePage",
                         onTap: () => Get.offAll(() => HomePage())),
+                    // SpeedDialChild(
+                    //     child: Icon(Icons.developer_board),
+                    //     label: "Test SDK API",
+                    //     onTap: () {
+                    //       var api = services.axSDK.api!;
+                    //       api.basic.tests();
+                    //     }),
                     SpeedDialChild(
                         child: Icon(Icons.api),
                         label: "Test WS",
@@ -189,22 +197,21 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 )
               : Container(),
-          appBar: AppBar(
-            title: Text("Login"),
-            centerTitle: true,
-            elevation: 0,
-          ),
-          body: SafeArea(
-              child: Form(
+          // appBar: AppBar(
+          //   title: Text("Login"),
+          //   centerTitle: true,
+          //   elevation: 0,
+          // ),
+          body: Form(
             key: formKey,
             child: Stack(
               children: [
                 Container(
-                  height: Get.height * 0.15,
+                  height: Get.height * 0.3,
                   color: appColor[600],
                 ),
                 Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.only(left: 16, right: 16, top: 48),
                     child: SingleChildScrollView(
                       child: CommonWidgets.elevatedContainer(
                         padding: 16,
@@ -214,8 +221,9 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             SizedBox(
                                 height: Get.width * 0.2,
-                                width: Get.width * 0.2,
-                                child: FlutterLogo()),
+                                // width: Get.width * 0.2,
+                                child: Image.asset(
+                                    'assets/images/logo_about.png')),
                             SizedBox(
                               height: 16,
                             ),
@@ -257,10 +265,11 @@ class _LoginPageState extends State<LoginPage> {
                                         setState(() => obscurity = !obscurity),
                                   )),
                               validator: (val) => passwordController
-                                          .text.length <
-                                      8
-                                  ? "The password should be 8 characters long"
-                                  : null,
+                                      .text.isEmpty
+                                  ? "Please enter a password"
+                                  : passwordController.text.length < 8
+                                      ? "The password should be 8 characters long"
+                                      : null,
                               onFieldSubmitted: (val) {
                                 if (!isPhoneMode)
                                   confirmPasswordFocus.requestFocus();
@@ -297,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: Spinner(),
                                   )
                                 : Container(
-                                    width: Get.width,
+                                    width: double.infinity,
                                     child: TextButton(
                                       onPressed: () {
                                         onSubmit();
@@ -378,7 +387,7 @@ class _LoginPageState extends State<LoginPage> {
                     )),
               ],
             ),
-          ))),
+          )),
     );
   }
 }

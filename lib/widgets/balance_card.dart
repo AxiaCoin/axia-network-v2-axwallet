@@ -7,6 +7,7 @@ import 'package:wallet/Crypto_Models/axc_wallet.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/widgets/profile_avatar.dart';
 import 'package:wallet/widgets/spinner.dart';
 
 class BalanceCard extends StatefulWidget {
@@ -151,32 +152,50 @@ class _BalanceCardState extends State<BalanceCard> {
       );
     }
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(20),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          margin: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(20),
+            ),
+            gradient: LinearGradient(
+                colors: [appColor[600]!, appColor],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              total(),
+              SizedBox(
+                height: 8,
+              ),
+              ...Chain.values.map((e) => balanceItem(e)).toList(),
+              Divider(
+                color: Colors.white30,
+              ),
+              staked(),
+            ],
+          ),
         ),
-        gradient: LinearGradient(
-            colors: [appColor[600]!, appColor],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          total(),
-          SizedBox(
-            height: 8,
-          ),
-          ...Chain.values.map((e) => balanceItem(e)).toList(),
-          Divider(
-            color: Colors.white30,
-          ),
-          staked(),
-        ],
-      ),
+        Positioned(
+          top: -0.2,
+          right: 0,
+          left: 0,
+          child: ProfileAvatar(),
+        )
+      ],
     );
   }
 }

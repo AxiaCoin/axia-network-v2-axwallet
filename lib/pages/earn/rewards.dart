@@ -9,7 +9,6 @@ import 'package:wallet/code/database.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/widgets/common.dart';
-import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/reward_item.dart';
 import 'package:wallet/widgets/spinner.dart';
 
@@ -79,29 +78,6 @@ class _RewardsPageState extends State<RewardsPage> {
           leading: CommonWidgets.backButton(context),
         );
 
-    Widget empty() => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: Get.width * 0.25,
-                width: Get.width * 0.25,
-                child: Image.asset(
-                  "assets/icons/empty_txn.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              HomeWidgets.emptyListText("You do not have any pending rewards"),
-              // SizedBox(
-              //   height: 16,
-              // ),
-            ],
-          ),
-        );
-
     Widget totalRewards() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,30 +99,31 @@ class _RewardsPageState extends State<RewardsPage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Obx(() =>
-              (axcWalletData.wallet.value.allCore == null || validators.isEmpty)
-                  ? Spinner(
-                      text: "Getting your rewards",
-                    )
-                  : FutureBuilder(
-                      future: getRewards(axcWalletData.wallet.value.allCore!),
-                      builder: ((context, snapshot) {
-                        return RefreshIndicator(
-                          key: _refreshKey,
-                          onRefresh: () async => await getValidators(),
-                          child: rewards.isEmpty
-                              ? empty()
-                              : ListView.builder(
-                                  itemCount: rewards.length + 1,
-                                  itemBuilder: (context, index) {
-                                    return index == 0
-                                        ? totalRewards()
-                                        : RewardItem(
-                                            delegator: rewards[index - 1],
-                                          );
-                                  }),
-                        );
-                      }))),
+          child: Obx(() => (axcWalletData.wallet.value.allCore == null ||
+                  (isLoading && validators.isEmpty))
+              ? Spinner(
+                  text: "Getting your rewards",
+                )
+              : FutureBuilder(
+                  future: getRewards(axcWalletData.wallet.value.allCore!),
+                  builder: ((context, snapshot) {
+                    return RefreshIndicator(
+                      key: _refreshKey,
+                      onRefresh: () async => await getValidators(),
+                      child: rewards.isEmpty
+                          ? CommonWidgets.empty(
+                              "You do not have any pending rewards")
+                          : ListView.builder(
+                              itemCount: rewards.length + 1,
+                              itemBuilder: (context, index) {
+                                return index == 0
+                                    ? totalRewards()
+                                    : RewardItem(
+                                        nominator: rewards[index - 1],
+                                      );
+                              }),
+                    );
+                  }))),
         ),
       ),
     );

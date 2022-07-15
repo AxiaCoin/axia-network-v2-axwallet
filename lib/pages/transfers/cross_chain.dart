@@ -11,6 +11,7 @@ import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
 import 'package:wallet/currencies/axiacoin.dart';
 import 'package:wallet/pages/device_auth.dart';
+import 'package:wallet/widgets/amount_suffix.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
@@ -81,20 +82,20 @@ class _CrossChainPageState extends State<CrossChainPage> {
         await Future.delayed(Duration(milliseconds: 200));
         try {
           print("Transfer started");
-          // add import fees for destination chain
-          int amount =
-              ((double.parse(amountController.text) + importFees[dest]!) *
-                      pow(10, denomination))
-                  .toInt();
-          print(amount);
+          // BigInt amount = BigInt.from(
+          //         (double.parse(amountController.text) + importFees[dest]!)) *
+          //     BigInt.from(pow(10, denomination));
+          print(amountController.text);
           var response = await api.transfer.crossChain(
             from: source.name,
             to: dest.name,
-            amount: amount.toString(),
+            amount: amountController.text,
           );
           print("Send response:$response");
           await Future.delayed(Duration(milliseconds: 200));
-          if (response != null && response["exportID"] != null) {
+          if (response != null &&
+              response is Map &&
+              response["exportID"] != null) {
             print("success");
             Get.back();
             services.getAXCWalletDetails();
@@ -132,7 +133,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
     cImFee = double.parse(data[1]);
     exportFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cExFee};
     importFees = {Chain.Swap: 0.001, Chain.Core: 0.001, Chain.AX: cImFee};
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override
@@ -160,6 +161,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
           children: [
             TextButton(
               onPressed: () {
+                if (calculateMax()! <= 0) {
+                  return CommonWidgets.snackBar(
+                      "Balance too low (after fees) to transfer");
+                }
                 amountController.text = calculateMax()?.toString() ?? "";
               },
               child: Text("MAX"),
@@ -312,11 +317,11 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "Name",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
+                        // Text(
+                        //   "Name",
+                        //   style: TextStyle(
+                        //       fontSize: 16, fontWeight: FontWeight.w500),
+                        // )
                       ],
                     ),
                     Expanded(
@@ -326,17 +331,17 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           Text(source.name,
                               style: TextStyle(
                                   fontSize: 36, fontWeight: FontWeight.w400)),
-                          Expanded(
-                            child: Text(
-                              source == Chain.Swap
-                                  ? "Exchange Chain"
-                                  : source == Chain.Core
-                                      ? "Platform Chain"
-                                      : "Contract Chain",
-                              style: TextStyle(fontSize: 16),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: Text(
+                          //     source == Chain.Swap
+                          //         ? "Exchange Chain"
+                          //         : source == Chain.Core
+                          //             ? "Platform Chain"
+                          //             : "Contract Chain",
+                          //     style: TextStyle(fontSize: 16),
+                          //     textAlign: TextAlign.right,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -393,11 +398,11 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "Name",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
+                        // Text(
+                        //   "Name",
+                        //   style: TextStyle(
+                        //       fontSize: 16, fontWeight: FontWeight.w500),
+                        // )
                       ],
                     ),
                     Expanded(
@@ -407,17 +412,17 @@ class _CrossChainPageState extends State<CrossChainPage> {
                           Text(dest.name,
                               style: TextStyle(
                                   fontSize: 36, fontWeight: FontWeight.w400)),
-                          Expanded(
-                            child: Text(
-                              dest == Chain.Swap
-                                  ? "Exchange Chain"
-                                  : dest == Chain.Core
-                                      ? "Platform Chain"
-                                      : "Contract Chain",
-                              style: TextStyle(fontSize: 16),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: Text(
+                          //     dest == Chain.Swap
+                          //         ? "Exchange Chain"
+                          //         : dest == Chain.Core
+                          //             ? "Platform Chain"
+                          //             : "Contract Chain",
+                          //     style: TextStyle(fontSize: 16),
+                          //     textAlign: TextAlign.right,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -477,7 +482,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
             child: ListView(
               children: [
                 PluginWidgets.indexTitle(
-                    "Transfer tokens between Exchange (Swap), Platform (Core) and Contract (AX) chains."),
+                    "Transfer tokens between Swap, Core and AX chains."),
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -504,7 +509,7 @@ class _CrossChainPageState extends State<CrossChainPage> {
                     )),
                 SizedBox(height: 8),
                 Stack(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.topRight,
                   children: [
                     TextFormField(
                       controller: amountController,
@@ -522,9 +527,9 @@ class _CrossChainPageState extends State<CrossChainPage> {
                               val != "." &&
                               double.parse(val) != 0 &&
                               (getSourceBalance() == null ||
-                                  double.parse(val) < getSourceBalance()!)
+                                  double.parse(val) <= calculateMax()!)
                           ? null
-                          : "Amount should be lower than the balance (including fees)\nand not zero",
+                          : "Amount should be lower than the balance (including fees) and not zero",
                       autovalidateMode: autoValidate
                           ? AutovalidateMode.onUserInteraction
                           : AutovalidateMode.disabled,
@@ -539,7 +544,10 @@ class _CrossChainPageState extends State<CrossChainPage> {
                         }
                       },
                     ),
-                    amountSuffixWidget()
+                    AmountSuffix(
+                      controller: amountController,
+                      maxAmount: calculateMax(),
+                    )
                   ],
                 ),
                 SizedBox(height: 8),

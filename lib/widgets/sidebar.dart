@@ -6,9 +6,14 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/services.dart';
+import 'package:wallet/pages/home.dart';
+import 'package:wallet/pages/receive.dart';
 import 'package:wallet/pages/search.dart';
+import 'package:wallet/pages/transfers/same_chain.dart';
+import 'package:wallet/pages/wallet/index.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
+import 'package:wallet/widgets/network_switcher.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({Key? key}) : super(key: key);
@@ -18,6 +23,7 @@ class SideBar extends StatelessWidget {
     final BalanceData balanceData = Get.find();
     final WalletData walletData = Get.find();
     User user = Get.find();
+    AXCWalletData axcWalletData = Get.find();
     UserModel userModel = user.userModel.value;
     String firstName = userModel.firstName;
     String lastName = userModel.lastName ?? "";
@@ -64,7 +70,7 @@ class SideBar extends StatelessWidget {
                   ),
                   Obx(
                     () => Text(
-                      "\$${balanceData.totalBalance.toStringAsFixed(2)}",
+                      "${isMulticurrencyEnabled ? "\$" : ""}${balanceData.totalBalance.toStringAsFixed(2)}${isMulticurrencyEnabled ? "" : " AXC"}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -90,10 +96,14 @@ class SideBar extends StatelessWidget {
                 child: HomeWidgets.roundedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    pushNewScreen(
-                      context,
-                      screen: SearchPage(searchMode: SearchMode.send),
-                    );
+                    if (isMulticurrencyEnabled) {
+                      pushNewScreen(
+                        context,
+                        screen: SearchPage(searchMode: SearchMode.send),
+                      );
+                    } else {
+                      Get.to(() => SameChainTransfer());
+                    }
                   },
                   icon: SvgPicture.asset(
                     "assets/icons/assets_send.svg",
@@ -109,10 +119,18 @@ class SideBar extends StatelessWidget {
                 child: HomeWidgets.roundedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    pushNewScreen(
-                      context,
-                      screen: SearchPage(searchMode: SearchMode.receive),
-                    );
+                    if (isMulticurrencyEnabled) {
+                      pushNewScreen(
+                        context,
+                        screen: SearchPage(searchMode: SearchMode.receive),
+                      );
+                    } else {
+                      if (axcWalletData.wallet.value.swap == null) {
+                        return CommonWidgets.snackBar(
+                            "Wait for the wallet to load");
+                      }
+                      Get.to(() => ReceivePage());
+                    }
                   },
                   icon: SvgPicture.asset(
                     "assets/icons/qr.svg",
@@ -151,7 +169,10 @@ class SideBar extends StatelessWidget {
               // ),
               Divider(),
               ListTile(
-                onTap: support,
+                onTap: () {
+                  Navigator.pop(context);
+                  support();
+                },
                 title: Text(
                   cat[0],
                   style: TextStyle(color: appColor[800], fontSize: 16),

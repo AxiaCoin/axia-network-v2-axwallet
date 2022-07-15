@@ -1,17 +1,23 @@
 import 'dart:math';
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/code/utils.dart';
+import 'package:wallet/pages/home.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/collectibles.dart';
 import 'package:wallet/pages/search.dart';
 import 'package:wallet/pages/wallet/finance.dart';
+import 'package:wallet/pages/wallet/new_wallet.dart';
 import 'package:wallet/pages/wallet/tokens.dart';
+import 'package:wallet/widgets/axc_txn_tile.dart';
 import 'package:wallet/widgets/balance_card.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/home_widgets.dart';
@@ -20,17 +26,15 @@ import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/walletname_update.dart';
 
 class WalletPage extends StatefulWidget {
-  WalletPage({Key? key}) : super(key: newWalletKey);
+  WalletPage({Key? key}) : super(key: key);
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
 
-final newWalletKey = GlobalKey<_WalletPageState>();
-
 class _WalletPageState extends State<WalletPage>
     with AutomaticKeepAliveClientMixin {
-  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  // GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   int slidingIndex = 0;
   PageController pageController = PageController(keepPage: false);
   List<Widget> pages = [TokensPage(), FinancePage(), CollectiblesPage()];
@@ -41,10 +45,13 @@ class _WalletPageState extends State<WalletPage>
   final TokenData list = Get.find();
   final BalanceData balanceData = Get.find();
   final WalletData walletData = Get.find();
+  final AXCWalletData axcWalletData = Get.find();
+  List<AXCTransaction> transactions = [];
 
   Future refreshData() async {
     if (isLoading || isRefreshing) {
-      await 1.delay();
+      // await 1.delay();
+      await services.getAXCWalletDetails();
       data = list.data;
       balanceInfo = balanceData.getData();
       if (list.selected == null) list.defaultSelection();
@@ -55,6 +62,15 @@ class _WalletPageState extends State<WalletPage>
         });
       print("balance is $balanceInfo");
     }
+  }
+
+  getTransactions() async {
+    // setState(() {
+    //   transactions = CustomCacheManager.instance.transactionsFromCache();
+    // });
+    // transactions = await services.axSDK.api!.transfer.getTransactions();
+    // CustomCacheManager.instance.cacheTransactions(transactions);
+    // setState(() {});
   }
 
   @override
@@ -125,17 +141,17 @@ class _WalletPageState extends State<WalletPage>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await CommonWidgets.bottomSheet(
-                                WalletNameUpdate(wname: walletData.name.value));
-                            setState(() {});
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 18,
-                          )),
+                      // IconButton(
+                      //     onPressed: () async {
+                      //       await CommonWidgets.bottomSheet(
+                      //           WalletNameUpdate(wname: walletData.name.value));
+                      //       setState(() {});
+                      //     },
+                      //     icon: Icon(
+                      //       Icons.edit,
+                      //       color: Colors.white,
+                      //       size: 18,
+                      //     )),
                     ],
                   ),
                   SizedBox(
@@ -221,8 +237,140 @@ class _WalletPageState extends State<WalletPage>
           //brightness: Brightness.dark,
         );
 
+    Widget multicurrencyModule() {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Other Assets",
+                  style: TextStyle(fontSize: 18),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    pushNewScreen(context,
+                        screen: SearchPage(
+                          searchMode: SearchMode.customize,
+                        )).then(
+                      (value) {
+                        setState(() {});
+                      },
+                    );
+                  },
+                  child: Text(
+                    "Edit Assets",
+                    style: TextStyle(color: appColor, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(16),
+              ),
+              color: Colors.grey[50],
+            ),
+            child: ListView.builder(
+              itemCount: isLoading
+                  ? 1
+                  : list.selected!.isEmpty
+                      ? 1
+                      : list.selected!.length,
+              shrinkWrap: true,
+              primary: false,
+              itemBuilder: (context, index) {
+                if (isLoading) {
+                  return Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Spinner(),
+                  ));
+                }
+                if (list.selected!.isEmpty) {
+                  return CommonWidgets.empty(
+                      "Select at least one more asset to display here");
+                }
+                Currency currency = list.selected![index];
+                CoinData item = currency.coinData;
+                String name = item.name;
+                String unit = item.unit;
+                String rate = "\$${item.rate} ";
+                String change = item.change;
+                // double balance = balanceInfo[currency]!;
+                // String balance = "${balanceInfo[currency]} $unit";
+                // String value = "\$" +
+                //     (item.rate * balanceInfo[currency]!).toStringAsFixed(2);
+                var rand = Random().nextInt(2);
+                String ticker = "-$change%";
+                if (rand == 0) {
+                  ticker = "+$change%";
+                }
+                return Obx(
+                  () => HomeWidgets.coinTile(
+                    balance:
+                        FormatText.roundOff((balanceData.data![currency]!)) +
+                            " $unit",
+                    name: name,
+                    rate: rate,
+                    ticker: ticker,
+                    unit: unit,
+                    value: "\$" +
+                        (item.rate * balanceData.data![currency]!)
+                            .toStringAsFixed(2),
+                    onTap: () => pushNewScreen(
+                      context,
+                      screen: CoinPage(
+                        currency: currency,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(bottom: 16)),
+        ],
+      );
+    }
+
+    Widget transactionList() {
+      return Column(children: [
+        Text(
+          "Transaction History",
+          style: Theme.of(context).textTheme.headline6,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        Obx(
+          () => ListView.builder(
+              itemCount: axcWalletData.transactions.isEmpty
+                  ? 1
+                  : axcWalletData.transactions.length,
+              shrinkWrap: true,
+              primary: false,
+              itemBuilder: ((context, index) {
+                if (axcWalletData.transactions.isEmpty) {
+                  return CommonWidgets.empty(
+                      "You don't have any transactions in this wallet");
+                }
+                return AXCTxnTile(
+                  transaction: axcWalletData.transactions[index],
+                );
+              })),
+        ),
+      ]);
+    }
+
     return Scaffold(
-      key: scaffoldKey,
+      key: drawerScaffoldKey,
       appBar: appBar(),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
@@ -240,151 +388,15 @@ class _WalletPageState extends State<WalletPage>
         },
         child: ListView(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: dash(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Your Portfolio",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      pushNewScreen(context,
-                          screen: SearchPage(
-                            searchMode: SearchMode.customize,
-                          )).then(
-                        (value) {
-                          setState(() {});
-                        },
-                      );
-                    },
-                    child: Text(
-                      "Edit Assets",
-                      style: TextStyle(color: appColor, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(16),
-                ),
-                color: Colors.grey[50],
-              ),
-              child: ListView.builder(
-                itemCount: isLoading ? 1 : list.selected!.length,
-                shrinkWrap: true,
-                primary: false,
-                itemBuilder: (context, index) {
-                  if (isLoading) {
-                    return Center(
-                        child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Spinner(),
-                    ));
-                  }
-                  Currency currency = list.selected![index];
-                  CoinData item = currency.coinData;
-                  String name = item.name;
-                  String unit = item.unit;
-                  String rate = "\$${item.rate} ";
-                  String change = item.change;
-                  // double balance = balanceInfo[currency]!;
-                  // String balance = "${balanceInfo[currency]} $unit";
-                  // String value = "\$" +
-                  //     (item.rate * balanceInfo[currency]!).toStringAsFixed(2);
-                  var rand = Random().nextInt(2);
-                  String ticker = "-$change%";
-                  if (rand == 0) {
-                    ticker = "+$change%";
-                  }
-                  return Obx(
-                    () => HomeWidgets.coinTile(
-                      balance:
-                          FormatText.roundOff((balanceData.data![currency]!)) +
-                              " $unit",
-                      name: name,
-                      rate: rate,
-                      ticker: ticker,
-                      unit: unit,
-                      value: "\$" +
-                          (item.rate * balanceData.data![currency]!)
-                              .toStringAsFixed(2),
-                      onTap: () => pushNewScreen(
-                        context,
-                        screen: CoinPage(
-                          currency: currency,
-                        ),
-                      ),
-                    ),
-                  );
-                  // return ListTile(
-                  //   leading: Image.asset(
-                  //     "assets/currencies/$unit.png",
-                  //     height: 40,
-                  //     width: 40,
-                  //     fit: BoxFit.contain,
-                  //     filterQuality: FilterQuality.high,
-                  //   ),
-                  //   trailing: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.end,
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Text(
-                  //         balance,
-                  //         style: TextStyle(
-                  //           fontSize: 16,
-                  //           fontWeight: FontWeight.w500,
-                  //         ),
-                  //       ),
-                  //       Text(
-                  //         value,
-                  //         style: TextStyle(
-                  //           fontSize: 14,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  //   title: Text(
-                  //     name,
-                  //     style: TextStyle(
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w500,
-                  //     ),
-                  //   ),
-                  //   subtitle: Text.rich(
-                  //     TextSpan(
-                  //       text: rate,
-                  //       children: [
-                  //         TextSpan(
-                  //             text: ticker,
-                  //             style: TextStyle(color: tickerColor[rand]))
-                  //       ],
-                  //     ),
-                  //   ),
-                  //   onTap: () => pushNewScreen(
-                  //     context,
-                  //     screen: CoinPage(
-                  //       currency: currency,
-                  //       balance: balanceInfo[currency]!,
-                  //     ),
-                  //   ),
-                  // );
-                },
-                // children: [
-                //   dash(),
-                // ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(16.0),
+            //   child: dash(),
+            // ),
+            NewWalletDashboard(),
+            isMulticurrencyEnabled ? multicurrencyModule() : transactionList(),
+            SizedBox(
+              height: kBottomNavigationBarHeight,
+            )
           ],
         ),
       ),

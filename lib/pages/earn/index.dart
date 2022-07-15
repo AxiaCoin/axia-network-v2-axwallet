@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/database.dart';
-import 'package:wallet/code/storage.dart';
-import 'package:wallet/pages/earn/delegate.dart';
+import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
-import 'package:wallet/pages/network_switch.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
 import 'package:wallet/pages/transfers/same_chain.dart';
-import 'package:wallet/widgets/address_card.dart';
-import 'package:wallet/widgets/balance_card.dart';
-import 'package:wallet/widgets/onboard_widgets.dart';
+import 'package:wallet/pages/wallet/new_wallet.dart';
 import 'package:wallet/widgets/plugin_widgets.dart';
-import 'package:axwallet_sdk/axwallet_sdk.dart';
 
 class EarnPage extends StatefulWidget {
   const EarnPage({Key? key}) : super(key: key);
@@ -23,6 +18,7 @@ class EarnPage extends StatefulWidget {
 
 class _EarnPageState extends State<EarnPage> {
   AXCWalletData axcWalletData = Get.find();
+  bool isRefreshing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,52 +26,6 @@ class _EarnPageState extends State<EarnPage> {
           title: Text("Earn & Transfer"),
           centerTitle: true,
         );
-
-    Widget networkStatus() {
-      NetworkConfig? network = StorageService.instance.connectedNetwork;
-      return Obx(
-        () => Center(
-          child: GestureDetector(
-            onTap: () async {
-              await Get.to(() => NetworkSwitchPage());
-              setState(() {});
-            },
-            child: Container(
-              padding: EdgeInsets.all(4),
-              child: Text.rich(
-                TextSpan(
-                  text: axcWalletData.wallet.value.swap != null
-                      ? "Connected to "
-                      : "Connecting to a node",
-                  children: [
-                    TextSpan(
-                      text: axcWalletData.wallet.value.swap != null
-                          ? StorageService.instance.connectedNetwork?.name
-                          : null,
-                      style: Theme.of(context).textTheme.subtitle2,
-                    ),
-                    TextSpan(
-                      text: (StorageService.instance.connectedNetwork == null ||
-                              axcWalletData.wallet.value.swap == null)
-                          ? null
-                          : StorageService.instance.connectedNetwork!.isTestNet
-                              ? " (Testnet)"
-                              : " (Mainnet)",
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                    WidgetSpan(
-                      child: Icon(Icons.keyboard_arrow_right),
-                      alignment: PlaceholderAlignment.middle,
-                    )
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
 
     return GestureDetector(
       onTap: () {
@@ -91,19 +41,15 @@ class _EarnPageState extends State<EarnPage> {
           // padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
           child: ListView(
             children: [
-              networkStatus(),
-              BalanceCard(),
-              SizedBox(height: 8),
-              AddressCard(),
-              SizedBox(height: 8),
+              // NewWalletDashboard(),
               // PluginWidgets.indexTitle(
               //     "You can earn more AXC by staking your existing tokens."),
               // PluginWidgets.earntiles(
               //     "Validate",
-              //     "You have an Avalanche node that you want to stake with.",
+              //     "You have an Axia node that you want to stake with.",
               //     Icons.people,
               //     () => null),
-              // SizedBox(height: 8),
+              SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Same Chain Transfer",
                   "Send coins to other wallets in the Swap-Chain or AX-Chain",
@@ -120,7 +66,7 @@ class _EarnPageState extends State<EarnPage> {
                   "Nominate",
                   "You do not own a node, but you want to stake using another node.",
                   Icons.shield,
-                  () => pushNewScreen(context, screen: DelegatePage())),
+                  () => pushNewScreen(context, screen: NominatePage())),
               SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Estimated Rewards",

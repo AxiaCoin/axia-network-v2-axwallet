@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/new_user/create_wallet/disclaimer.dart';
 import 'package:wallet/pages/new_user/create_wallet/import_wallet.dart';
+import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/tabpageselector.dart';
 
 class OnboardPage extends StatefulWidget {
-  const OnboardPage({Key? key}) : super(key: key);
+  final bool showBack;
+  const OnboardPage({
+    Key? key,
+    this.showBack = false,
+  }) : super(key: key);
 
   @override
   _OnboardPageState createState() => _OnboardPageState();
@@ -65,6 +72,23 @@ class _OnboardPageState extends State<OnboardPage>
       appBar: AppBar(
         title: Text("Welcome"),
         centerTitle: true,
+        leading: widget.showBack
+            ? CommonWidgets.backButton(context)
+            : IconButton(
+                onPressed: () async {
+                  services.logOut(showMessage: false);
+                },
+                tooltip: "Logout",
+                icon: Icon(Icons.logout)),
+        // actions: widget.showBack
+        //     ? null
+        //     : [
+        //         IconButton(
+        //             onPressed: () async {
+        //               services.logOut(showMessage: false);
+        //             },
+        //             icon: Icon(Icons.logout))
+        //       ],
       ),
       // floatingActionButton: Column(
       //   mainAxisAlignment: MainAxisAlignment.end,
@@ -85,21 +109,28 @@ class _OnboardPageState extends State<OnboardPage>
       body: Container(
         child: Column(
           // mainAxisSize: MainAxisSize.min,
-          // crossAxisAlignment: CrossAxisAlignment.stretch,
+          // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Expanded(
+            //   child: TabBarView(controller: tabController, children: items),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(bottom: 64.0),
+            //   child: MyTabPageSelector(
+            //     controller: tabController,
+            //     color: Colors.grey.withOpacity(0.2),
+            //     indicatorSize: 8,
+            //   ),
+            // ),
             Expanded(
-              child: TabBarView(controller: tabController, children: items),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 64.0),
-              child: MyTabPageSelector(
-                controller: tabController,
-                color: Colors.grey.withOpacity(0.2),
-                indicatorSize: 8,
+              child: Container(
+                width: Get.width / 3,
+                child: Image.asset('assets/images/logo_about.png'),
               ),
             ),
-            SizedBox(
-              width: Get.width * 0.92,
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 8),
               child: ElevatedButton(
                 onPressed: () => Get.to(() => DisclaimerPage()),
                 child: Text("CREATE WALLET"),
@@ -109,14 +140,16 @@ class _OnboardPageState extends State<OnboardPage>
             SizedBox(
               height: 8,
             ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: TextButton(
+                  onPressed: () => Get.to(() => ImportWalletPage()),
+                  child: Text("IMPORT WALLET"),
+                  style: MyButtonStyles.onboardStyle),
+            ),
             SizedBox(
-                width: Get.width * 0.92,
-                child: TextButton(
-                    onPressed: () => Get.to(() => ImportWalletPage()),
-                    child: Text("IMPORT WALLET"),
-                    style: MyButtonStyles.onboardStyle)),
-            SizedBox(
-              height: 32,
+              height: 16,
             )
           ],
         ),

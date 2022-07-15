@@ -11,11 +11,13 @@ import 'package:hex/hex.dart';
 import 'package:http/http.dart' as http;
 import 'package:local_auth/local_auth.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/Crypto_Models/validator.dart';
 import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
 import 'package:wallet/code/storage.dart';
+import 'package:wallet/pages/new_user/create_wallet/onboard.dart';
 import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -105,9 +107,9 @@ class Services {
     HDWallet wallet = HDWallet.fromSeed(seedData);
     HDWalletInfo walletInfo = HDWalletInfo(
         seed: seed, name: name, mnemonic: mnemonic, hdWallet: wallet);
-    StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
+    await StorageService.instance.storeMnemonicSeed(wallet.pubKey!, walletInfo);
     hdWallets[wallet.pubKey!] = walletInfo;
-    StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
+    await StorageService.instance.storeCurrentPubKey(wallet.pubKey!);
     await initMCWallet(wallet.pubKey!);
   }
 
@@ -116,7 +118,7 @@ class Services {
     bool isChangingWallet =
         pubKey != null && currentPubKey != null && currentPubKey != pubKey;
     print("isChangingWallet = $isChangingWallet");
-    var mnemonicSeeds = StorageService.instance.readMnemonicSeed();
+    var mnemonicSeeds = await StorageService.instance.readMnemonicSeed();
     if (mnemonicSeeds == null || mnemonicSeeds.isEmpty) return;
     mnemonicSeeds.forEach((key, value) {
       var seedData = HexDecoder().convert(value.seed) as Uint8List;
@@ -133,6 +135,9 @@ class Services {
       if (isChangingWallet || axcWalletStatus == AXCWalletStatus.idle) {
         await this.initAXSDK(mnemonic: hdWallets[pubKey]!.mnemonic);
       }
+      StorageService.instance.storeCurrentPubKey(pubKey);
+      AXCWalletData axcWalletData = Get.find();
+      axcWalletData.setCachedData();
       print("wallet created");
       currencyList.forEach(
         (e) => e.getWallet(),
@@ -142,31 +147,55 @@ class Services {
 
   getAXCWalletDetails() async {
     AXCWalletData axcWalletData = Get.find();
+    axcWalletData.setCachedData();
     update() async {
       var api = this.axSDK.api!;
       var data = await Future.wait([
         api.basic.getWallet(),
         api.basic.getBalance(),
+        api.transfer.getTransactions(),
       ]);
-      var wallet = AXCWallet.fromMap(data[0]);
-      var balance = AXCBalance.fromMap(data[1]);
+      AXCWallet wallet = AXCWallet.fromMap(data[0]);
+      AXCBalance balance = AXCBalance.fromMap(data[1]);
+      List<AXCTransaction> transactions = data[2];
+      CustomCacheManager.instance.cacheAddress(wallet);
+      CustomCacheManager.instance.cacheBalance(balance);
+      CustomCacheManager.instance.cacheTransactions(transactions);
       axcWalletData.updateWallet(wallet);
       axcWalletData.updateBalance(balance);
+      axcWalletData.updateTransactions(transactions);
     }
 
     if (timerAXC != null) {
       timerAXC?.cancel();
-      print("timer cancelled");
     }
-    update();
+    await update();
+
+    // called only once when any configs/wallets change
+    updateValidators();
+
     timerAXC = Timer.periodic(Duration(minutes: 1), (t) {
       update();
     });
   }
 
+  updateValidators() async {
+    var response =
+        (await axSDK.api!.nomination.getValidators())["validators"] as List;
+    List<ValidatorItem> validators =
+        response.map((e) => ValidatorItem.fromMap(e)).toList();
+    validators
+        .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
+    CustomCacheManager.instance.cacheValidators(validators);
+  }
+
   updateBalances() async {
     BalanceData balanceCont = Get.find();
     void update() async {
+      if (!isMulticurrencyEnabled) {
+        balanceCont.updateAXCBalance();
+        return;
+      }
       await Future.wait(currencyList.map((e) async {
         double balance = (await e.getBalance()).toDouble();
         balanceCont.updateBalance(e, balance);
@@ -175,7 +204,6 @@ class Services {
 
     if (timer != null) {
       timer?.cancel();
-      print("timer cancelled");
     }
     update();
     timer = Timer.periodic(Duration(seconds: 10), (t) {
@@ -183,13 +211,40 @@ class Services {
     });
   }
 
-  logOut() async {
+  deleteWallet(BuildContext context, String pubKey) async {
+    String current = walletData.hdWallet!.value.pubKey!;
+    hdWallets.remove(pubKey);
+    StorageService.instance.removeMnemonicSeed(pubKey);
+    print("hdWallets is $hdWallets");
+    if (hdWallets.isEmpty) {
+      print("wallet is empty");
+      StorageService.instance.clearCurrentPubKey();
+      Get.offAll(() => OnboardPage());
+    } else if (current == pubKey) {
+      print("deleting me $pubKey");
+      String nextPubKey = hdWallets.entries.first.key;
+      CommonWidgets.waitDialog(
+          text: "Switching to a different wallet. Please wait");
+      print("new key is $nextPubKey");
+      await initMCWallet(nextPubKey);
+      hdWallets
+          .remove(pubKey); // need to call this for reasons I have no answer for
+      Get.back();
+    } else {
+      print("deleting other");
+      CommonWidgets.snackBar("Wallet Deleted!");
+    }
+  }
+
+  logOut({bool showMessage = true}) async {
     bool? confirm = await Get.dialog(
       AlertDialog(
         title: Text("Do you want to logout of your current account?"),
-        content: Text(
-            "This will remove the wallet(s) you have created and you will need to re-import them with the secret phrase.\n"
-            "If you do not have access to the secret phrase(s) then you risk losing all the assets and we cannot help you recover them!"),
+        content: showMessage
+            ? Text(
+                "This will remove the wallet(s) you have created and you will need to re-import them with the secret phrase.\n"
+                "If you do not have access to the secret phrase(s) then you risk losing all the assets and we cannot help you recover them!")
+            : null,
         actions: [
           TextButton(
             onPressed: () => Get.back(result: true),
@@ -217,6 +272,7 @@ class Services {
     StorageService.instance
       ..clearTokens()
       ..init();
+    hdWallets.clear();
     Get.offAll(() => LoginPage());
     // }
   }
@@ -274,6 +330,9 @@ class APIServices {
         return null;
       }
     } on SocketException {
+      if (url == networkConfigURL) {
+        return generalRequest(networkConfigURLAlt);
+      }
       return CommonWidgets.snackBar("No internet connection");
     } on HttpException {
       return CommonWidgets.snackBar("Couldn't find URL");

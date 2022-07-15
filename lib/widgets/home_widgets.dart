@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +8,7 @@ import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/database.dart';
 import 'package:wallet/code/models.dart';
+import 'package:wallet/code/services.dart';
 import 'package:wallet/pages/wallet/coin_page.dart';
 import 'package:wallet/pages/wallet/finance.dart';
 import 'package:wallet/pages/webview.dart';
@@ -28,6 +30,7 @@ class HomeWidgets {
         style: TextStyle(
             fontSize: 16, fontWeight: FontWeight.w300, color: appColor),
         maxLines: 1,
+        textAlign: TextAlign.center,
       );
 
   static Widget coinPageHeaderText(String text, {bool isTicker = false}) {
@@ -109,6 +112,35 @@ class HomeWidgets {
       label: Text(
         label,
         style: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  static Widget addressIdenticon(String address) {
+    return SizedBox(
+      width: 40,
+      height: 40,
+      child: Container(
+        padding: EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: appColor[600],
+        ),
+        child: FutureBuilder(
+            future: services.axSDK.api!.utils.getIdenticon(address: address),
+            builder: (context, AsyncSnapshot<String?> snapshot) {
+              return snapshot.data == null
+                  ? Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                      size: 32,
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.memory(
+                          base64Decode(snapshot.data!.split("base64,")[1])),
+                    );
+            }),
       ),
     );
   }

@@ -16,6 +16,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+GlobalKey<ScaffoldState> drawerScaffoldKey = new GlobalKey<ScaffoldState>();
+
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   PageController pageController = PageController();
   PersistentTabController _controller =
@@ -41,7 +43,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         inactiveColorPrimary: Colors.grey),
     PersistentBottomNavBarItem(
         icon: Icon(Icons.trending_up),
-        title: "AXC Hub",
+        title: "Hub",
         activeColorPrimary: appColor,
         inactiveColorPrimary: Colors.grey),
     // PersistentBottomNavBarItem(
@@ -79,6 +81,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         controller: _controller,
         screens: pages,
         items: bottomNavBarItems,
+        onItemSelected: (_) {
+          drawerScaffoldKey.currentState?.closeDrawer();
+        },
         confineInSafeArea: true,
         backgroundColor: settingsState.darkMode.value
             ? darkNavBar

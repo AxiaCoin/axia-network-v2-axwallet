@@ -19,20 +19,20 @@ Future<void> main() async {
 initServices() async {
   // Get.changeTheme(Get.isDarkMode ? darkTheme : lightTheme);
   // Get.changeTheme(Get.isDarkMode ? lightTheme : darkTheme);
-  Get.put(TokenData());
-  Get.put(BalanceData());
-  Get.put(SettingsState());
-  Get.put(WalletData());
-  Get.put(AXCWalletData());
   await Future.wait(
     [
       GetStorage.init(),
       GetStorage.init(CustomCacheManager.key),
     ],
   );
+  await StorageService.instance.init();
+  Get.put(TokenData());
+  Get.put(BalanceData());
+  Get.put(SettingsState());
+  Get.put(WalletData());
+  Get.put(AXCWalletData());
   // CustomCacheManager.instance.box.erase();
 
-  StorageService.instance.init();
   // await services.initAXSDK(jsOnly: true);
   initAXCSDK();
   // var mnemonics = StorageService.instance.readMnemonicSeed();
@@ -55,7 +55,7 @@ initAXCSDK() async {
     return services.initAXSDK();
   }
   HDWalletInfo walletInfo =
-      StorageService.instance.readMnemonicSeed(pubKey: pubKey);
+      await StorageService.instance.readMnemonicSeed(pubKey: pubKey);
   services.initAXSDK(mnemonic: walletInfo.mnemonic);
 }
 

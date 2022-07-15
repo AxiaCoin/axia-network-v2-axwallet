@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/services.dart';
 import 'package:wallet/code/storage.dart';
@@ -11,7 +13,15 @@ import 'package:wallet/pages/home.dart';
 import 'package:wallet/widgets/common.dart';
 
 class DeviceAuthPage extends StatefulWidget {
-  const DeviceAuthPage({Key? key}) : super(key: key);
+  final String? mnemonic;
+  final String? name;
+  final bool isChangingPin;
+  const DeviceAuthPage({
+    Key? key,
+    this.mnemonic,
+    this.name,
+    this.isChangingPin = false,
+  }) : super(key: key);
 
   @override
   State<DeviceAuthPage> createState() => _DeviceAuthPageState();
@@ -28,12 +38,20 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   initAuthentication() async {
     canCheckBiometrics = await Services().canCheckBiometrics();
     setState(() {});
-    if (canCheckBiometrics && StorageService.instance.useBiometric!) {
-      bool success = await localAuth.authenticate(
+    print(StorageService.instance.useBiometric!);
+    bool isBiometricAllowed = canCheckBiometrics &&
+        StorageService.instance.useBiometric! &&
+        !widget.isChangingPin;
+    if (isBiometricAllowed) {
+      bool success = await localAuth
+          .authenticate(
         localizedReason: isSettingUp
             ? "Please authenticate to continue to wallet"
             : "Please authenticate this Transaction",
-      );
+      )
+          .catchError((onError) {
+        return false;
+      });
       if (success) {
         successful();
       } else {
@@ -59,7 +77,9 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   }
 
   successful() async {
-    if (isSettingUp) {
+    if (widget.mnemonic != null) {
+      createNewWallet();
+    } else if (isSettingUp) {
       String pubKey = StorageService.instance.readCurrentPubKey()!;
       CommonWidgets.waitDialog();
       await services.initMCWallet(pubKey);
@@ -68,6 +88,12 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
       Get.back(result: true);
       return;
     }
+  }
+
+  createNewWallet() async {
+    CommonWidgets.waitDialog();
+    await services.createMCWallet(widget.mnemonic!, widget.name!);
+    Get.offAll(() => HomePage());
   }
 
   BoxDecoration get _pinPutDecoration {
@@ -80,7 +106,6 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
   @override
   void initState() {
     super.initState();
-    mnemonic = StorageService.instance.readCurrentPubKey();
     initAuthentication();
   }
 
@@ -96,6 +121,15 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
           centerTitle: true,
           leading: isSettingUp ? null : CommonWidgets.backButton(context),
         ),
+        floatingActionButton: kDebugMode
+            ? FloatingActionButton(
+                child: Icon(Icons.developer_board),
+                onPressed: () {
+                  var api = services.axSDK.api!;
+                  api.basic.tests();
+                },
+              )
+            : null,
         body: SafeArea(
           child: Stack(
             children: [
@@ -113,7 +147,7 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                     Text(
                       isSettingUp
                           ? "Enter your PIN to access your Wallet"
-                          : "Enter your PIN to authenticate this Transaction",
+                          : "Enter your PIN to authenticate",
                       style: context.textTheme.headline5,
                     ),
                     SizedBox(
@@ -140,12 +174,12 @@ class _DeviceAuthPageState extends State<DeviceAuthPage> {
                         setState(() {});
                       },
                     ),
-                    canCheckBiometrics
+                    canCheckBiometrics && !widget.isChangingPin
                         ? SizedBox(
                             height: 32,
                           )
                         : Container(),
-                    canCheckBiometrics
+                    canCheckBiometrics && !widget.isChangingPin
                         ? GestureDetector(
                             onTap: (() {
                               StorageService.instance

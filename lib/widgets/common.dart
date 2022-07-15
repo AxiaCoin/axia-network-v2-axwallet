@@ -2,9 +2,15 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/code/constants.dart';
+import 'package:wallet/code/currency.dart';
+import 'package:wallet/code/utils.dart';
+import 'package:wallet/pages/qr_scan.dart';
+import 'package:wallet/widgets/home_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 
 class CommonWidgets {
@@ -29,9 +35,21 @@ class CommonWidgets {
       WillPopScope(
         onWillPop: () async => true,
         child: AlertDialog(
+          // content: Text.rich(
+          //   TextSpan(text: "", children: [
+          //     WidgetSpan(child: Spinner()),
+          //     TextSpan(text: text),
+          //   ]),
+          // ),
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [Spinner(), Text(text)],
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Spinner(),
+              ),
+              Expanded(child: Text(text))
+            ],
           ),
         ),
       ),
@@ -43,10 +61,11 @@ class CommonWidgets {
     await Get.bottomSheet(bottomsheet);
   }
 
-  static launch(String url) async {
+  static launch(String url,
+      {LaunchMode launchMode = LaunchMode.externalApplication}) async {
     Uri uri = Uri.parse(url);
     (await canLaunchUrl(uri))
-        ? await launchUrl(uri, mode: LaunchMode.externalApplication)
+        ? await launchUrl(uri, mode: launchMode)
         : CommonWidgets.snackBar("Cannot open the link");
   }
 
@@ -58,6 +77,17 @@ class CommonWidgets {
       onPressed: () {
         Navigator.pop(context);
       });
+
+  static Widget handleBar() {
+    return Container(
+      height: 4,
+      width: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.grey,
+      ),
+    );
+  }
 
   static Widget elevatedContainer({
     required Widget child,
@@ -108,5 +138,29 @@ class CommonWidgets {
               ? Container()
               : IconButton(onPressed: onPressed, icon: Icon(Icons.edit))
         ],
+      );
+
+  static Widget empty(String text) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: Get.width * 0.25,
+              width: Get.width * 0.25,
+              child: Image.asset(
+                "assets/icons/empty_txn.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            HomeWidgets.emptyListText(text),
+            // SizedBox(
+            //   height: 16,
+            // ),
+          ],
+        ),
       );
 }

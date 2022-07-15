@@ -1,6 +1,8 @@
+import 'package:axwallet_sdk/axwallet_sdk.dart';
 import 'package:coinslib/coinslib.dart';
 import 'package:get/get.dart';
 import 'package:wallet/Crypto_Models/axc_wallet.dart';
+import 'package:wallet/code/cache.dart';
 import 'package:wallet/code/constants.dart';
 import 'package:wallet/code/currency.dart';
 import 'package:wallet/code/models.dart';
@@ -32,6 +34,7 @@ class TokenData extends GetxController {
 
 class BalanceData extends GetxController {
   final TokenData tokenData = Get.put(TokenData());
+  final AXCWalletData axcWalletData = Get.put(AXCWalletData());
   Map<Currency, double>? data;
   var totalBalance = 0.0.obs;
   Map<Currency, double> getData() => data ??= {
@@ -43,10 +46,16 @@ class BalanceData extends GetxController {
   updateBalance(Currency currency, double value) {
     getData()[currency] = value;
     totalBalance.value = 0;
+    updateAXCBalance();
     data!.forEach((key, value) {
       if (key.coinData.selected)
         totalBalance.value += value * key.coinData.rate;
     });
+  }
+
+  updateAXCBalance() {
+    totalBalance.value = axcWalletData.balance.value
+        .getTotalBalance(inUSD: isMulticurrencyEnabled);
   }
 }
 
@@ -85,8 +94,11 @@ class User extends GetxController {
 }
 
 class AXCWalletData extends GetxController {
-  var wallet = AXCWallet().obs;
-  var balance = AXCBalance().obs;
+  var wallet =
+      (CustomCacheManager.instance.addressFromCache() ?? AXCWallet()).obs;
+  var balance =
+      (CustomCacheManager.instance.balanceFromCache() ?? AXCBalance()).obs;
+  var transactions = CustomCacheManager.instance.transactionsFromCache().obs;
 
   var mappedWallet = {
     Chain.Swap: AXCWallet().swap,
@@ -118,5 +130,19 @@ class AXCWalletData extends GetxController {
             : key == Chain.AX
                 ? data.ax
                 : data.staked);
+  }
+
+  updateTransactions(List<AXCTransaction> data) {
+    transactions.value = data;
+  }
+
+  setCachedData() {
+    if (CustomCacheManager.instance.addressFromCache() != null) {
+      wallet.value = CustomCacheManager.instance.addressFromCache()!;
+    }
+    if (CustomCacheManager.instance.balanceFromCache() != null) {
+      balance.value = CustomCacheManager.instance.balanceFromCache()!;
+    }
+    transactions.value = CustomCacheManager.instance.transactionsFromCache();
   }
 }

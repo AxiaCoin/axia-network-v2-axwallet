@@ -13,14 +13,14 @@ import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 import 'package:wallet/widgets/validator_tile.dart';
 
-class DelegatePage extends StatefulWidget {
-  const DelegatePage({Key? key}) : super(key: key);
+class NominatePage extends StatefulWidget {
+  const NominatePage({Key? key}) : super(key: key);
 
   @override
-  State<DelegatePage> createState() => _DelegatePageState();
+  State<NominatePage> createState() => _NominatePageState();
 }
 
-class _DelegatePageState extends State<DelegatePage> {
+class _NominatePageState extends State<NominatePage> {
   final GlobalKey<RefreshIndicatorState> _refreshKey =
       new GlobalKey<RefreshIndicatorState>();
   TextEditingController controller = new TextEditingController();
@@ -36,13 +36,15 @@ class _DelegatePageState extends State<DelegatePage> {
     validators
         .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
     CustomCacheManager.instance.cacheValidators(validators);
+    validators = Utils.filterValidators(validators);
     if (mounted) setState(() => isLoading = false);
   }
 
   @override
   void initState() {
     super.initState();
-    validators = CustomCacheManager.instance.validatorsFromCache();
+    validators = Utils.filterValidators(
+        CustomCacheManager.instance.validatorsFromCache());
     getValidators();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshKey.currentState?.show();
@@ -102,7 +104,7 @@ class _DelegatePageState extends State<DelegatePage> {
         // ),
         body: Container(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: validators.isEmpty
+            child: isLoading && validators.isEmpty
                 ? Center(
                     child: Spinner(
                       text: "Fetching Validators",
@@ -111,33 +113,35 @@ class _DelegatePageState extends State<DelegatePage> {
                 : RefreshIndicator(
                     key: _refreshKey,
                     onRefresh: () async => await getValidators(),
-                    child: SearchableList<ValidatorItem>(
-                      initialList: validators,
-                      builder: (validator) {
-                        return ValidatorTile(validator: validator);
-                      },
-                      emptyWidget:
-                          OnboardWidgets.neverShare(text: "No nodes found"),
-                      filter: (value) => validators
-                          .where((element) => element.nodeID
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList(),
-                      // onRefresh: () async => await getValidators(),
-                      defaultSuffixIconColor: appColor,
-                      inputDecoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          // prefixIcon: Icon(
-                          //   Icons.search,
-                          //   color: Colors.black12,
-                          // ),
-                          hintText: "Search Node",
-                          hintStyle: TextStyle(
-                              // color: Colors.black12,
-                              )),
-                    ),
+                    child: validators.isEmpty
+                        ? CommonWidgets.empty("No potential validators found")
+                        : SearchableList<ValidatorItem>(
+                            initialList: validators,
+                            builder: (validator) {
+                              return ValidatorTile(validator: validator);
+                            },
+                            emptyWidget: OnboardWidgets.neverShare(
+                                text: "No nodes found"),
+                            filter: (value) => validators
+                                .where((element) => element.nodeID
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()))
+                                .toList(),
+                            // onRefresh: () async => await getValidators(),
+                            defaultSuffixIconColor: appColor,
+                            inputDecoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15))),
+                                // prefixIcon: Icon(
+                                //   Icons.search,
+                                //   color: Colors.black12,
+                                // ),
+                                hintText: "Search Node",
+                                hintStyle: TextStyle(
+                                    // color: Colors.black12,
+                                    )),
+                          ),
                   )
             // child: Column(
             //   children: [

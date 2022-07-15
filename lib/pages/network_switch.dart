@@ -32,10 +32,12 @@ class _NetworkSwitchPageState extends State<NetworkSwitchPage> {
     if (isSuccessful) {
       print("connected is $isSuccessful");
       StorageService.instance.updateConnectedNetwork(config);
-      services.getAXCWalletDetails();
+      Get.back();
+      CommonWidgets.waitDialog(text: "Fetching wallet details");
+      await services.getAXCWalletDetails();
     }
     Get.back();
-    // Get.back();
+    Get.back();
     CommonWidgets.snackBar(isSuccessful
         ? "Succesfully changed to ${config.name}"
         : "Failed to change network. Please try again");
