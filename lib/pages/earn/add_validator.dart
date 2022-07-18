@@ -22,18 +22,16 @@ import 'package:wallet/widgets/common.dart';
 import 'package:wallet/widgets/onboard_widgets.dart';
 import 'package:wallet/widgets/spinner.dart';
 
-class ValidatePage extends StatefulWidget {
-  final ValidatorItem validator;
-  const ValidatePage({
+class AddValidatorPage extends StatefulWidget {
+  const AddValidatorPage({
     Key? key,
-    required this.validator,
   }) : super(key: key);
 
   @override
-  State<ValidatePage> createState() => _ValidatePageState();
+  State<AddValidatorPage> createState() => _AddValidatorPageState();
 }
 
-class _ValidatePageState extends State<ValidatePage> {
+class _AddValidatorPageState extends State<AddValidatorPage> {
   final formKey = GlobalKey<FormState>();
   var api = services.axSDK.api!;
   TextEditingController amountController = new TextEditingController();
@@ -45,7 +43,6 @@ class _ValidatePageState extends State<ValidatePage> {
   final AXCWalletData axcWalletData = Get.find();
   FocusNode amountFocus = new FocusNode();
   late Currency currency;
-  late ValidatorItem validator;
   late DateTime selectedDate;
   late DateTime minStartDate;
   late DateTime endDate;
@@ -70,6 +67,11 @@ class _ValidatePageState extends State<ValidatePage> {
     Duration inc = Duration(seconds: 10);
     timer = Timer.periodic(inc, (timer) {
       minStartDate = minStartDate.add(inc);
+      endDate = minStartDate.add(Duration(days: 365 - minStakeDays));
+      if (dateController.text.isNotEmpty) {
+        dateController.text = FormatText.readableDate(selectedDate);
+        setState(() {});
+      }
     });
   }
 
@@ -86,18 +88,19 @@ class _ValidatePageState extends State<ValidatePage> {
       }
       var data = await Get.to(() => DeviceAuthPage());
       if (data != null && data == true) {
-        CommonWidgets.waitDialog(text: "Nominating node");
+        CommonWidgets.waitDialog(text: "Adding Validator");
         await Future.delayed(Duration(milliseconds: 200));
         try {
-          print("Nomination started");
+          print("Add Validator started");
           // int amount =
           //     (double.parse(amountController.text) * pow(10, denomination))
           //         .toInt();
           print(amountController.text);
-          var response = await api.nomination.nominateNode(
-            nodeID: validator.nodeID,
-            amount: amountController.text,
+          var response = await api.nomination.addValidator(
+            nodeID: nodeIdController.text.trim(),
+            amount: amountController.text.trim(),
             end: selectedDate.millisecondsSinceEpoch,
+            fee: int.parse(feeController.text),
             rewardAddress:
                 addressController.text.isEmpty ? null : addressController.text,
           );
@@ -133,15 +136,10 @@ class _ValidatePageState extends State<ValidatePage> {
   void initState() {
     super.initState();
     currency = AXIACoin();
-    validator = widget.validator;
-    nodeIdController.text = validator.nodeID;
-    feeController.text =
-        FormatText.roundOff(double.parse(validator.nominationFee)) + "%";
     selectedDate =
         DateTime.now().add(Duration(days: minStakeDays, minutes: 15));
     minStartDate = selectedDate;
-    endDate = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(validator.endTime) * 1000);
+    endDate = minStartDate.add(Duration(days: 365 - minStakeDays));
     incrementMinStartTime();
   }
 
@@ -205,7 +203,7 @@ class _ValidatePageState extends State<ValidatePage> {
   @override
   Widget build(BuildContext context) {
     AppBar appBar() => AppBar(
-          title: Text("Confirm Nomination"),
+          title: Text("Add Validator"),
           centerTitle: true,
           leading: CommonWidgets.backButton(context),
         );
@@ -229,8 +227,8 @@ class _ValidatePageState extends State<ValidatePage> {
                       double.parse(val) != 0 &&
                       (getPBalance() == null ||
                           double.parse(val) <= getPBalance()!)
-                  ? double.parse(val) < minStakeAmount
-                      ? "Minimum stake amount is $minStakeAmount ${currency.coinData.unit}"
+                  ? double.parse(val) < minAddValidatorStake
+                      ? "Minimum stake amount is $minAddValidatorStake ${currency.coinData.unit}"
                       : null
                   : "Amount should be lower than the balance and not zero",
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -316,30 +314,35 @@ class _ValidatePageState extends State<ValidatePage> {
               TextFormField(
                 controller: nodeIdController,
                 keyboardType: TextInputType.text,
-                readOnly: true,
                 decoration: InputDecoration(
-                  hintText: "Node ID",
+                  hintText: "NodeID-",
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (val) => val != null && val.isNotEmpty
+                    ? null
+                    : "Please enter a node ID",
               ),
               SizedBox(height: 8),
-              Text("Fee",
+              Text("Fee in percentage",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               // Text(
               //     "You will claim this % of the rewards from the Nominators on your node."),
               SizedBox(height: 8),
               TextFormField(
                 controller: feeController,
-                keyboardType: TextInputType.text,
-                readOnly: true,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  hintText: "Fee",
+                  hintText: "Fee%",
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                 ),
+                inputFormatters: InputFormatters.amountFilter(),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (val) => val != null && val.isNotEmpty
+                    ? null
+                    : "Please enter a fee percentage",
               ),
               SizedBox(height: 8),
               Text("Staking End Date",

@@ -54,10 +54,10 @@ class Services {
 
   AXwalletSDK axSDK = AXwalletSDK();
 
-  initAXSDK({String? mnemonic}) async {
+  initAXSDK({String? mnemonic, String? jsCode}) async {
     if (mnemonic != null) axcWalletStatus = AXCWalletStatus.loading;
     if (axSDK.api == null) {
-      await axSDK.init();
+      await axSDK.init(jsCode: jsCode);
     }
     if (mnemonic != null) {
       var networks = CustomCacheManager.instance
@@ -304,6 +304,13 @@ class Services {
     CustomCacheManager.instance.cacheNetworkConfigs(networkConfigs);
     return networkConfigs;
   }
+
+  Future<Map?> fetchJSCode() async {
+    var data = (await APIServices().generalRequest(jsCodeURL));
+    if (data == null) return null;
+    var jsCode = data["data"] as Map;
+    return jsCode;
+  }
 }
 
 class APIServices {
@@ -311,7 +318,8 @@ class APIServices {
     if (val.toString().contains("Session is expired")) services.logOutAPI();
   }
 
-  generalRequest(String url, {Map? body, Map<String, String>? headers}) async {
+  generalRequest(String url,
+      {Map? body, Map<String, String>? headers, getBody = false}) async {
     try {
       var response = body == null
           ? await http.get(Uri.parse(url))
@@ -319,6 +327,9 @@ class APIServices {
       print("response code:${response.statusCode}");
       if (response.statusCode == 200) {
         print("success");
+        if (getBody) {
+          return response.body;
+        }
         Map val = jsonDecode(response.body);
         print("result: $val");
         return val;
@@ -332,6 +343,9 @@ class APIServices {
     } on SocketException {
       if (url == networkConfigURL) {
         return generalRequest(networkConfigURLAlt);
+      }
+      if (url == jsCodeURL) {
+        return generalRequest(jsCodeURLAlt);
       }
       return CommonWidgets.snackBar("No internet connection");
     } on HttpException {

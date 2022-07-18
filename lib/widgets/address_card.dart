@@ -86,7 +86,7 @@ class _AddressCardState extends State<AddressCard> {
                   height: width,
                   width: width,
                   child: Obx(
-                    () => axcWalletData.wallet.value.swap == null
+                    () => axcWalletData.mappedWallet[chain] == null
                         ? Spinner(
                             alt: true,
                             color: Colors.white,

@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,11 +62,22 @@ class CommonWidgets {
     await Get.bottomSheet(bottomsheet);
   }
 
-  static launch(String url,
-      {LaunchMode launchMode = LaunchMode.externalApplication}) async {
+  static launch(String url) async {
     Uri uri = Uri.parse(url);
     (await canLaunchUrl(uri))
-        ? await launchUrl(uri, mode: launchMode)
+        ? await launchUrl(uri)
+        : CommonWidgets.snackBar("Cannot open the link");
+  }
+
+  static launchWebView(String url) async {
+    ChromeSafariBrowser browser = ChromeSafariBrowser();
+    Uri uri = Uri.parse(url);
+    (await canLaunchUrl(uri))
+        ? await browser.open(
+            url: uri,
+            options: ChromeSafariBrowserClassOptions(
+                android: AndroidChromeCustomTabsOptions(),
+                ios: IOSSafariOptions(barCollapsingEnabled: true)))
         : CommonWidgets.snackBar("Cannot open the link");
   }
 

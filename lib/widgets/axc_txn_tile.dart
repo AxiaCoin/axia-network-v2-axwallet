@@ -1,5 +1,6 @@
 import 'package:axwallet_sdk/models/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet/code/constants.dart';
@@ -95,7 +96,7 @@ class AXCTxnTile extends StatelessWidget {
       double total = 0;
       List<String> addr = [];
       transaction.tokens!.forEach((e) {
-        total += double.parse(e.amountDisplayValue!);
+        total += double.parse(e.amountDisplayValue!.replaceAll(",", ""));
         addr.addAll(e.addresses!);
       });
       bool isSent = total <= 0;
@@ -161,9 +162,7 @@ class AXCTxnTile extends StatelessWidget {
           onTap: () {
             NetworkConfig network = StorageService.instance.connectedNetwork!;
             String url = network.explorerTxnURL + "/tx/$id";
-            // CommonWidgets.launch(url,
-            //     launchMode: LaunchMode.externalApplication);
-            Get.to(() => WebViewPage(url: url));
+            CommonWidgets.launchWebView(url);
           },
           child: Container(
             // padding: EdgeInsets.all(8),

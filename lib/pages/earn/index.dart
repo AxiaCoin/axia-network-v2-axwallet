@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:wallet/code/database.dart';
+import 'package:wallet/pages/earn/add_validator.dart';
 import 'package:wallet/pages/earn/nominate.dart';
 import 'package:wallet/pages/earn/rewards.dart';
 import 'package:wallet/pages/transfers/cross_chain.dart';
@@ -44,11 +45,6 @@ class _EarnPageState extends State<EarnPage> {
               // NewWalletDashboard(),
               // PluginWidgets.indexTitle(
               //     "You can earn more AXC by staking your existing tokens."),
-              // PluginWidgets.earntiles(
-              //     "Validate",
-              //     "You have an Axia node that you want to stake with.",
-              //     Icons.people,
-              //     () => null),
               SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Same Chain Transfer",
@@ -61,6 +57,12 @@ class _EarnPageState extends State<EarnPage> {
                   "Exchange coins from one chain to another within your own wallet",
                   Icons.swap_horiz,
                   () => pushNewScreen(context, screen: CrossChainPage())),
+              SizedBox(height: 8),
+              PluginWidgets.earntiles(
+                  "Validate",
+                  "You have an Axia node that you want to stake with.",
+                  Icons.people,
+                  () => pushNewScreen(context, screen: AddValidatorPage())),
               SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Nominate",
