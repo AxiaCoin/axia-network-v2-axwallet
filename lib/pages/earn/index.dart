@@ -60,7 +60,7 @@ class _EarnPageState extends State<EarnPage> {
               SizedBox(height: 8),
               PluginWidgets.earntiles(
                   "Validate",
-                  "You have an Axia node that you want to stake with.",
+                  "You have an AXIA node that you want to stake with.",
                   Icons.people,
                   () => pushNewScreen(context, screen: AddValidatorPage())),
               SizedBox(height: 8),

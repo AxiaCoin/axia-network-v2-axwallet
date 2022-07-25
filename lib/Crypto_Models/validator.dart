@@ -9,6 +9,7 @@ class ValidatorItem {
   String endTime;
   String stakeAmount;
   String nominationFee;
+  String remainingStake;
   List<Nominator> nominators;
   ValidatorItem({
     required this.txID,
@@ -17,6 +18,7 @@ class ValidatorItem {
     required this.endTime,
     required this.stakeAmount,
     required this.nominationFee,
+    required this.remainingStake,
     required this.nominators,
   });
 
@@ -27,6 +29,7 @@ class ValidatorItem {
     String? endTime,
     String? stakeAmount,
     String? nominationFee,
+    String? remainingStake,
     List<Nominator>? nominators,
   }) {
     return ValidatorItem(
@@ -36,6 +39,7 @@ class ValidatorItem {
       endTime: endTime ?? this.endTime,
       stakeAmount: stakeAmount ?? this.stakeAmount,
       nominationFee: nominationFee ?? this.nominationFee,
+      remainingStake: remainingStake ?? this.remainingStake,
       nominators: nominators ?? this.nominators,
     );
   }
@@ -48,6 +52,7 @@ class ValidatorItem {
       'endTime': endTime,
       'stakeAmount': stakeAmount,
       'nominationFee': nominationFee,
+      'remainingStake': remainingStake,
       'nominators': nominators.map((x) => x.toMap()).toList(),
     };
   }
@@ -60,6 +65,7 @@ class ValidatorItem {
       endTime: map['endTime'] ?? '',
       stakeAmount: map['stakeAmount'] ?? '',
       nominationFee: map['nominationFee'] ?? '',
+      remainingStake: map['remainingStake'] ?? '',
       nominators: map['nominators'] != null
           ? List<Nominator>.from(
               map['nominators']?.map((x) => Nominator.fromMap(x)))
@@ -74,7 +80,7 @@ class ValidatorItem {
 
   @override
   String toString() {
-    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, nominationFee: $nominationFee, nominators: $nominators)';
+    return 'ValidatorItem(txID: $txID, nodeID: $nodeID, startTime: $startTime, endTime: $endTime, stakeAmount: $stakeAmount, nominationFee: $nominationFee, remainingStake: $remainingStake, nominators: $nominators)';
   }
 
   @override
@@ -88,6 +94,7 @@ class ValidatorItem {
         other.endTime == endTime &&
         other.stakeAmount == stakeAmount &&
         other.nominationFee == nominationFee &&
+        other.remainingStake == remainingStake &&
         listEquals(other.nominators, nominators);
   }
 
@@ -99,6 +106,7 @@ class ValidatorItem {
         endTime.hashCode ^
         stakeAmount.hashCode ^
         nominationFee.hashCode ^
+        remainingStake.hashCode ^
         nominators.hashCode;
   }
 }

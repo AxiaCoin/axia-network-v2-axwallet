@@ -100,7 +100,7 @@ class _AddValidatorPageState extends State<AddValidatorPage> {
             nodeID: nodeIdController.text.trim(),
             amount: amountController.text.trim(),
             end: selectedDate.millisecondsSinceEpoch,
-            fee: int.parse(feeController.text),
+            fee: double.parse(feeController.text),
             rewardAddress:
                 addressController.text.isEmpty ? null : addressController.text,
           );
@@ -113,7 +113,7 @@ class _AddValidatorPageState extends State<AddValidatorPage> {
             Get.back();
             services.getAXCWalletDetails();
             CommonWidgets.snackBar(
-                "The node was successfully Nominated, check rewards page!",
+                "The node was successfully added as a validator!",
                 duration: 7);
           } else {
             Get.back();

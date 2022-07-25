@@ -60,7 +60,6 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
 
   bool checkValidity() {
     bool isValid = true;
-    if (selected.length != 3) return false;
     selected.forEach((key, value) {
       if (widget.words[key] != value) isValid = false;
     });
@@ -243,7 +242,10 @@ class _VerifyRecoveryPageState extends State<VerifyRecoveryPage> {
                   padding: EdgeInsets.only(top: 8),
                   child: TextButton(
                     onPressed: () {
-                      if (checkValidity()) {
+                      if (selected.length != 3) {
+                        CommonWidgets.snackBar(
+                            "You need to select all the words");
+                      } else if (checkValidity()) {
                         // Get.offAll(() => PinBiometricPage());
                         // print("valid");
                         onsubmit();

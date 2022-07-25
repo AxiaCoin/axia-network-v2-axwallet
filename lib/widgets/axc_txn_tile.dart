@@ -37,11 +37,13 @@ class AXCTxnTile extends StatelessWidget {
       );
     }
 
-    Widget addNominator() {
-      int start =
-          DateTime.parse(transaction.stakeStart!).millisecondsSinceEpoch;
-      DateTime endDate = DateTime.parse(transaction.stakeEnd!);
+    Widget addNominatorValidator() {
+      DateTime startDate = DateTime.parse(transaction.stakeStart!).toLocal();
+      DateTime endDate = DateTime.parse(transaction.stakeEnd!).toLocal();
+      int start = startDate.millisecondsSinceEpoch;
       int end = endDate.millisecondsSinceEpoch;
+      bool isStarted = startDate.compareTo(DateTime.now()).isNegative;
+      bool isNominator = transaction.type == "add_nominator";
       return Column(
         children: [
           ListTile(
@@ -58,10 +60,10 @@ class AXCTxnTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "End Date",
+                  isStarted ? "End Date" : "Start Date",
                   style: TextStyle(color: Colors.grey),
                 ),
-                Text(FormatText.readableDate(endDate))
+                Text(FormatText.readableDate(isStarted ? endDate : startDate))
               ],
             ),
           ),
@@ -71,7 +73,7 @@ class AXCTxnTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Add Nominator",
+                  isNominator ? "Add Nominator" : "Add Validator",
                   style: TextStyle(color: Colors.grey),
                 ),
                 Text(
@@ -135,10 +137,14 @@ class AXCTxnTile extends StatelessWidget {
         case "transaction":
         case "transaction_evm":
           return baseTxn();
+        case "add_validator":
         case "add_nominator":
-          return addNominator();
+          return addNominatorValidator();
+        //   return addValidator();
         default:
-          return Container();
+          return Container(
+            child: Text(transaction.type!),
+          );
       }
     }
 

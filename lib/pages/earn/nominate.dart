@@ -30,8 +30,8 @@ class _NominatePageState extends State<NominatePage> {
   getValidators() async {
     setState(() => isLoading = true);
     _refreshKey.currentState?.show();
-    var response = (await services.axSDK.api!.nomination
-        .getValidators())["validators"] as List;
+    var response =
+        (await services.axSDK.api!.nomination.getValidators()) as List;
     validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
     validators
         .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));

@@ -231,7 +231,11 @@ class _ValidatePageState extends State<ValidatePage> {
                           double.parse(val) <= getPBalance()!)
                   ? double.parse(val) < minStakeAmount
                       ? "Minimum stake amount is $minStakeAmount ${currency.coinData.unit}"
-                      : null
+                      : double.parse(val) >
+                              double.parse(
+                                  validator.remainingStake.replaceAll(",", ""))
+                          ? "Stake amount cannot be higher than the available stake"
+                          : null
                   : "Amount should be lower than the balance and not zero",
               autovalidateMode: AutovalidateMode.onUserInteraction,
               onTap: () {
@@ -244,7 +248,8 @@ class _ValidatePageState extends State<ValidatePage> {
             ),
             AmountSuffix(
               controller: amountController,
-              maxAmount: getPBalance(),
+              maxAmount: min(getPBalance() ?? 0,
+                  double.parse(validator.remainingStake.replaceAll(",", ""))),
             ),
             // Row(
             //   mainAxisSize: MainAxisSize.min,
@@ -392,10 +397,18 @@ class _ValidatePageState extends State<ValidatePage> {
                             ],
                           )
                         : Text(
-                            "Balance: ${getPBalance()} ${currency.coinData.unit}",
+                            "Balance: ${FormatText.commaNumber(getPBalance().toString())} ${currency.coinData.unit}",
                             style: context.textTheme.caption,
                             textAlign: TextAlign.start,
                           ),
+                  )),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    "Available Stake: ${validator.remainingStake} ${currency.coinData.unit}",
+                    style: context.textTheme.caption,
+                    textAlign: TextAlign.start,
                   )),
               SizedBox(height: 8),
               Text("Reward Address",

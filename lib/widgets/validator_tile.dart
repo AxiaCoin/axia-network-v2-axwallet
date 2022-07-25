@@ -17,7 +17,8 @@ class ValidatorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget infoItem(String title, String value) => Text.rich(
+    Widget infoItem(String title, String value, {String? moreValue}) =>
+        Text.rich(
           TextSpan(
             style: TextStyle(color: appColor, fontWeight: FontWeight.bold),
             text: "$title: ",
@@ -27,6 +28,13 @@ class ValidatorTile extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.black,
+                    fontWeight: FontWeight.normal),
+              ),
+              TextSpan(
+                text: moreValue ?? "",
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
                     fontWeight: FontWeight.normal),
               ),
             ],
@@ -78,8 +86,8 @@ class ValidatorTile extends StatelessWidget {
                 )),
                 Row(
                   children: [
-                    infoItem(
-                        "Stake", FormatText.stakeAmount(validator.stakeAmount)),
+                    infoItem("Stake", validator.remainingStake,
+                        moreValue: "/${validator.stakeAmount}"),
                     Spacer(),
                     iconItem(
                         Icons.groups, validator.nominators.length.toString()),

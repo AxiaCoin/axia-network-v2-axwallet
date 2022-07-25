@@ -2,7 +2,7 @@ name: wallet
 description: AXIA's native blockchain wallet with Multicurrency .
 
 publish_to: 'none'
-version: 2.0.3+30
+version: 2.0.4+30
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

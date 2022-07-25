@@ -22,6 +22,7 @@ import 'package:wallet/pages/new_user/login.dart';
 import 'package:wallet/widgets/common.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:axwallet_sdk/axwallet_sdk.dart';
+import 'package:path_provider/path_provider.dart';
 
 class IsolateParams {
   String mnemonic;
@@ -54,7 +55,8 @@ class Services {
 
   AXwalletSDK axSDK = AXwalletSDK();
 
-  initAXSDK({String? mnemonic, String? jsCode}) async {
+  initAXSDK({String? mnemonic}) async {
+    String? jsCode = await getJSCode();
     if (mnemonic != null) axcWalletStatus = AXCWalletStatus.loading;
     if (axSDK.api == null) {
       await axSDK.init(jsCode: jsCode);
@@ -180,8 +182,7 @@ class Services {
   }
 
   updateValidators() async {
-    var response =
-        (await axSDK.api!.nomination.getValidators())["validators"] as List;
+    var response = (await axSDK.api!.nomination.getValidators()) as List;
     List<ValidatorItem> validators =
         response.map((e) => ValidatorItem.fromMap(e)).toList();
     validators
@@ -305,11 +306,40 @@ class Services {
     return networkConfigs;
   }
 
-  Future<Map?> fetchJSCode() async {
+  Future<Map?> fetchJSCodeInfo() async {
     var data = (await APIServices().generalRequest(jsCodeURL));
     if (data == null) return null;
     var jsCode = data["data"] as Map;
     return jsCode;
+  }
+
+  getJSCode() async {
+    Map? jsCode = await fetchJSCodeInfo();
+    if (jsCode == null) return null;
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/js_code.json');
+    String? localVersion;
+    String? localJSCode;
+    try {
+      var data = jsonDecode(await file.readAsString());
+      localVersion = data["version"];
+      localJSCode = data["jsCode"];
+    } catch (e) {
+      print("failed to get local js code");
+    }
+    double currentLocal =
+        double.parse(localVersion?.replaceAll(".", "") ?? "0");
+    double currentPackage = double.parse(jsVersion.replaceAll(".", ""));
+    double newCloud = double.parse(jsCode["version"].replaceAll(".", ""));
+    if (newCloud > currentLocal && newCloud > currentPackage) {
+      var jsFile =
+          await APIServices().generalRequest(jsCode["url"], getBody: true);
+      if (jsFile == null) return;
+      var data = {"version": jsCode["version"], "jsCode": jsFile};
+      await file.writeAsString(jsonEncode(data));
+      return jsFile;
+    }
+    return currentLocal > currentPackage ? localJSCode : null;
   }
 }
 

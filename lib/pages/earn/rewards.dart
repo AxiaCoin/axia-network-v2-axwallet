@@ -30,8 +30,8 @@ class _RewardsPageState extends State<RewardsPage> {
 
   getValidators() async {
     setState(() => isLoading = true);
-    var response = (await services.axSDK.api!.nomination
-        .getValidators())["validators"] as List;
+    var response =
+        (await services.axSDK.api!.nomination.getValidators()) as List;
     validators = response.map((e) => ValidatorItem.fromMap(e)).toList();
     validators
         .sort((a, b) => b.nominators.length.compareTo(a.nominators.length));
